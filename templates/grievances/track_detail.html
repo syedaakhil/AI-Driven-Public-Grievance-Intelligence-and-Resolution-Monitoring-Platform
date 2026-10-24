@@ -1,25 +1,25 @@
-{% load ui %}<!DOCTYPE html>
-<html lang="en">
+{% load ui i18n %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ complaint.reference }} · City Corporation</title>
-  <meta name="description" content="Progress of your complaint with the City Corporation.">
+  <title>{{ complaint.reference }} · {% translate "City Corporation" %}</title>
+  <meta name="description" content="{% translate 'Progress of your complaint with the City Corporation.' %}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="{% static_v 'css/citizen.css' %}">
 </head>
 <body>
-  <a class="skip-link" href="#main">Skip to main content</a>
+  <a class="skip-link" href="#main">{% translate "Skip to main content" %}</a>
 
   {% include "grievances/_citizen_header.html" %}
 
   <main class="page" id="main" tabindex="-1">
-    <nav class="breadcrumb" aria-label="Breadcrumb">
+    <nav class="breadcrumb" aria-label="{% translate 'Breadcrumb' %}">
       <ol>
-        <li><a href="{% url 'grievances:complaint_registration' %}">Citizen portal</a></li>
-        <li><a href="{% url 'grievances:track_list' %}">My complaints</a></li>
+        <li><a href="{% url 'grievances:complaint_registration' %}">{% translate "Citizen portal" %}</a></li>
+        <li><a href="{% url 'grievances:track_list' %}">{% translate "My complaints" %}</a></li>
         <li aria-current="page">{{ complaint.reference }}</li>
       </ol>
     </nav>
@@ -34,57 +34,57 @@
 
     <div class="track">
       <section class="card track__card" aria-labelledby="progress-title">
-        <h2 class="track__title" id="progress-title">Progress</h2>
+        <h2 class="track__title" id="progress-title">{% translate "Progress" %}</h2>
         <ol class="timeline">
           {% for step in timeline %}
             <li class="timeline__step timeline__step--{{ step.state }}">
               <span class="timeline__dot" aria-hidden="true"></span>
-              <span><strong>{{ step.label }}</strong><small>{% if step.when %}{{ step.when|date:"d M Y, h:i A" }}{% elif step.state == 'pending' %}Pending{% else %}—{% endif %}</small></span>
+              <span><strong>{{ step.label }}</strong><small>{% if step.when %}{{ step.when|date:"d M Y, h:i A" }}{% elif step.state == 'pending' %}{% translate "Pending" %}{% else %}—{% endif %}</small></span>
             </li>
           {% endfor %}
         </ol>
       </section>
 
       <section class="card track__card" aria-labelledby="details-title">
-        <h2 class="track__title" id="details-title">Complaint details</h2>
+        <h2 class="track__title" id="details-title">{% translate "Complaint details" %}</h2>
         <dl class="summary">
-          <dt>Filed on</dt><dd>{{ complaint.created_at|date:"d M Y, h:i A" }}</dd>
-          <dt>Service</dt><dd>{% if complaint.category %}{{ complaint.category.name }} · {{ complaint.category.department }}{% else %}Being reviewed by the corporation{% endif %}</dd>
-          <dt>Ward</dt><dd>{{ complaint.ward|default:"Being reviewed by the corporation" }}</dd>
-          {% if complaint.taluk %}<dt>Taluk</dt><dd>{{ complaint.taluk }}</dd>{% endif %}
-          {% if complaint.location %}<dt>Affected area</dt><dd>{{ complaint.location }}</dd>{% endif %}
-          {% if complaint.category %}<dt>Target time</dt><dd>{{ complaint.category.target_time }}</dd>{% endif %}
-          {% if complaint.resolved_at %}<dt>Resolved on</dt><dd>{{ complaint.resolved_at|date:"d M Y, h:i A" }}</dd>{% endif %}
-          {% if complaint.attachment %}<dt>Problem photo</dt><dd><a href="{% url 'grievances:complaint_file' complaint.reference 'photo' %}" target="_blank" rel="noopener">View photo</a></dd>{% endif %}
-          {% if complaint.previously_reported and complaint.previous_copy %}<dt>Earlier complaint copy</dt><dd><a href="{% url 'grievances:complaint_file' complaint.reference 'previous-copy' %}" target="_blank" rel="noopener">View copy</a></dd>{% endif %}
+          <dt>{% translate "Filed on" %}</dt><dd>{{ complaint.created_at|date:"d M Y, h:i A" }}</dd>
+          <dt>{% translate "Service" %}</dt><dd>{% if complaint.category %}{{ complaint.category.name|tr }} · {{ complaint.category.department|tr }}{% else %}{% translate "Being reviewed by the corporation" %}{% endif %}</dd>
+          <dt>{% translate "Ward" %}</dt><dd>{% if complaint.ward %}{{ complaint.ward }}{% else %}{% translate "Being reviewed by the corporation" %}{% endif %}</dd>
+          {% if complaint.taluk %}<dt>{% translate "Taluk" %}</dt><dd>{{ complaint.taluk }}</dd>{% endif %}
+          {% if complaint.location %}<dt>{% translate "Affected area" %}</dt><dd>{{ complaint.location }}</dd>{% endif %}
+          {% if complaint.category %}<dt>{% translate "Target time" %}</dt><dd>{{ complaint.category.target_time|tr }}</dd>{% endif %}
+          {% if complaint.resolved_at %}<dt>{% translate "Resolved on" %}</dt><dd>{{ complaint.resolved_at|date:"d M Y, h:i A" }}</dd>{% endif %}
+          {% if complaint.attachment %}<dt>{% translate "Problem photo" %}</dt><dd><a href="{% url 'grievances:complaint_file' complaint.reference 'photo' %}" target="_blank" rel="noopener">{% translate "View photo" %}</a></dd>{% endif %}
+          {% if complaint.previously_reported and complaint.previous_copy %}<dt>{% translate "Earlier complaint copy" %}</dt><dd><a href="{% url 'grievances:complaint_file' complaint.reference 'previous-copy' %}" target="_blank" rel="noopener">{% translate "View copy" %}</a></dd>{% endif %}
         </dl>
-        <h3 class="track__subtitle">Your description</h3>
+        <h3 class="track__subtitle">{% translate "Your description" %}</h3>
         <p class="track__text">{{ complaint.description|linebreaksbr }}</p>
       </section>
 
       <section class="card track__card track__card--wide" aria-labelledby="updates-title">
-        <h2 class="track__title" id="updates-title">Updates from the corporation</h2>
+        <h2 class="track__title" id="updates-title">{% translate "Updates from the corporation" %}</h2>
         <ul class="updates">
           {% for update in updates %}
             <li class="updates__item">
               <span class="badge badge--{{ update.status }}">{{ update.get_status_display }}</span>
               <div>
-                {% if update.is_public and update.note %}<p>{{ update.note }}</p>{% else %}<p class="updates__plain">Status updated to {{ update.get_status_display|lower }}.</p>{% endif %}
+                {% if update.is_public and update.note %}<p>{{ update.note }}</p>{% else %}<p class="updates__plain">{% blocktranslate with status=update.get_status_display|lower %}Status updated to {{ status }}.{% endblocktranslate %}</p>{% endif %}
                 <small>{{ update.created_at|date:"d M Y, h:i A" }}</small>
               </div>
             </li>
           {% empty %}
-            <li class="updates__plain">No updates yet.</li>
+            <li class="updates__plain">{% translate "No updates yet." %}</li>
           {% endfor %}
         </ul>
       </section>
     </div>
 
-    <p class="track__back"><a href="{% url 'grievances:track_list' %}">{% icon 'arrow-left' 'sm' %}Back to my complaints</a></p>
+    <p class="track__back"><a href="{% url 'grievances:track_list' %}">{% icon 'arrow-left' 'sm' %}{% translate "Back to my complaints" %}</a></p>
   </main>
 
   <footer class="site-footer">
-    <p>© City Corporation · College project — not an official government portal.</p>
+    <p>© {% translate "City Corporation · College project — not an official government portal." %}</p>
   </footer>
 </body>
 </html>

@@ -12,6 +12,7 @@ import time
 
 from django.conf import settings
 from django.core.cache import cache
+from django.utils.translation import gettext as _, ngettext
 
 from . import sms
 
@@ -56,17 +57,17 @@ def send(request, phone):
     if current and current['phone'] == phone:
         wait = int(RESEND_WAIT_SECONDS - (now - current['sent_at']))
         if wait > 0:
-            raise OTPError(f'Please wait {wait} seconds before asking for another OTP.')
+            raise OTPError(_('Please wait %(seconds)s seconds before asking for another OTP.') % {'seconds': wait})
 
     counter = f'otp-sends:{phone}'
     if cache.get(counter, 0) >= MAX_SENDS_PER_HOUR:
-        raise OTPError('Too many OTP requests for this number. Please try again in an hour.')
+        raise OTPError(_('Too many OTP requests for this number. Please try again in an hour.'))
 
     code = f'{secrets.randbelow(10 ** LENGTH):0{LENGTH}d}'
     try:
         sms.send_otp(phone, code, LIFETIME_SECONDS // 60)
     except sms.SMSError as exc:
-        raise OTPError('We could not send the SMS right now. Please try again later.') from exc
+        raise OTPError(_('We could not send the SMS right now. Please try again later.')) from exc
 
     if not cache.add(counter, 1, 60 * 60):
         cache.incr(counter)
@@ -86,23 +87,24 @@ def verify(request, code):
     """Return the verified phone number, or raise OTPError."""
     data = request.session.get(SESSION_KEY)
     if not data:
-        raise OTPError('Please request an OTP first.')
+        raise OTPError(_('Please request an OTP first.'))
     if data['expires'] <= time.time():
         clear(request)
-        raise OTPError('This OTP has expired. Please request a new one.')
+        raise OTPError(_('This OTP has expired. Please request a new one.'))
 
     code = (code or '').strip()
     if not re.fullmatch(rf'\d{{{LENGTH}}}', code):
-        raise OTPError(f'Enter the {LENGTH}-digit OTP.')
+        raise OTPError(_('Enter the %(length)s-digit OTP.') % {'length': LENGTH})
 
     if not hmac.compare_digest(data['digest'], _digest(data['phone'], code)):
         data['tries'] += 1
         if data['tries'] >= MAX_TRIES:
             clear(request)
-            raise OTPError('Too many incorrect attempts. Please request a new OTP.')
+            raise OTPError(_('Too many incorrect attempts. Please request a new OTP.'))
         request.session[SESSION_KEY] = data
         left = MAX_TRIES - data['tries']
-        raise OTPError(f'Incorrect OTP. {left} attempt{"" if left == 1 else "s"} left.')
+        raise OTPError(ngettext('Incorrect OTP. %(left)s attempt left.', 'Incorrect OTP. %(left)s attempts left.',
+                                 left) % {'left': left})
 
     clear(request)
     return data['phone']

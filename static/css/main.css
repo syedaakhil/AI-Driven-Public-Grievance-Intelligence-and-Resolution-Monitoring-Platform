@@ -30,7 +30,7 @@
   --shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 1px 3px rgba(16, 24, 40, .03);
   --shadow-pop: 0 16px 44px rgba(20, 35, 60, .18);
   --sidebar: 248px;
-  --font: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --font: 'Plus Jakarta Sans', 'Noto Sans Devanagari', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
 }
 
 html[data-text="large"] { font-size: 112.5%; }
@@ -227,6 +227,7 @@ code { font-size: .85em; padding: 1px 4px; border-radius: 4px; background: var(-
   background: #fff; border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-pop);
 }
 .menu__panel--wide { width: 330px; }
+.menu__panel--narrow { min-width: 160px; }
 .menu__head { padding: 8px 10px 6px; font-size: .7rem; color: var(--muted); }
 .menu__head strong { display: block; font-size: .8rem; color: var(--navy); }
 .menu__item {
@@ -744,3 +745,22 @@ code { font-size: .85em; padding: 1px 4px; border-radius: 4px; background: var(-
   .sidebar, .topbar, .footer, .backdrop { display: none !important; }
   .shell { margin: 0; }
 }
+
+/* Language switch (partials/language_switch.html) ------------------------- */
+.langswitch { margin: 0; }
+.langswitch--compact {
+  display: inline-flex; flex: none; padding: 2px; gap: 2px;
+  border: 1px solid var(--line); border-radius: 999px; background: #fff;
+}
+.langswitch__option {
+  padding: 4px 10px; border: 0; border-radius: 999px; background: transparent;
+  font: inherit; font-size: .75rem; font-weight: 600; line-height: 1.4; color: var(--navy); cursor: pointer; white-space: nowrap;
+}
+.langswitch__option:hover { background: #F4F7FC; }
+.langswitch__option[aria-pressed="true"] { background: var(--blue); color: #fff; }
+.langswitch__option:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.login__lang { display: flex; justify-content: flex-end; margin: -12px -10px 8px 0; }
+
+/* Hindi: letter-spacing pulls Devanagari letters apart, so drop it (the OTP box keeps its spacing). */
+html[lang="hi"] body *:not(input) { letter-spacing: normal; }
+html[lang="hi"] .brand__tag { font-size: .62rem; }

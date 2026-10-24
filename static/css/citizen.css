@@ -27,7 +27,7 @@
   --radius: 12px;
   --radius-sm: 8px;
   --shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 2px 8px rgba(16, 24, 40, .04);
-  --font: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --font: 'Plus Jakarta Sans', 'Noto Sans Devanagari', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
 }
 
 /* 2. Base ------------------------------------------------------------------ */
@@ -389,6 +389,17 @@ a.mine__ref { display: inline-block; }
   }
 }
 
+@media (max-width: 420px) {
+  /* Room for the language switch: smaller logo, and the name may wrap onto two lines */
+  .site-header__inner { gap: 10px; padding: 10px 12px; }
+  .brand { gap: 8px; }
+  .brand__logo { width: 32px; height: 32px; }
+  .brand__name { font-size: 1rem; white-space: normal; line-height: 1.2; }
+  .site-header__user { gap: 6px; }
+  .site-header__user .btn { min-width: 36px; padding: 7px 8px; }
+  .langswitch__option { padding: 4px 8px; }
+}
+
 @media (max-width: 480px) {
   .choice { flex: 1; min-width: 0; }
   .upload__preview { flex-wrap: wrap; }
@@ -398,3 +409,20 @@ a.mine__ref { display: inline-block; }
   .dialog .actions { flex-direction: column-reverse; }
   .dialog .btn { width: 100%; }
 }
+
+/* Language switch (partials/language_switch.html) ------------------------- */
+.langswitch { margin: 0; }
+.langswitch--compact {
+  display: inline-flex; flex: none; padding: 2px; gap: 2px;
+  border: 1px solid var(--line); border-radius: 999px; background: #fff;
+}
+.langswitch__option {
+  padding: 4px 10px; border: 0; border-radius: 999px; background: transparent;
+  font: inherit; font-size: .75rem; font-weight: 600; line-height: 1.4; color: var(--navy); cursor: pointer; white-space: nowrap;
+}
+.langswitch__option:hover { background: #F4F7FC; }
+.langswitch__option[aria-pressed="true"] { background: var(--blue); color: #fff; }
+.langswitch__option:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+/* Hindi: letter-spacing pulls Devanagari letters apart, so drop it (the OTP box keeps its spacing). */
+html[lang="hi"] body *:not(input) { letter-spacing: normal; }

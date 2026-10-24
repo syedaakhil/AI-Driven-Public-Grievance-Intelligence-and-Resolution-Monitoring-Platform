@@ -1,33 +1,33 @@
-{% load ui %}
-<aside class="sidebar" id="sidebar" aria-label="Sidebar">
+{% load ui i18n %}
+<aside class="sidebar" id="sidebar" aria-label="{% translate 'Sidebar' %}">
   <div class="sidebar__inner">
     <div class="sidebar__top">
-      <a class="brand" href="{% url 'grievances:home' %}" aria-label="City Corporation home">
+      <a class="brand" href="{% url 'grievances:home' %}" aria-label="{% translate 'City Corporation home' %}">
         <span class="brand__mark">{% icon 'building' 'lg' %}</span>
         <span class="brand__text">
-          <span class="brand__name">City <span>Corporation</span></span>
-          <span class="brand__tag">Your city, our responsibility.</span>
+          <span class="brand__name">{% translate "City" context "brand, first word" %} <span>{% translate "Corporation" context "brand, second word" %}</span></span>
+          <span class="brand__tag">{% translate "Your city, our responsibility." %}</span>
         </span>
       </a>
-      <button type="button" class="icon-btn sidebar__close" data-nav-close aria-label="Close menu">{% icon 'x' %}</button>
+      <button type="button" class="icon-btn sidebar__close" data-nav-close aria-label="{% translate 'Close menu' %}">{% icon 'x' %}</button>
     </div>
 
     <a class="portal" href="{% url 'grievances:home' %}">
       <span class="portal__badge" aria-hidden="true">IN</span>
       <span class="portal__text">
-        <strong data-i18n="portal">Citizen portal</strong>
-        <small>Municipal corporation services</small>
+        <strong>{% translate "Citizen portal" %}</strong>
+        <small>{% translate "Municipal corporation services" %}</small>
       </span>
       {% icon 'chevron-right' 'sm' %}
     </a>
 
-    <p class="nav-label" id="nav-label" data-i18n="mainMenu">Main menu</p>
+    <p class="nav-label" id="nav-label">{% translate "Main menu" %}</p>
     <nav aria-labelledby="nav-label">
       <ul class="nav">
         {% for item in menu %}
           <li>
             <a class="nav__link{% if item.active %} is-active{% endif %}" href="{{ item.url }}"{% if item.active %} aria-current="page"{% endif %}>
-              {% icon item.icon %}<span data-i18n="{{ item.key }}">{{ item.label }}</span>
+              {% icon item.icon %}<span>{{ item.label }}</span>
               {% if item.badge and not item.active %}<span class="nav__badge">{{ item.badge }}</span>{% endif %}
             </a>
           </li>
@@ -39,17 +39,17 @@
 
     <a class="helpcard{% if menu_active == 'help_desk' %} is-active{% endif %}" href="{% url 'grievances:help_desk' %}"{% if menu_active == 'help_desk' %} aria-current="page"{% endif %}>
       {% icon 'phone' %}
-      <strong class="helpcard__title">Your neighbourhood matters.</strong>
-      <span class="helpcard__text">Water, roads or drainage? Connect with your corporation.</span>
-      <span class="helpcard__link"><span data-i18n="helpDesk">Citizen help desk</span>{% icon 'arrow-right' 'sm' %}</span>
-      <small class="helpcard__small">For everyday civic services &amp; assistance.</small>
+      <strong class="helpcard__title">{% translate "Your neighbourhood matters." %}</strong>
+      <span class="helpcard__text">{% translate "Water, roads or drainage? Connect with your corporation." %}</span>
+      <span class="helpcard__link"><span>{% translate "Citizen help desk" %}</span>{% icon 'arrow-right' 'sm' %}</span>
+      <small class="helpcard__small">{% translate "For everyday civic services &amp; assistance." %}</small>
     </a>
 
     <a class="nav__link nav__link--support{% if menu_active == 'help_support' %} is-active{% endif %}" href="{% url 'grievances:help_support' %}"{% if menu_active == 'help_support' %} aria-current="page"{% endif %}>
-      {% icon 'help' %}<span data-i18n="support">Help &amp; support</span>{% icon 'chevron-right' 'sm' %}
+      {% icon 'help' %}<span>{% translate "Help &amp; support" %}</span>{% icon 'chevron-right' 'sm' %}
     </a>
 
-    <p class="sidebar__foot"><span class="flag" aria-hidden="true"></span>Better cities. Better everyday lives.</p>
+    <p class="sidebar__foot"><span class="flag" aria-hidden="true"></span>{% translate "Better cities. Better everyday lives." %}</p>
   </div>
 </aside>
 <div class="backdrop" data-nav-close hidden></div>

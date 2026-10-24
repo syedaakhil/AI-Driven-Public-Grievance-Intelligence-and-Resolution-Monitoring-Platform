@@ -1,55 +1,53 @@
-{% load ui %}
+{% load ui i18n %}{% get_current_language as current_language %}{% get_language_info for current_language as current_info %}
 <header class="topbar">
-  <button type="button" class="icon-btn topbar__menu" data-nav-open aria-controls="sidebar" aria-expanded="false" aria-label="Open menu">{% icon 'menu' %}</button>
+  <button type="button" class="icon-btn topbar__menu" data-nav-open aria-controls="sidebar" aria-expanded="false" aria-label="{% translate 'Open menu' %}">{% icon 'menu' %}</button>
 
-  <nav class="crumbs" aria-label="Breadcrumb">
+  <nav class="crumbs" aria-label="{% translate 'Breadcrumb' %}">
     <ol>
-      <li><a href="{% url 'grievances:home' %}" data-i18n="portal">Citizen portal</a></li>
+      <li><a href="{% url 'grievances:home' %}">{% translate "Citizen portal" %}</a></li>
       <li aria-current="page">{{ crumb }}</li>
     </ol>
   </nav>
 
   <div class="topbar__tools">
-    <span class="live"><span class="live__dot" aria-hidden="true"></span>Municipal corporation dashboard</span>
+    <span class="live"><span class="live__dot" aria-hidden="true"></span>{% translate "Municipal corporation dashboard" %}</span>
 
     <details class="menu">
-      <summary class="menu__button lang" aria-label="Choose language">
-        {% icon 'globe' 'sm' %}<span class="lang__name" data-lang-name>English</span>{% icon 'chevron-down' 'sm' %}
+      <summary class="menu__button lang" aria-label="{% translate 'Choose language' %}">
+        {% icon 'globe' 'sm' %}<span class="lang__name">{{ current_info.name_local }}</span>{% icon 'chevron-down' 'sm' %}
       </summary>
-      <div class="menu__panel" role="menu">
-        <button type="button" class="menu__item" role="menuitemradio" aria-checked="true" data-lang="en">English</button>
-        <button type="button" class="menu__item" role="menuitemradio" aria-checked="false" data-lang="ta">தமிழ்</button>
-        <button type="button" class="menu__item" role="menuitemradio" aria-checked="false" data-lang="hi">हिन्दी</button>
+      <div class="menu__panel menu__panel--narrow" role="menu">
+        {% include "partials/language_switch.html" %}
       </div>
     </details>
 
     <details class="menu">
-      <summary class="menu__button icon-btn" aria-label="Notifications">
+      <summary class="menu__button icon-btn" aria-label="{% translate 'Notifications' %}">
         {% icon 'bell' %}{% if notifications %}<span class="dot-badge" aria-hidden="true"></span>{% endif %}
       </summary>
       <div class="menu__panel menu__panel--wide">
-        <p class="menu__head"><strong>Notifications</strong>Latest complaints and notices</p>
+        <p class="menu__head"><strong>{% translate "Notifications" %}</strong>{% translate "Latest complaints and notices" %}</p>
         {% for item in notifications %}
           <a class="notif" href="{{ item.url }}">
             <span class="tile tile--sm">{% icon item.icon 'sm' %}</span>
             <span class="notif__text"><strong>{{ item.title }}</strong><small>{{ item.meta }}</small></span>
           </a>
         {% empty %}
-          <p class="menu__empty">No notifications yet.</p>
+          <p class="menu__empty">{% translate "No notifications yet." %}</p>
         {% endfor %}
       </div>
     </details>
 
     <details class="menu">
-      <summary class="menu__button avatar" aria-label="Profile menu">{{ user.first_name|first|default:"A" }}{{ user.last_name|first }}</summary>
+      <summary class="menu__button avatar" aria-label="{% translate 'Profile menu' %}">{{ user.first_name|first|default:"A" }}{{ user.last_name|first }}</summary>
       <div class="menu__panel" role="menu">
-        <p class="menu__head"><strong>{{ user.get_full_name|default:user.username }}</strong>Signed in as {{ user.username }}</p>
-        <a class="menu__item" role="menuitem" href="{% url 'grievances:complaint_list' %}">{% icon 'list' 'sm' %}All complaints</a>
-        <a class="menu__item" role="menuitem" href="{% url 'grievances:complaint_create' %}">{% icon 'file' 'sm' %}File a complaint</a>
-        <a class="menu__item" role="menuitem" href="{% url 'grievances:help_support' %}#accessibility">{% icon 'access' 'sm' %}Accessibility settings</a>
-        <a class="menu__item" role="menuitem" href="{% url 'admin:index' %}">{% icon 'settings' 'sm' %}Manage officers &amp; notices</a>
+        <p class="menu__head"><strong>{{ user.get_full_name|default:user.username }}</strong>{% blocktranslate with name=user.username %}Signed in as {{ name }}{% endblocktranslate %}</p>
+        <a class="menu__item" role="menuitem" href="{% url 'grievances:complaint_list' %}">{% icon 'list' 'sm' %}{% translate "All complaints" %}</a>
+        <a class="menu__item" role="menuitem" href="{% url 'grievances:complaint_create' %}">{% icon 'file' 'sm' %}{% translate "File a complaint" %}</a>
+        <a class="menu__item" role="menuitem" href="{% url 'grievances:help_support' %}#accessibility">{% icon 'access' 'sm' %}{% translate "Accessibility settings" %}</a>
+        <a class="menu__item" role="menuitem" href="{% url 'admin:index' %}">{% icon 'settings' 'sm' %}{% translate "Manage officers &amp; notices" %}</a>
         <hr class="menu__sep">
-        <button type="submit" form="logout-form" class="menu__item" role="menuitem">{% icon 'logout' 'sm' %}Sign out</button>
+        <button type="submit" form="logout-form" class="menu__item" role="menuitem">{% icon 'logout' 'sm' %}{% translate "Sign out" %}</button>
       </div>
     </details>
   </div>

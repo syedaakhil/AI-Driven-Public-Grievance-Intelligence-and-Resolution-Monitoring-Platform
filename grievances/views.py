@@ -13,6 +13,7 @@ from django.http import FileResponse, Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from accounts.decorators import CITIZEN_SESSION_KEY, citizen_required, staff_required
@@ -95,19 +96,19 @@ def _csv_safe(value):
 
 @staff_required
 def complaint_export(request):
-    _, complaints = _filtered_complaints(request)
+    _form, complaints = _filtered_complaints(request)
     response = HttpResponse(content_type='text/csv; charset=utf-8')
     response['Content-Disposition'] = 'attachment; filename="city-corporation-complaints.csv"'
     response.write('﻿')  # lets Excel detect UTF-8
     writer = csv.writer(response)
-    writer.writerow(['Reference', 'Title', 'Category', 'Department', 'Ward', 'Location', 'Channel',
-                     'Priority', 'Status', 'Officer', 'Filed on', 'Resolved on'])
+    writer.writerow([_('Reference'), _('Title'), _('Category'), _('Department'), _('Ward'), _('Location'),
+                     _('Channel'), _('Priority'), _('Status'), _('Officer'), _('Filed on'), _('Resolved on')])
     for complaint in complaints:
         writer.writerow([_csv_safe(value) for value in (
             complaint.reference, complaint.title,
-            complaint.category.name if complaint.category else 'Not assigned',
-            complaint.category.department if complaint.category else '',
-            complaint.ward or 'Not assigned', complaint.location, complaint.get_channel_display(),
+            _(complaint.category.name) if complaint.category else _('Not assigned'),
+            _(complaint.category.department) if complaint.category else '',
+            complaint.ward or _('Not assigned'), complaint.location, complaint.get_channel_display(),
             complaint.get_priority_display(), complaint.get_status_display(),
             complaint.officer.name if complaint.officer else '',
             timezone.localtime(complaint.created_at).strftime('%Y-%m-%d %H:%M'),
@@ -180,15 +181,15 @@ def complaint_detail(request, reference):
                 # Sent after saving: a failed SMS is logged and reported, never undoes the update.
                 if status_changed and notify.status_sms_recipient(complaint):
                     if notify.notify_status_change(complaint):
-                        messages.success(request, f'Complaint {complaint.reference} updated. '
-                                                  'The citizen was sent an SMS about the new status.')
+                        messages.success(request, _('Complaint %(reference)s updated. The citizen was sent an SMS about '
+                                                    'the new status.') % {'reference': complaint.reference})
                     else:
-                        messages.warning(request, f'Complaint {complaint.reference} updated, but the SMS '
-                                                  'to the citizen could not be sent. See the server log.')
+                        messages.warning(request, _('Complaint %(reference)s updated, but the SMS to the citizen could '
+                                                    'not be sent. See the server log.') % {'reference': complaint.reference})
                 else:
-                    messages.success(request, f'Complaint {complaint.reference} updated.')
+                    messages.success(request, _('Complaint %(reference)s updated.') % {'reference': complaint.reference})
             else:
-                messages.info(request, 'Nothing changed.')
+                messages.info(request, _('Nothing changed.'))
             return redirect(complaint)
     else:
         form = StatusUpdateForm(initial={
@@ -214,11 +215,11 @@ def complaint_delete(request, reference):
     """
     complaint = get_object_or_404(Complaint, reference=reference)
     if request.POST.get('confirm') != 'yes':
-        messages.error(request, 'Tick "I understand this cannot be undone" to delete the complaint.')
+        messages.error(request, _('Tick “I understand this cannot be undone” to delete the complaint.'))
         return redirect(complaint)
     complaint.delete()
     logger.warning('Complaint %s was deleted by %s.', reference, request.user.get_username())
-    messages.success(request, f'Complaint {reference} was deleted.')
+    messages.success(request, _('Complaint %(reference)s was deleted.') % {'reference': reference})
     return redirect('grievances:complaint_list')
 
 
@@ -313,11 +314,11 @@ def help_desk(request):
     tracked, track_error = None, ''
     if reference:
         if not REFERENCE_RE.match(reference):
-            track_error = 'Complaint IDs look like CC-2026-00042.'
+            track_error = _('Complaint IDs look like CC-2026-00042.')
         else:
             tracked = Complaint.objects.select_related('category', 'ward').filter(reference=reference).first()
             if not tracked:
-                track_error = f'No complaint with ID {reference} was found.'
+                track_error = _('No complaint with ID %(reference)s was found.') % {'reference': reference}
     return render(request, 'grievances/help_desk.html', {
         'categories': Category.objects.all(),
         'reference': reference,
@@ -333,9 +334,10 @@ def help_support(request):
         form = SupportEnquiryForm(request.POST)
         if form.is_valid():
             enquiry = form.save()
-            messages.success(request, f'Thank you. Your enquiry {enquiry.reference} has been recorded.')
+            messages.success(request, _('Thank you. Your enquiry %(reference)s has been recorded.')
+                             % {'reference': enquiry.reference})
             return redirect('grievances:help_support')
-        messages.error(request, 'Please fix the highlighted fields.')
+        messages.error(request, _('Please fix the highlighted fields.'))
     else:
         form = SupportEnquiryForm()
     return render(request, 'grievances/help_support.html', {
@@ -443,7 +445,7 @@ def api_complaints(request):
     """
     phone = request.session.get(CITIZEN_SESSION_KEY)
     if not phone:
-        return JsonResponse({'error': 'Please verify your mobile number to continue.',
+        return JsonResponse({'error': _('Please verify your mobile number to continue.'),
                              'login_url': reverse('accounts:login')}, status=401)
     form = CitizenComplaintForm(request.POST, request.FILES)
     if not form.is_valid():

@@ -1,0 +1,250 @@
+# Hindi translation of the City Corporation portal.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: City Corporation\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-24 15:24+0530\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: City Corporation team\n"
+"Language-Team: Hindi\n"
+"Language: hi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "JPG, JPEG, PNG or WEBP"
+msgstr "JPG, JPEG, PNG या WEBP"
+
+msgid "PDF, JPG, JPEG or PNG"
+msgstr "PDF, JPG, JPEG या PNG"
+
+msgid "%(count)s bytes"
+msgstr "%(count)s बाइट"
+
+msgid "Enter your full name."
+msgstr "अपना पूरा नाम दर्ज करें।"
+
+msgid "Your name must have at least 2 characters."
+msgstr "आपके नाम में कम से कम 2 अक्षर होने चाहिए।"
+
+msgid "Use letters, spaces, full stops, apostrophes or hyphens in your name."
+msgstr "अपने नाम में केवल अक्षर, रिक्त स्थान, पूर्ण विराम, एपॉस्ट्रॉफ़ी या हाइफ़न का उपयोग करें।"
+
+msgid "Enter your residential address."
+msgstr "अपना आवासीय पता दर्ज करें।"
+
+msgid "Please enter your full address, including house number and street."
+msgstr "कृपया मकान नंबर और गली सहित अपना पूरा पता दर्ज करें।"
+
+msgid "Enter your taluk."
+msgstr "अपना तालुक दर्ज करें।"
+
+msgid "The taluk name must have at least 2 characters."
+msgstr "तालुक के नाम में कम से कम 2 अक्षर होने चाहिए।"
+
+msgid "Enter a valid taluk name."
+msgstr "मान्य तालुक नाम दर्ज करें।"
+
+msgid "Describe the problem you are facing."
+msgstr "आप जिस समस्या का सामना कर रहे हैं, उसका वर्णन करें।"
+
+msgid "Please describe the problem in a little more detail (at least 20 characters)."
+msgstr "कृपया समस्या का थोड़ा और विस्तार से वर्णन करें (कम से कम 20 अक्षर)।"
+
+msgid "Enter the area affected by the problem."
+msgstr "समस्या से प्रभावित क्षेत्र दर्ज करें।"
+
+msgid "Please enter the locality, street, village, ward or landmark."
+msgstr "कृपया मोहल्ला, गली, गाँव, वार्ड या कोई पहचान चिह्न दर्ज करें।"
+
+msgid "Explain how this problem affects you."
+msgstr "बताएँ कि यह समस्या आपको कैसे प्रभावित करती है।"
+
+msgid "Please explain the effect in a little more detail (at least 10 characters)."
+msgstr "कृपया प्रभाव को थोड़ा और विस्तार से बताएँ (कम से कम 10 अक्षर)।"
+
+msgid "Select Yes or No."
+msgstr "हाँ या नहीं चुनें।"
+
+msgid "Use only letters, numbers, spaces, hyphens, full stops or slashes."
+msgstr "केवल अक्षर, अंक, रिक्त स्थान, हाइफ़न, पूर्ण विराम या स्लैश का उपयोग करें।"
+
+msgid "Please confirm that the information you have provided is accurate."
+msgstr "कृपया पुष्टि करें कि आपके द्वारा दी गई जानकारी सही है।"
+
+msgid "“%(name)s” is not an accepted format. Please choose a %(formats)s file."
+msgstr "“%(name)s” स्वीकार्य प्रारूप में नहीं है। कृपया %(formats)s फ़ाइल चुनें।"
+
+msgid "“%(name)s” is empty. Please choose another file."
+msgstr "“%(name)s” खाली है। कृपया दूसरी फ़ाइल चुनें।"
+
+msgid "“%(name)s” (%(size)s) is larger than the 5 MB limit. Please choose a smaller file."
+msgstr "“%(name)s” (%(size)s) 5 MB की सीमा से बड़ी है। कृपया छोटी फ़ाइल चुनें।"
+
+msgid "Please correct %(count)s problem before submitting"
+msgid_plural "Please correct %(count)s problems before submitting"
+msgstr[0] "जमा करने से पहले कृपया %(count)s समस्या ठीक करें"
+msgstr[1] "जमा करने से पहले कृपया %(count)s समस्याएँ ठीक करें"
+
+msgid "File"
+msgstr "फ़ाइल"
+
+msgid "Your earlier file “%(name)s” is still selected."
+msgstr "आपकी पिछली फ़ाइल “%(name)s” अभी भी चुनी हुई है।"
+
+msgid "No file has been attached."
+msgstr "कोई फ़ाइल संलग्न नहीं की गई।"
+
+msgid "“%(name)s” could not be opened as an image. Please choose another file."
+msgstr "“%(name)s” को छवि के रूप में नहीं खोला जा सका। कृपया दूसरी फ़ाइल चुनें।"
+
+msgid "Clear the form? Everything you have entered will be removed."
+msgstr "फ़ॉर्म साफ़ करें? आपके द्वारा दर्ज सब कुछ हटा दिया जाएगा।"
+
+msgid "The complaint could not be registered. Please check your details and try again."
+msgstr "शिकायत दर्ज नहीं हो सकी। कृपया अपना विवरण जाँचें और फिर से प्रयास करें।"
+
+msgid "Submitting…"
+msgstr "जमा हो रहा है…"
+
+msgid "Submit Complaint"
+msgstr "शिकायत जमा करें"
+
+msgid "Submitted on"
+msgstr "जमा करने की तिथि"
+
+msgid "Name"
+msgstr "नाम"
+
+msgid "Taluk"
+msgstr "तालुक"
+
+msgid "Affected area"
+msgstr "प्रभावित क्षेत्र"
+
+msgid "Problem photo"
+msgstr "समस्या की फ़ोटो"
+
+msgid "Not attached"
+msgstr "संलग्न नहीं"
+
+msgid "No"
+msgstr "नहीं"
+
+msgid "Yes"
+msgstr "हाँ"
+
+msgid "Ref."
+msgstr "संदर्भ"
+
+msgid "reference not provided"
+msgstr "संदर्भ संख्या नहीं दी गई"
+
+msgid "copy: %(name)s"
+msgstr "प्रति: %(name)s"
+
+msgid "Reported before"
+msgstr "पहले दर्ज की गई"
+
+msgid "Status"
+msgstr "स्थिति"
+
+msgid "Your session has expired"
+msgstr "आपका सत्र समाप्त हो गया है"
+
+msgid "Please reload this page and submit the complaint again."
+msgstr "कृपया यह पेज फिर से लोड करें और शिकायत दोबारा जमा करें।"
+
+msgid "Your complaint could not be registered"
+msgstr "आपकी शिकायत दर्ज नहीं हो सकी"
+
+msgid "Something went wrong on our side. Please try again in a few minutes."
+msgstr "हमारी ओर से कुछ गड़बड़ हो गई। कृपया कुछ मिनट बाद फिर से प्रयास करें।"
+
+msgid "Your complaint could not be sent"
+msgstr "आपकी शिकायत भेजी नहीं जा सकी"
+
+msgid "Check your internet connection and submit again. Your details are still in the form."
+msgstr "अपना इंटरनेट कनेक्शन जाँचें और फिर से जमा करें। आपका विवरण अभी भी फ़ॉर्म में है।"
+
+msgid "Copy"
+msgstr "कॉपी करें"
+
+msgid "Reference number copied."
+msgstr "संदर्भ संख्या कॉपी हो गई।"
+
+msgid "Copied"
+msgstr "कॉपी हो गया"
+
+msgid "Could not copy. Please write the reference number down."
+msgstr "कॉपी नहीं हो सका। कृपया संदर्भ संख्या लिख लें।"
+
+msgid "Copy failed"
+msgstr "कॉपी विफल"
+
+msgid "Copy is not available in this browser. Please write the reference number down."
+msgstr "इस ब्राउज़र में कॉपी उपलब्ध नहीं है। कृपया संदर्भ संख्या लिख लें।"
+
+msgid "(no title)"
+msgstr "(कोई शीर्षक नहीं)"
+
+msgid "Open complaint →"
+msgstr "शिकायत खोलें →"
+
+msgid "Assistant is typing"
+msgstr "सहायक लिख रहा है"
+
+msgid "Your session has ended. Please sign in again."
+msgstr "आपका सत्र समाप्त हो गया है। कृपया फिर से साइन इन करें।"
+
+msgid "Too many messages. Please wait a minute and try again."
+msgstr "बहुत अधिक संदेश। कृपया एक मिनट रुककर फिर से प्रयास करें।"
+
+msgid "The server had a problem. Please try again in a moment."
+msgstr "सर्वर में समस्या आई। कृपया थोड़ी देर बाद फिर से प्रयास करें।"
+
+msgid "Something went wrong. Please try again."
+msgstr "कुछ गड़बड़ हो गई। कृपया फिर से प्रयास करें।"
+
+msgid "Please keep the message under 500 characters."
+msgstr "कृपया संदेश 500 अक्षरों से कम रखें।"
+
+msgid "Could not reach the server. Check your connection and try again."
+msgstr "सर्वर तक नहीं पहुँच सके। अपना कनेक्शन जाँचें और फिर से प्रयास करें।"
+
+msgid "Chart could not load (Chart.js needs an internet connection). The figures above still work."
+msgstr "चार्ट लोड नहीं हो सका (Chart.js के लिए इंटरनेट कनेक्शन चाहिए)। ऊपर दिए आँकड़े फिर भी काम करते हैं।"
+
+msgid "Reported"
+msgstr "दर्ज"
+
+msgid "Resolved"
+msgstr "हल हो गई"
+
+msgid "No complaints yet"
+msgstr "अभी कोई शिकायत नहीं"
+
+msgid "%(area)s · %(count)s open"
+msgstr "%(area)s · %(count)s खुली"
+
+msgid "View complaints"
+msgstr "शिकायतें देखें"
+
+msgid "Illustrative ward boundaries · not to scale"
+msgstr "सांकेतिक वार्ड सीमाएँ · पैमाने के अनुसार नहीं"
+
+msgid "Chennai, Tamil Nadu · © OpenStreetMap contributors"
+msgstr "चेन्नई, तमिलनाडु · © OpenStreetMap योगदानकर्ता"
+
+msgid "Loading street map…"
+msgstr "स्ट्रीट मैप लोड हो रहा है…"
+
+msgid "Street map unavailable offline — showing the illustrated map."
+msgstr "ऑफ़लाइन होने पर स्ट्रीट मैप उपलब्ध नहीं — चित्रित मानचित्र दिखाया जा रहा है।"
+
+msgid "%(count)s help topic matches “%(phrase)s”."
+msgid_plural "%(count)s help topics match “%(phrase)s”."
+msgstr[0] "%(count)s सहायता विषय “%(phrase)s” से मेल खाता है।"
+msgstr[1] "%(count)s सहायता विषय “%(phrase)s” से मेल खाते हैं।"

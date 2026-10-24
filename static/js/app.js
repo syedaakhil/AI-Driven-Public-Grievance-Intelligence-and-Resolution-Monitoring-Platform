@@ -1,23 +1,14 @@
 /* City Corporation — behaviour shared by every page:
-   viewer preferences, mobile menu, dropdown menus, language labels,
+   viewer preferences, mobile menu, dropdown menus,
    dialogs, auto-submitting selects and character counters. */
 (function () {
   'use strict';
 
   /* ---------- Viewer preferences (saved in this browser only) ---------- */
   var PREFS_KEY = 'citycorp.prefs';
-  var DEFAULTS = { text: 'normal', contrast: false, reduceMotion: false, lang: 'en' };
-  var LANG_NAMES = { en: 'English', ta: 'தமிழ்', hi: 'हिन्दी' };
-  var LABELS = {
-    ta: {
-      home: 'முகப்பு', file: 'புகார் பதிவு', officers: 'பொறுப்பு அதிகாரிகள்', dataset: 'தரவுத்தொகுப்பு',
-      helpDesk: 'குடிமக்கள் உதவி மையம்', support: 'உதவி & ஆதரவு', mainMenu: 'முதன்மை மெனு', portal: 'குடிமக்கள் போர்டல்'
-    },
-    hi: {
-      home: 'होम', file: 'शिकायत दर्ज करें', officers: 'प्रभारी अधिकारी', dataset: 'डेटासेट',
-      helpDesk: 'नागरिक सहायता केंद्र', support: 'सहायता और समर्थन', mainMenu: 'मुख्य मेनू', portal: 'नागरिक पोर्टल'
-    }
-  };
+  // The site language (English / Hindi) is chosen with the language menu and handled by Django
+  // (set_language + translation files), not here.
+  var DEFAULTS = { text: 'normal', contrast: false, reduceMotion: false };
 
   function readPrefs() {
     try {
@@ -32,19 +23,6 @@
     root.setAttribute('data-text', prefs.text);
     root.classList.toggle('contrast', !!prefs.contrast);
     root.classList.toggle('reduce-motion', !!prefs.reduceMotion);
-    root.setAttribute('lang', prefs.lang);
-
-    var labels = LABELS[prefs.lang] || {};
-    document.querySelectorAll('[data-i18n]').forEach(function (el) {
-      if (!el.hasAttribute('data-i18n-en')) el.setAttribute('data-i18n-en', el.textContent);
-      el.textContent = labels[el.getAttribute('data-i18n')] || el.getAttribute('data-i18n-en');
-    });
-    document.querySelectorAll('[data-lang]').forEach(function (btn) {
-      btn.setAttribute('aria-checked', String(btn.getAttribute('data-lang') === prefs.lang));
-    });
-    document.querySelectorAll('[data-lang-name]').forEach(function (el) {
-      el.textContent = LANG_NAMES[prefs.lang] || LANG_NAMES.en;
-    });
   }
 
   window.CityCorp = {
@@ -105,14 +83,6 @@
     } else if (document.body.classList.contains('nav-open')) {
       setNav(false);
     }
-  });
-
-  document.querySelectorAll('[data-lang]').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      window.CityCorp.setPref('lang', btn.getAttribute('data-lang'));
-      var menu = btn.closest('details');
-      if (menu) menu.open = false;
-    });
   });
 
   /* ---------- Selects that submit their form when changed ---------- */

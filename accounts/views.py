@@ -6,6 +6,7 @@ from django.core.cache import cache
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from . import otp
@@ -41,7 +42,7 @@ def admin_login(request):
     next_url = request.POST.get('next', '')
     failures_key = f'admin-login-failures:{request.META.get("REMOTE_ADDR", "")}'
     if cache.get(failures_key, 0) >= MAX_ADMIN_FAILURES:
-        messages.error(request, 'Too many failed attempts. Please try again in 15 minutes.')
+        messages.error(request, _('Too many failed attempts. Please try again in 15 minutes.'))
         return redirect(_login_url('admin', next_url))
 
     user = authenticate(
@@ -53,10 +54,10 @@ def admin_login(request):
         if not cache.add(failures_key, 1, LOCKOUT_SECONDS):
             cache.incr(failures_key)
         if getattr(request, WEAK_PASSWORD_FLAG, False):
-            messages.error(request, 'This account still has a weak password, so it is blocked on the live site. '
-                                    'Set a strong one with "manage.py changepassword".')
+            messages.error(request, _('This account still has a weak password, so it is blocked on the live '
+                                      'site. Set a strong one with “manage.py changepassword”.'))
         else:
-            messages.error(request, 'Invalid username or password.')
+            messages.error(request, _('Invalid username or password.'))
         return redirect(_login_url('admin', next_url))
 
     cache.delete(failures_key)
@@ -71,14 +72,14 @@ def admin_login(request):
 def send_otp(request):
     phone = otp.normalize_phone(request.POST.get('phone'))
     if not phone:
-        messages.error(request, 'Enter a valid 10-digit mobile number starting with 6, 7, 8 or 9.')
+        messages.error(request, _('Enter a valid 10-digit mobile number starting with 6, 7, 8 or 9.'))
         return redirect('accounts:login')
     try:
         otp.send(request, phone)
     except otp.OTPError as exc:
         messages.error(request, str(exc))
     else:
-        messages.success(request, f'OTP sent to {otp.mask(phone)}.')
+        messages.success(request, _('OTP sent to %(phone)s.') % {'phone': otp.mask(phone)})
     return redirect('accounts:login')
 
 
@@ -103,5 +104,5 @@ def reset_otp(request):
 @require_POST
 def logout_view(request):
     logout(request)
-    messages.success(request, 'You have been signed out.')
+    messages.success(request, _('You have been signed out.'))
     return redirect('accounts:login')

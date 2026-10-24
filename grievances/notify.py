@@ -1,6 +1,8 @@
 """Text messages to citizens about their complaints."""
 import logging
 
+from django.utils import translation
+
 from accounts import sms
 from accounts.otp import normalize_phone
 
@@ -8,7 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 def status_message(complaint):
-    return f'Your complaint {complaint.reference} is now {complaint.get_status_display()}. - City Corporation'
+    # Always English, whatever language the admin uses the site in (SMS templates are fixed English text).
+    with translation.override('en'):
+        return f'Your complaint {complaint.reference} is now {complaint.get_status_display()}. - City Corporation'
 
 
 def status_sms_recipient(complaint):

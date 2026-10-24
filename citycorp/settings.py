@@ -124,12 +124,14 @@ INSTALLED_APPS = [
     'core',
     'accounts',
     'grievances',
+    'assistant',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # serves /static/ under gunicorn
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'core.middleware.CookieLanguageMiddleware',  # English or Hindi, from the language cookie
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -148,6 +150,7 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
+                'django.template.context_processors.i18n',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.layout',
@@ -187,7 +190,14 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-LANGUAGE_CODE = 'en-in'
+# The site is in English and Hindi. Visitors start in English and switch with the language menu
+# (django.views.i18n.set_language, remembered in a cookie; see core/middleware.py).
+# Translations: locale/hi/LC_MESSAGES/*.po. SMS and emails always stay in English.
+LANGUAGE_CODE = 'en'
+LANGUAGES = [('en', 'English'), ('hi', 'हिंदी')]
+LOCALE_PATHS = [BASE_DIR / 'locale']
+LANGUAGE_COOKIE_AGE = 365 * 24 * 60 * 60
+LANGUAGE_COOKIE_SAMESITE = 'Lax'
 TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 USE_TZ = True
@@ -233,6 +243,16 @@ MSG91_SMS_TEMPLATE_ID = os.environ.get('MSG91_SMS_TEMPLATE_ID', '')  # status-up
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID', '')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN', '')
 TWILIO_FROM_NUMBER = os.environ.get('TWILIO_FROM_NUMBER', '')
+
+# --- Assistant: email through Brevo, and the data-ingestion API (see assistant/, INGEST_API.md) ---
+BREVO_API_KEY = os.environ.get('BREVO_API_KEY', '').strip()
+SENDER_EMAIL = os.environ.get('SENDER_EMAIL', '').strip()     # a sender verified in Brevo
+SENDER_NAME = os.environ.get('SENDER_NAME', 'City Corporation').strip()
+# Emails only ever go to assistant.brevo.ONLY_RECIPIENT; ADMIN_EMAIL must match it or nothing is sent.
+ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'govermentowncoporation@gmail.com').strip()
+INGEST_API_KEY = os.environ.get('INGEST_API_KEY', '').strip()
+# Request bodies up to 5 MB (the ingestion API's limit; Django's default is 2.5 MB).
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
 
 # Warnings and errors (failed SMS, server errors) go to the console, which gunicorn/systemd keep.
 LOGGING = {

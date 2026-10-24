@@ -3,6 +3,8 @@ from datetime import timedelta
 
 from django.db.models import Count, Q
 from django.utils import timezone
+from django.utils.formats import date_format
+from django.utils.translation import gettext
 
 from .models import Complaint, Ward
 
@@ -39,7 +41,7 @@ def month_periods(count, months_back=0):
     """(label, start, end) for `count` calendar months, ending `months_back` months before this one."""
     first = _shift_months(_start_of_month(timezone.localtime()), -(count - 1 + months_back))
     return [
-        (_shift_months(first, i).strftime('%b'), _shift_months(first, i), _shift_months(first, i + 1))
+        (date_format(_shift_months(first, i), 'M'), _shift_months(first, i), _shift_months(first, i + 1))
         for i in range(count)
     ]
 
@@ -48,7 +50,7 @@ def week_periods(count):
     today = timezone.localtime().replace(hour=0, minute=0, second=0, microsecond=0)
     monday = today - timedelta(days=today.weekday())
     starts = [monday - timedelta(weeks=count - 1 - i) for i in range(count)]
-    return [(start.strftime('%d %b'), start, start + timedelta(weeks=1)) for start in starts]
+    return [(date_format(start, 'd M'), start, start + timedelta(weeks=1)) for start in starts]
 
 
 def _between(queryset, field, start, end):
@@ -125,7 +127,7 @@ def dashboard(range_months):
         'citizen_filed': filed.filter(filed_by_citizen=True).count(),
         # For the optional street map (Leaflet)
         'ward_points': [
-            {'id': ward.pk, 'label': str(ward), 'area': ward.area, 'open': ward.open_count,
+            {'id': ward.pk, 'label': str(ward), 'area': gettext(ward.area), 'open': ward.open_count,
              'lat': float(ward.latitude), 'lng': float(ward.longitude)}
             for ward in all_wards if ward.latitude is not None and ward.longitude is not None
         ],

@@ -9,6 +9,13 @@
 (function () {
   'use strict';
 
+  // Translations from Django's JavaScript catalogue (/jsi18n/); English if it didn't load.
+  var gettext = window.gettext || function (text) { return text; };
+  var ngettext = window.ngettext || function (one, many, n) { return n === 1 ? one : many; };
+  var interpolate = window.interpolate || function (text, values) {
+    return text.replace(/%\((\w+)\)s/g, function (_, key) { return values[key]; });
+  };
+
   var MAX_FILE_BYTES = 5 * 1024 * 1024;
 
   // Form field id -> CitizenComplaintForm field name (used in the request and in the server's errors).
@@ -30,12 +37,12 @@
     photo: {
       extensions: ['jpg', 'jpeg', 'png', 'webp'],
       types: ['image/jpeg', 'image/png', 'image/webp'],
-      label: 'JPG, JPEG, PNG or WEBP'
+      label: gettext('JPG, JPEG, PNG or WEBP')
     },
     previousCopy: {
       extensions: ['pdf', 'jpg', 'jpeg', 'png'],
       types: ['application/pdf', 'image/jpeg', 'image/png'],
-      label: 'PDF, JPG, JPEG or PNG'
+      label: gettext('PDF, JPG, JPEG or PNG')
     }
   };
 
@@ -79,7 +86,7 @@
   }
 
   function formatSize(bytes) {
-    if (bytes < 1024) return bytes + ' bytes';
+    if (bytes < 1024) return interpolate(gettext('%(count)s bytes'), { count: bytes }, true);
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + ' KB';
     return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
   }
@@ -108,45 +115,45 @@
 
   var validators = {
     fullName: function () {
-      var message = requiredText('fullName', 'Enter your full name.', 2, 'Your name must have at least 2 characters.');
+      var message = requiredText('fullName', gettext('Enter your full name.'), 2, gettext('Your name must have at least 2 characters.'));
       if (message) return message;
-      if (!NAME_PATTERN.test(value('fullName'))) return 'Use letters, spaces, full stops, apostrophes or hyphens in your name.';
+      if (!NAME_PATTERN.test(value('fullName'))) return gettext('Use letters, spaces, full stops, apostrophes or hyphens in your name.');
       return '';
     },
     address: function () {
-      return requiredText('address', 'Enter your residential address.', 10, 'Please enter your full address, including house number and street.');
+      return requiredText('address', gettext('Enter your residential address.'), 10, gettext('Please enter your full address, including house number and street.'));
     },
     taluk: function () {
-      var message = requiredText('taluk', 'Enter your taluk.', 2, 'The taluk name must have at least 2 characters.');
+      var message = requiredText('taluk', gettext('Enter your taluk.'), 2, gettext('The taluk name must have at least 2 characters.'));
       if (message) return message;
-      if (!HAS_LETTER.test(value('taluk'))) return 'Enter a valid taluk name.';
+      if (!HAS_LETTER.test(value('taluk'))) return gettext('Enter a valid taluk name.');
       return '';
     },
     description: function () {
-      return requiredText('description', 'Describe the problem you are facing.', 20, 'Please describe the problem in a little more detail (at least 20 characters).');
+      return requiredText('description', gettext('Describe the problem you are facing.'), 20, gettext('Please describe the problem in a little more detail (at least 20 characters).'));
     },
     photo: function () {
       return state.files.photo ? checkFile('photo', state.files.photo) : '';   // optional
     },
     affectedArea: function () {
-      return requiredText('affectedArea', 'Enter the area affected by the problem.', 3, 'Please enter the locality, street, village, ward or landmark.');
+      return requiredText('affectedArea', gettext('Enter the area affected by the problem.'), 3, gettext('Please enter the locality, street, village, ward or landmark.'));
     },
     impact: function () {
-      return requiredText('impact', 'Explain how this problem affects you.', 10, 'Please explain the effect in a little more detail (at least 10 characters).');
+      return requiredText('impact', gettext('Explain how this problem affects you.'), 10, gettext('Please explain the effect in a little more detail (at least 10 characters).'));
     },
     previouslyReported: function () {
-      return selectedRadio('previouslyReported') ? '' : 'Select Yes or No.';
+      return selectedRadio('previouslyReported') ? '' : gettext('Select Yes or No.');
     },
     previousReference: function () {
       var text = value('previousReference');
-      if (text && !REFERENCE_PATTERN.test(text)) return 'Use only letters, numbers, spaces, hyphens, full stops or slashes.';
+      if (text && !REFERENCE_PATTERN.test(text)) return gettext('Use only letters, numbers, spaces, hyphens, full stops or slashes.');
       return '';
     },
     previousCopy: function () {
       return state.files.previousCopy ? checkFile('previousCopy', state.files.previousCopy) : '';   // optional
     },
     declaration: function () {
-      return form.elements.declaration.checked ? '' : 'Please confirm that the information you have provided is accurate.';
+      return form.elements.declaration.checked ? '' : gettext('Please confirm that the information you have provided is accurate.');
     }
   };
 
@@ -154,9 +161,9 @@
     var rule = FILE_RULES[name];
     var extOk = rule.extensions.indexOf(fileExtension(file.name)) !== -1;
     var typeOk = !file.type || rule.types.indexOf(file.type) !== -1;
-    if (!extOk || !typeOk) return '“' + file.name + '” is not an accepted format. Please choose a ' + rule.label + ' file.';
-    if (file.size === 0) return '“' + file.name + '” is empty. Please choose another file.';
-    if (file.size > MAX_FILE_BYTES) return '“' + file.name + '” (' + formatSize(file.size) + ') is larger than the 5 MB limit. Please choose a smaller file.';
+    if (!extOk || !typeOk) return interpolate(gettext('“%(name)s” is not an accepted format. Please choose a %(formats)s file.'), { name: file.name, formats: rule.label }, true);
+    if (file.size === 0) return interpolate(gettext('“%(name)s” is empty. Please choose another file.'), { name: file.name }, true);
+    if (file.size > MAX_FILE_BYTES) return interpolate(gettext('“%(name)s” (%(size)s) is larger than the 5 MB limit. Please choose a smaller file.'), { name: file.name, size: formatSize(file.size) }, true);
     return '';
   }
 
@@ -216,9 +223,9 @@
       errorSummary.hidden = true;
       return;
     }
-    errorSummaryTitle.textContent = errors.length === 1
-      ? 'Please correct 1 problem before submitting'
-      : 'Please correct ' + errors.length + ' problems before submitting';
+    errorSummaryTitle.textContent = interpolate(ngettext('Please correct %(count)s problem before submitting',
+                          'Please correct %(count)s problems before submitting', errors.length),
+                 { count: errors.length }, true);
     errors.forEach(function (error) {
       var item = document.createElement('li');
       if (!error.name) {   // a server message that belongs to no single field
@@ -331,7 +338,7 @@
 
     upload.querySelector('.upload__name').textContent = file.name;
     upload.querySelector('.upload__size').textContent =
-      (fileExtension(file.name).toUpperCase() || 'File') + ' · ' + formatSize(file.size);
+      (fileExtension(file.name).toUpperCase() || gettext('File')) + ' · ' + formatSize(file.size);
     drop.hidden = true;
     preview.hidden = false;
     // The Replace and Remove buttons take over keyboard access while a file is selected.
@@ -356,8 +363,8 @@
       input.value = '';    // the chosen File is kept in state; the input itself is not submitted
       if (message) {
         setError(name, state.files[name]
-          ? message + ' Your earlier file “' + state.files[name].name + '” is still selected.'
-          : message + ' No file has been attached.');
+          ? message + ' ' + interpolate(gettext('Your earlier file “%(name)s” is still selected.'), { name: state.files[name].name }, true)
+          : message + ' ' + gettext('No file has been attached.'));
         refreshSummary();
         return;
       }
@@ -372,7 +379,7 @@
       var file = state.files[name];
       if (!file || !thumb.getAttribute('src')) return;
       removeFile(name);
-      setError(name, '“' + file.name + '” could not be opened as an image. Please choose another file.');
+      setError(name, interpolate(gettext('“%(name)s” could not be opened as an image. Please choose another file.'), { name: file.name }, true));
       refreshSummary();
     });
 
@@ -424,7 +431,7 @@
     }
     if (typeof clearDialog.showModal === 'function') {
       clearDialog.showModal();
-    } else if (window.confirm('Clear the form? Everything you have entered will be removed.')) {
+    } else if (window.confirm(gettext('Clear the form? Everything you have entered will be removed.'))) {
       clearAndFocus();
     }
   });
@@ -470,7 +477,7 @@
     Object.keys(serverErrors).forEach(function (key) {
       if (!known[key]) serverErrors[key].forEach(function (message) { errors.push({ name: '', message: message }); });
     });
-    if (!errors.length) errors.push({ name: '', message: 'The complaint could not be registered. Please check your details and try again.' });
+    if (!errors.length) errors.push({ name: '', message: gettext('The complaint could not be registered. Please check your details and try again.') });
     renderSummary(errors);
     errorSummary.scrollIntoView({ block: 'start' });
     errorSummary.focus({ preventScroll: true });
@@ -497,7 +504,7 @@
     state.submitting = isSubmitting;
     submitBtn.disabled = isSubmitting;
     clearBtn.disabled = isSubmitting;
-    submitBtn.textContent = isSubmitting ? 'Submitting…' : 'Submit Complaint';
+    submitBtn.textContent = isSubmitting ? gettext('Submitting…') : gettext('Submit Complaint');
     form.setAttribute('aria-busy', String(isSubmitting));
   }
 
@@ -517,18 +524,18 @@
     document.getElementById('copyStatus').textContent = '';
     summary.textContent = '';
 
-    addSummaryRow(summary, 'Submitted on', new Date(complaint.submitted_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }));
-    addSummaryRow(summary, 'Name', complaint.citizen_name);
-    addSummaryRow(summary, 'Taluk', complaint.taluk);
-    addSummaryRow(summary, 'Affected area', complaint.location);
-    addSummaryRow(summary, 'Problem photo', complaint.attachment || 'Not attached');
-    var previous = 'No';
+    addSummaryRow(summary, gettext('Submitted on'), new Date(complaint.submitted_at).toLocaleString(document.documentElement.lang === 'hi' ? 'hi-IN' : 'en-IN', { dateStyle: 'medium', timeStyle: 'short' }));
+    addSummaryRow(summary, gettext('Name'), complaint.citizen_name);
+    addSummaryRow(summary, gettext('Taluk'), complaint.taluk);
+    addSummaryRow(summary, gettext('Affected area'), complaint.location);
+    addSummaryRow(summary, gettext('Problem photo'), complaint.attachment || gettext('Not attached'));
+    var previous = gettext('No');
     if (complaint.previously_reported) {
-      previous = 'Yes' + (complaint.previous_reference ? ' · Ref. ' + complaint.previous_reference : ' · reference not provided');
-      if (complaint.previous_copy) previous += ' · copy: ' + complaint.previous_copy;
+      previous = gettext('Yes') + (complaint.previous_reference ? ' · ' + gettext('Ref.') + ' ' + complaint.previous_reference : ' · ' + gettext('reference not provided'));
+      if (complaint.previous_copy) previous += ' · ' + interpolate(gettext('copy: %(name)s'), { name: complaint.previous_copy }, true);
     }
-    addSummaryRow(summary, 'Reported before', previous);
-    addSummaryRow(summary, 'Status', complaint.status);
+    addSummaryRow(summary, gettext('Reported before'), previous);
+    addSummaryRow(summary, gettext('Status'), complaint.status);
 
     form.hidden = true;
     successPanel.hidden = false;
@@ -571,15 +578,15 @@
         } else if (response.status === 400 && data.errors) {
           showServerErrors(data.errors);
         } else if (response.status === 403) {
-          showProblem('Your session has expired', 'Please reload this page and submit the complaint again.');
+          showProblem(gettext('Your session has expired'), gettext('Please reload this page and submit the complaint again.'));
         } else {
-          showProblem('Your complaint could not be registered', 'Something went wrong on our side. Please try again in a few minutes.');
+          showProblem(gettext('Your complaint could not be registered'), gettext('Something went wrong on our side. Please try again in a few minutes.'));
         }
         setSubmitting(false);
       });
     }).catch(function () {
       setSubmitting(false);
-      showProblem('Your complaint could not be sent', 'Check your internet connection and submit again. Your details are still in the form.');
+      showProblem(gettext('Your complaint could not be sent'), gettext('Check your internet connection and submit again. Your details are still in the form.'));
     });
   });
 
@@ -592,15 +599,15 @@
     function done(message, buttonText) {
       status.textContent = message;
       label.textContent = buttonText;
-      setTimeout(function () { label.textContent = 'Copy'; }, 2000);
+      setTimeout(function () { label.textContent = gettext('Copy'); }, 2000);
     }
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(reference).then(
-        function () { done('Reference number copied.', 'Copied'); },
-        function () { done('Could not copy. Please write the reference number down.', 'Copy failed'); }
+        function () { done(gettext('Reference number copied.'), gettext('Copied')); },
+        function () { done(gettext('Could not copy. Please write the reference number down.'), gettext('Copy failed')); }
       );
     } else {
-      done('Copy is not available in this browser. Please write the reference number down.', 'Copy failed');
+      done(gettext('Copy is not available in this browser. Please write the reference number down.'), gettext('Copy failed'));
     }
   });
 

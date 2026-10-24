@@ -24,7 +24,7 @@
   --radius: 12px;
   --radius-sm: 8px;
   --shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 2px 8px rgba(16, 24, 40, .04);
-  --font: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --font: 'Plus Jakarta Sans', 'Noto Sans Devanagari', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
 }
 
 /* 2. Base ------------------------------------------------------------------ */
@@ -300,3 +300,21 @@ button { cursor: pointer; }
   .dialog .actions { flex-direction: column-reverse; }
   .dialog .btn { width: 100%; }
 }
+
+/* Language switch (partials/language_switch.html) ------------------------- */
+.langswitch { margin: 0; }
+.langswitch--compact {
+  display: inline-flex; flex: none; padding: 2px; gap: 2px;
+  border: 1px solid var(--line); border-radius: 999px; background: #fff;
+}
+.langswitch__option {
+  padding: 4px 10px; border: 0; border-radius: 999px; background: transparent;
+  font: inherit; font-size: .75rem; font-weight: 600; line-height: 1.4; color: var(--navy); cursor: pointer; white-space: nowrap;
+}
+.langswitch__option:hover { background: #F4F7FC; }
+.langswitch__option[aria-pressed="true"] { background: var(--blue); color: #fff; }
+.langswitch__option:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.site-header__tools { display: flex; align-items: center; gap: 10px; flex: none; }
+
+/* Hindi: letter-spacing pulls Devanagari letters apart, so drop it (the OTP box keeps its spacing). */
+html[lang="hi"] body *:not(input) { letter-spacing: normal; }

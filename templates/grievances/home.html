@@ -1,113 +1,113 @@
 {% extends "base.html" %}
-{% load ui humanize %}
+{% load ui humanize i18n %}
 
-{% block title %}Government Corporation{% endblock %}
+{% block title %}{% translate "Government Corporation" %}{% endblock %}
 
 {% block content %}
 <div class="head">
-  <h1 class="head__title">Your corporation at a glance</h1>
+  <h1 class="head__title">{% translate "Your corporation at a glance" %}</h1>
   <form method="get" class="head__tools">
-    <label class="sr-only" for="range">Date range</label>
+    <label class="sr-only" for="range">{% translate "Date range" %}</label>
     <select class="select select--sm" id="range" name="range" data-autosubmit>
-      <option value="3"{% if range_months == 3 %} selected{% endif %}>Last 3 months</option>
-      <option value="6"{% if range_months == 6 %} selected{% endif %}>Last 6 months</option>
+      <option value="3"{% if range_months == 3 %} selected{% endif %}>{% translate "Last 3 months" %}</option>
+      <option value="6"{% if range_months == 6 %} selected{% endif %}>{% translate "Last 6 months" %}</option>
     </select>
-    <noscript><button type="submit" class="btn btn--ghost btn--sm">Apply</button></noscript>
+    <noscript><button type="submit" class="btn btn--ghost btn--sm">{% translate "Apply" %}</button></noscript>
   </form>
 </div>
 
-<section class="grid grid--3 section" aria-label="Summary">
+<section class="grid grid--3 section" aria-label="{% translate 'Summary' %}">
   <article class="card stat">
     <div class="stat__top">
-      <h2 class="stat__label">Complaints reported</h2>
+      <h2 class="stat__label">{% translate "Complaints reported" %}</h2>
       <span class="tile">{% icon 'file' %}</span>
     </div>
     <p class="stat__value">{{ stats.reported|intcomma }}</p>
-    <p class="stat__note">{% include "partials/change.html" with value=stats.reported_change %} from previous period · <b class="change">{{ stats.citizen_filed|intcomma }}</b> filed by citizens</p>
+    <p class="stat__note">{% include "partials/change.html" with value=stats.reported_change %} {% translate "from previous period" %} · {% blocktranslate with count=stats.citizen_filed|intcomma %}<b class="change">{{ count }}</b> filed by citizens{% endblocktranslate %}</p>
   </article>
   <article class="card stat">
     <div class="stat__top">
-      <h2 class="stat__label">Complaints resolved</h2>
+      <h2 class="stat__label">{% translate "Complaints resolved" %}</h2>
       <span class="tile tile--green">{% icon 'check' %}</span>
     </div>
     <p class="stat__value">{{ stats.resolved|intcomma }}</p>
-    <p class="stat__note">{% include "partials/change.html" with value=stats.resolved_change %} from previous period</p>
+    <p class="stat__note">{% include "partials/change.html" with value=stats.resolved_change %} {% translate "from previous period" %}</p>
   </article>
   <article class="card stat">
     <div class="stat__top">
-      <h2 class="stat__label">Works in progress</h2>
+      <h2 class="stat__label">{% translate "Works in progress" %}</h2>
       <span class="tile tile--orange">{% icon 'road' %}</span>
     </div>
     <p class="stat__value">{{ stats.working|intcomma }}</p>
-    <p class="stat__note"><b class="change">{{ stats.waiting|intcomma }}</b> new complaints awaiting assignment</p>
+    <p class="stat__note">{% blocktranslate with count=stats.waiting|intcomma %}<b class="change">{{ count }}</b> new complaints awaiting assignment{% endblocktranslate %}</p>
   </article>
 </section>
 
-<section class="grid grid--charts section" aria-label="Charts">
+<section class="grid grid--charts section" aria-label="{% translate 'Charts' %}">
   <article class="card">
     <div class="card__head">
-      <h2 class="card__title">Complaint trends</h2>
-      <div class="seg" role="group" aria-label="Trend period">
-        <button type="button" class="seg__btn" aria-pressed="true" data-trend="monthly">Monthly</button>
-        <button type="button" class="seg__btn" aria-pressed="false" data-trend="weekly">Weekly</button>
+      <h2 class="card__title">{% translate "Complaint trends" %}</h2>
+      <div class="seg" role="group" aria-label="{% translate 'Trend period' %}">
+        <button type="button" class="seg__btn" aria-pressed="true" data-trend="monthly">{% translate "Monthly" %}</button>
+        <button type="button" class="seg__btn" aria-pressed="false" data-trend="weekly">{% translate "Weekly" %}</button>
       </div>
     </div>
     <div class="legend legend--inline" aria-hidden="true">
-      <span><i class="swatch" style="--swatch:#2E5487"></i>Reported</span>
-      <span><i class="swatch" style="--swatch:#A9C1DE"></i>Resolved</span>
+      <span><i class="swatch" style="--swatch:#2E5487"></i>{% translate "Reported" %}</span>
+      <span><i class="swatch" style="--swatch:#A9C1DE"></i>{% translate "Resolved" %}</span>
     </div>
-    <div class="chart"><canvas id="trend-chart" role="img" aria-label="Bar chart of complaints reported and resolved"></canvas></div>
+    <div class="chart"><canvas id="trend-chart" role="img" aria-label="{% translate 'Bar chart of complaints reported and resolved' %}"></canvas></div>
     <p class="card__foot">
       {% icon 'trend-up' 'sm' %}
       {% if stats.rate is None %}
-        <strong>No complaints in this period yet</strong>
+        <strong>{% translate "No complaints in this period yet" %}</strong>
       {% else %}
-        <strong>Resolution rate {{ stats.rate }}%</strong>
-        {% if stats.rate_before is None %}<span>no earlier complaints to compare</span>{% else %}<span>compared to {{ stats.rate_before }}% in the previous period</span>{% endif %}
+        <strong>{% blocktranslate with rate=stats.rate %}Resolution rate {{ rate }}%{% endblocktranslate %}</strong>
+        {% if stats.rate_before is None %}<span>{% translate "no earlier complaints to compare" %}</span>{% else %}<span>{% blocktranslate with rate=stats.rate_before %}compared to {{ rate }}% in the previous period{% endblocktranslate %}</span>{% endif %}
       {% endif %}
     </p>
   </article>
 
   <article class="card">
     <div class="card__head">
-      <h2 class="card__title">Complaints by Social Media and Other Channels</h2>
-      <a class="icon-btn icon-btn--sm" href="{% url 'grievances:complaint_list' %}" aria-label="Open complaints dataset" title="Open dataset">{% icon 'arrow-right' 'sm' %}</a>
+      <h2 class="card__title">{% translate "Complaints by Social Media and Other Channels" %}</h2>
+      <a class="icon-btn icon-btn--sm" href="{% url 'grievances:complaint_list' %}" aria-label="{% translate 'Open complaints dataset' %}" title="{% translate 'Open dataset' %}">{% icon 'arrow-right' 'sm' %}</a>
     </div>
     <div class="donut">
-      <canvas id="channel-chart" role="img" aria-label="Doughnut chart of complaints by channel"></canvas>
-      <div class="donut__centre"><strong>{{ stats.reported|intcomma }}</strong><span>Total complaints</span></div>
+      <canvas id="channel-chart" role="img" aria-label="{% translate 'Doughnut chart of complaints by channel' %}"></canvas>
+      <div class="donut__centre"><strong>{{ stats.reported|intcomma }}</strong><span>{% translate "Total complaints" %}</span></div>
     </div>
     <ul class="legend legend--grid">
       {% for channel in stats.channels %}
-        <li title="{{ channel.count }} complaint{{ channel.count|pluralize }}"><i class="swatch" style="--swatch:{{ channel.colour }}"></i>{{ channel.label }}<b>{{ channel.share }}%</b></li>
+        <li title="{% blocktranslate count counter=channel.count %}{{ counter }} complaint{% plural %}{{ counter }} complaints{% endblocktranslate %}"><i class="swatch" style="--swatch:{{ channel.colour }}"></i>{{ channel.label }}<b>{{ channel.share }}%</b></li>
       {% endfor %}
     </ul>
   </article>
 
   <article class="card">
     <div class="card__head">
-      <h2 class="card__title">Civic issues resolved</h2>
+      <h2 class="card__title">{% translate "Civic issues resolved" %}</h2>
       <span class="chip chip--green">{% include "partials/change.html" with value=stats.resolved_change %}</span>
     </div>
-    <p class="metric">{{ stats.resolved|intcomma }}<small>resolved</small></p>
-    <div class="chart chart--sm"><canvas id="resolved-chart" role="img" aria-label="Line chart of complaints resolved each month"></canvas></div>
+    <p class="metric">{{ stats.resolved|intcomma }}<small>{% translate "resolved" %}</small></p>
+    <div class="chart chart--sm"><canvas id="resolved-chart" role="img" aria-label="{% translate 'Line chart of complaints resolved each month' %}"></canvas></div>
   </article>
 </section>
 
-<section class="grid grid--feature section" aria-label="Neighbourhood and news">
+<section class="grid grid--feature section" aria-label="{% translate 'Neighbourhood and news' %}">
   <article class="card">
     <div class="card__head">
-      <h2 class="card__title">Your neighbourhood, mapped</h2>
-      <div class="seg" role="group" aria-label="Map style">
-        <button type="button" class="seg__btn" aria-pressed="true" data-map="illustrated">Illustrated</button>
-        <button type="button" class="seg__btn" aria-pressed="false" data-map="street">Street map</button>
+      <h2 class="card__title">{% translate "Your neighbourhood, mapped" %}</h2>
+      <div class="seg" role="group" aria-label="{% translate 'Map style' %}">
+        <button type="button" class="seg__btn" aria-pressed="true" data-map="illustrated">{% translate "Illustrated" %}</button>
+        <button type="button" class="seg__btn" aria-pressed="false" data-map="street">{% translate "Street map" %}</button>
       </div>
     </div>
     <div class="wardmap">
       <div>
         <div class="wardmap__canvas" id="ward-map">
           <svg viewBox="0 0 300 250" role="img" aria-labelledby="ward-map-title">
-            <title id="ward-map-title">Illustrated map of wards with open complaints</title>
+            <title id="ward-map-title">{% translate "Illustrated map of wards with open complaints" %}</title>
             <defs>
               <pattern id="map-grid" width="15" height="15" patternUnits="userSpaceOnUse">
                 <path d="M15 0H0V15" fill="none" stroke="#E2E8F0" stroke-width="1"/>
@@ -116,7 +116,7 @@
             <rect width="300" height="250" fill="url(#map-grid)"/>
             {% for ward in stats.wards %}
               <a href="{% url 'grievances:complaint_list' %}?ward={{ ward.pk }}" class="wardmap__area" data-ward="{{ ward.pk }}">
-                <title>{{ ward }} ({{ ward.area }}): {{ ward.open_count }} open complaint{{ ward.open_count|pluralize }}</title>
+                <title>{{ ward }} ({{ ward.area|tr }}): {% blocktranslate count counter=ward.open_count %}{{ counter }} open complaint{% plural %}{{ counter }} open complaints{% endblocktranslate %}</title>
                 <polygon points="{{ ward.shape }}" fill="{{ ward.fill }}"/>
               </a>
             {% endfor %}
@@ -124,15 +124,15 @@
             <path class="wardmap__river wardmap__river--line" d="M8 180 C 56 156, 88 182, 132 166 S 206 140, 246 156 S 282 182, 296 172"/>
             {% for ward in stats.wards %}
               <circle cx="{{ ward.pin_x }}" cy="{{ ward.pin_y }}" r="4.5" fill="#263B5B"/>
-              <text class="wardmap__label" x="{{ ward.pin_x|add:'-13' }}" y="{{ ward.pin_y|add:'14' }}">Ward {{ ward.number|stringformat:'02d' }}</text>
+              <text class="wardmap__label" x="{{ ward.pin_x|add:'-13' }}" y="{{ ward.pin_y|add:'14' }}">{% blocktranslate with number=ward.number|stringformat:'02d' %}Ward {{ number }}{% endblocktranslate %}</text>
             {% endfor %}
           </svg>
           <div class="wardmap__street" id="street-map" data-complaints-url="{% url 'grievances:complaint_list' %}" hidden></div>
         </div>
-        <p class="wardmap__caption" id="map-caption">Illustrative ward boundaries · not to scale</p>
+        <p class="wardmap__caption" id="map-caption">{% translate "Illustrative ward boundaries · not to scale" %}</p>
       </div>
       <div class="wardlist">
-        <div class="wardlist__head"><span>Ward / zone</span><span>Open</span></div>
+        <div class="wardlist__head"><span>{% translate "Ward / zone" %}</span><span>{% translate "Open" %}</span></div>
         {% for ward in stats.wards %}
           <a class="wardrow" data-ward="{{ ward.pk }}" href="{% url 'grievances:complaint_list' %}?ward={{ ward.pk }}">
             <span class="wardrow__top"><span>{{ ward }}</span><b>{{ ward.open_count }}</b></span>
@@ -141,20 +141,20 @@
         {% endfor %}
         {% if stats.unassigned.open %}
           <a class="wardrow" href="{% url 'grievances:complaint_create' %}?review=pending">
-            <span class="wardrow__top"><span>Ward not assigned yet</span><b>{{ stats.unassigned.open }}</b></span>
+            <span class="wardrow__top"><span>{% translate "Ward not assigned yet" %}</span><b>{{ stats.unassigned.open }}</b></span>
             <span class="bar bar--orange"><span style="width:{{ stats.unassigned.bar }}%"></span></span>
           </a>
         {% endif %}
-        <a class="link" href="{% url 'grievances:complaint_list' %}?sort=ward">Explore ward-wise data {% icon 'arrow-right' 'sm' %}</a>
+        <a class="link" href="{% url 'grievances:complaint_list' %}?sort=ward">{% translate "Explore ward-wise data" %} {% icon 'arrow-right' 'sm' %}</a>
       </div>
     </div>
   </article>
 
   <article class="card card--flush" id="news">
     <div class="card__head card__head--pad">
-      <h2 class="card__title">City news &amp; notices</h2>
+      <h2 class="card__title">{% translate "City news &amp; notices" %}</h2>
       {% if notices|length > 3 %}
-        <button type="button" class="link" data-dialog-open="all-notices">View all {% icon 'arrow-right' 'sm' %}</button>
+        <button type="button" class="link" data-dialog-open="all-notices">{% translate "View all" %} {% icon 'arrow-right' 'sm' %}</button>
       {% endif %}
     </div>
     {% if notices %}
@@ -176,24 +176,24 @@
       </ul>
     {% else %}
       <div class="empty">
-        <p>No notices published yet.</p>
-        <a class="link" href="{% url 'admin:grievances_notice_add' %}">Publish a notice {% icon 'arrow-right' 'sm' %}</a>
+        <p>{% translate "No notices published yet." %}</p>
+        <a class="link" href="{% url 'admin:grievances_notice_add' %}">{% translate "Publish a notice" %} {% icon 'arrow-right' 'sm' %}</a>
       </div>
     {% endif %}
   </article>
 
   <aside class="promo" aria-labelledby="promo-title">
-    <p class="promo__kicker">Our city, our shared pride</p>
-    <h2 class="promo__title" id="promo-title">Cleaner streets. Better everyday lives.</h2>
-    <p class="promo__text">Small actions in your neighbourhood make a big difference to our city.</p>
-    <a class="btn btn--orange btn--block" href="{% url 'grievances:help_desk' %}">Explore civic services {% icon 'arrow-right' 'sm' %}</a>
-    <small class="promo__small">Participate. Report. Make a difference.</small>
+    <p class="promo__kicker">{% translate "Our city, our shared pride" %}</p>
+    <h2 class="promo__title" id="promo-title">{% translate "Cleaner streets. Better everyday lives." %}</h2>
+    <p class="promo__text">{% translate "Small actions in your neighbourhood make a big difference to our city." %}</p>
+    <a class="btn btn--orange btn--block" href="{% url 'grievances:help_desk' %}">{% translate "Explore civic services" %} {% icon 'arrow-right' 'sm' %}</a>
+    <small class="promo__small">{% translate "Participate. Report. Make a difference." %}</small>
   </aside>
 </section>
 
 <div class="banner">
-  <p class="banner__text">{% icon 'building' %}<span>See a civic issue? <strong>Your voice can make a difference.</strong></span></p>
-  <a class="link" href="{% url 'grievances:complaint_create' %}">Report waste, road or sewage issues {% icon 'arrow-right' 'sm' %}</a>
+  <p class="banner__text">{% icon 'building' %}<span>{% blocktranslate %}See a civic issue? <strong>Your voice can make a difference.</strong>{% endblocktranslate %}</span></p>
+  <a class="link" href="{% url 'grievances:complaint_create' %}">{% translate "Report waste, road or sewage issues" %} {% icon 'arrow-right' 'sm' %}</a>
 </div>
 
 {% for notice in notices %}
@@ -203,12 +203,12 @@
         <h2 id="notice-{{ notice.pk }}-title">{{ notice.title }}</h2>
         <p>{{ notice.topic }} · {{ notice.published_on|date:"d M Y" }}</p>
       </div>
-      <button type="button" class="icon-btn" data-dialog-close aria-label="Close">{% icon 'x' %}</button>
+      <button type="button" class="icon-btn" data-dialog-close aria-label="{% translate 'Close' %}">{% icon 'x' %}</button>
     </div>
     <div class="dialog__body">{{ notice.body|default:notice.summary|linebreaks }}</div>
     <div class="dialog__foot">
-      <button type="button" class="btn btn--ghost" data-dialog-close>Close</button>
-      <a class="btn btn--primary" href="{% url 'grievances:complaint_create' %}">Report a related issue</a>
+      <button type="button" class="btn btn--ghost" data-dialog-close>{% translate "Close" %}</button>
+      <a class="btn btn--primary" href="{% url 'grievances:complaint_create' %}">{% translate "Report a related issue" %}</a>
     </div>
   </dialog>
 {% endfor %}
@@ -216,8 +216,8 @@
 {% if notices|length > 3 %}
   <dialog class="dialog" id="all-notices" aria-labelledby="all-notices-title">
     <div class="dialog__head">
-      <h2 id="all-notices-title">All city news &amp; notices</h2>
-      <button type="button" class="icon-btn" data-dialog-close aria-label="Close">{% icon 'x' %}</button>
+      <h2 id="all-notices-title">{% translate "All city news &amp; notices" %}</h2>
+      <button type="button" class="icon-btn" data-dialog-close aria-label="{% translate 'Close' %}">{% icon 'x' %}</button>
     </div>
     <ul class="news news--dialog">
       {% for notice in notices %}

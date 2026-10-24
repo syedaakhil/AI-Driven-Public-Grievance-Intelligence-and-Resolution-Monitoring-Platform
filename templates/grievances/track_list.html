@@ -1,37 +1,37 @@
-{% load ui %}<!DOCTYPE html>
-<html lang="en">
+{% load ui i18n %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>My complaints · City Corporation</title>
-  <meta name="description" content="Track the complaints you registered with the City Corporation citizen portal.">
+  <title>{% translate "My complaints · City Corporation" %}</title>
+  <meta name="description" content="{% translate 'Track the complaints you registered with the City Corporation citizen portal.' %}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="{% static_v 'css/citizen.css' %}">
 </head>
 <body>
-  <a class="skip-link" href="#main">Skip to main content</a>
+  <a class="skip-link" href="#main">{% translate "Skip to main content" %}</a>
 
   {% include "grievances/_citizen_header.html" %}
 
   <main class="page" id="main" tabindex="-1">
-    <nav class="breadcrumb" aria-label="Breadcrumb">
+    <nav class="breadcrumb" aria-label="{% translate 'Breadcrumb' %}">
       <ol>
-        <li><a href="{% url 'grievances:complaint_registration' %}">Citizen portal</a></li>
-        <li aria-current="page">My complaints</li>
+        <li><a href="{% url 'grievances:complaint_registration' %}">{% translate "Citizen portal" %}</a></li>
+        <li aria-current="page">{% translate "My complaints" %}</li>
       </ol>
     </nav>
 
     {% include "partials/messages.html" %}
 
     <div class="page-head">
-      <h1>My complaints</h1>
-      <p class="page-head__sub">Every complaint registered with your verified mobile number {{ masked_phone }}. Open one to see its progress and updates from the corporation.</p>
+      <h1>{% translate "My complaints" %}</h1>
+      <p class="page-head__sub">{% blocktranslate with phone=masked_phone %}Every complaint registered with your verified mobile number {{ phone }}. Open one to see its progress and updates from the corporation.{% endblocktranslate %}</p>
     </div>
 
     <section class="card mine mine--page" aria-labelledby="track-title">
-      <h2 class="sr-only" id="track-title">Your complaints</h2>
+      <h2 class="sr-only" id="track-title">{% translate "Your complaints" %}</h2>
       {% if page.paginator.count %}
         <ul class="mine__list">
           {% for complaint in page %}
@@ -39,7 +39,7 @@
               <div>
                 <a class="mine__ref" href="{% url 'grievances:track_detail' complaint.reference %}">{{ complaint.reference }}</a>
                 <p class="mine__text">{{ complaint.title }}</p>
-                <p class="mine__date">Filed {{ complaint.created_at|date:"d M Y" }}{% if complaint.location %} · {{ complaint.location }}{% endif %}</p>
+                <p class="mine__date">{% blocktranslate with date=complaint.created_at|date:"d M Y" %}Filed {{ date }}{% endblocktranslate %}{% if complaint.location %} · {{ complaint.location }}{% endif %}</p>
               </div>
               <span class="badge badge--{{ complaint.status }}">{{ complaint.get_status_display }}</span>
             </li>
@@ -47,16 +47,16 @@
         </ul>
         {% include "partials/pagination.html" %}
       {% else %}
-        <p class="mine__empty">You haven't registered any complaints with this mobile number yet.</p>
+        <p class="mine__empty">{% translate "You haven't registered any complaints with this mobile number yet." %}</p>
         <div class="actions">
-          <a class="btn btn--primary" href="{% url 'grievances:complaint_registration' %}">Register a complaint</a>
+          <a class="btn btn--primary" href="{% url 'grievances:complaint_registration' %}">{% translate "Register a complaint" %}</a>
         </div>
       {% endif %}
     </section>
   </main>
 
   <footer class="site-footer">
-    <p>© City Corporation · College project — not an official government portal.</p>
+    <p>© {% translate "City Corporation · College project — not an official government portal." %}</p>
   </footer>
 </body>
 </html>

@@ -1,0 +1,14 @@
+{% autoescape off %}CITY CORPORATION — {{ heading }}
+
+{{ intro }}
+{% if summary %}
+{% for label, value in summary %}{{ label }}: {{ value }}
+{% endfor %}{% endif %}
+{% if rows %}{% for row in rows %}{{ forloop.counter }}. {{ row.0 }} — {{ row.1 }}
+   {% if row.2 %}{{ row.2 }} | {% endif %}Status: {{ row.3|default:"—" }} | Filed: {{ row.4|default:"—" }}
+{% endfor %}{% else %}No records to show.
+{% endif %}{% if note %}
+{{ note }}
+{% endif %}
+Generated {{ generated }} by the City Corporation portal.
+{% endautoescape %}

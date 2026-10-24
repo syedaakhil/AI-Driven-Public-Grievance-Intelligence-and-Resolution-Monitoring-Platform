@@ -4,6 +4,7 @@
 branch = True
 source =
     accounts
+    assistant
     citycorp
     core
     grievances

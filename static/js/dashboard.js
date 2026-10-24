@@ -4,6 +4,12 @@
 (function () {
   'use strict';
 
+  // Translations from Django's JavaScript catalogue (/jsi18n/); English if it didn't load.
+  var gettext = window.gettext || function (text) { return text; };
+  var interpolate = window.interpolate || function (text, values) {
+    return text.replace(/%\((\w+)\)s/g, function (_, key) { return values[key]; });
+  };
+
   var dataElement = document.getElementById('dashboard-data');
   if (!dataElement) return;
   var data = JSON.parse(dataElement.textContent);
@@ -15,7 +21,7 @@
     if (!canvas) return;
     var note = document.createElement('div');
     note.className = 'chart-fallback';
-    note.textContent = 'Chart could not load (Chart.js needs an internet connection). The figures above still work.';
+    note.textContent = gettext('Chart could not load (Chart.js needs an internet connection). The figures above still work.');
     canvas.parentElement.appendChild(note);
   }
 
@@ -38,8 +44,8 @@
       data: {
         labels: data.monthly.labels,
         datasets: [
-          Object.assign({ label: 'Reported', data: data.monthly.reported, backgroundColor: '#2E5487' }, bar),
-          Object.assign({ label: 'Resolved', data: data.monthly.resolved, backgroundColor: '#A9C1DE' }, bar)
+          Object.assign({ label: gettext('Reported'), data: data.monthly.reported, backgroundColor: '#2E5487' }, bar),
+          Object.assign({ label: gettext('Resolved'), data: data.monthly.resolved, backgroundColor: '#A9C1DE' }, bar)
         ]
       },
       options: {
@@ -64,7 +70,7 @@
     charts.channels = new Chart(document.getElementById('channel-chart'), {
       type: 'doughnut',
       data: {
-        labels: noData ? ['No complaints yet'] : channels.labels,
+        labels: noData ? [gettext('No complaints yet')] : channels.labels,
         datasets: [{
           data: noData ? [1] : channels.counts,
           backgroundColor: noData ? ['#EEF1F5'] : channels.colours,
@@ -98,7 +104,7 @@
       data: {
         labels: data.resolvedLine.labels,
         datasets: [{
-          label: 'Resolved', data: data.resolvedLine.values,
+          label: gettext('Resolved'), data: data.resolvedLine.values,
           borderColor: '#2E5487', borderWidth: 2, backgroundColor: fill, fill: true,
           tension: 0.42, pointRadius: 0, pointHoverRadius: 4, pointBackgroundColor: '#2E5487'
         }]
@@ -182,10 +188,10 @@
     var title = document.createElement('strong');
     title.textContent = point.label;
     var info = document.createElement('div');
-    info.textContent = point.area + ' · ' + point.open + ' open';
+    info.textContent = interpolate(gettext('%(area)s · %(count)s open'), { area: point.area, count: point.open }, true);
     var link = document.createElement('a');
     link.href = street.getAttribute('data-complaints-url') + '?ward=' + encodeURIComponent(point.id);
-    link.textContent = 'View complaints';
+    link.textContent = gettext('View complaints');
     box.append(title, info, link);
     return box;
   }
@@ -196,20 +202,20 @@
     });
     if (mode === 'illustrated') {
       street.hidden = true;
-      caption.textContent = 'Illustrative ward boundaries · not to scale';
+      caption.textContent = gettext('Illustrative ward boundaries · not to scale');
       return;
     }
     street.hidden = false;
     if (streetMap) {
       streetMap.invalidateSize();
-      caption.textContent = 'Chennai, Tamil Nadu · © OpenStreetMap contributors';
+      caption.textContent = gettext('Chennai, Tamil Nadu · © OpenStreetMap contributors');
       return;
     }
-    caption.textContent = 'Loading street map…';
+    caption.textContent = gettext('Loading street map…');
     loadLeaflet(function (ok) {
       if (!ok) {
         setMapMode('illustrated');
-        caption.textContent = 'Street map unavailable offline — showing the illustrated map.';
+        caption.textContent = gettext('Street map unavailable offline — showing the illustrated map.');
         return;
       }
       var L = window.L;
@@ -223,7 +229,7 @@
           radius: 6 + Math.min(point.open, 24), color: '#2E5487', weight: 1.5, fillColor: '#2E5487', fillOpacity: 0.35
         }).addTo(streetMap).bindPopup(popup(point));
       });
-      caption.textContent = 'Chennai, Tamil Nadu · © OpenStreetMap contributors';
+      caption.textContent = gettext('Chennai, Tamil Nadu · © OpenStreetMap contributors');
       setTimeout(function () { streetMap.invalidateSize(); }, 50);
     });
   }

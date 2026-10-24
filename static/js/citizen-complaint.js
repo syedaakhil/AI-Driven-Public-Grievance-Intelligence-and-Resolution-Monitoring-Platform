@@ -8,18 +8,25 @@
 (function () {
   'use strict';
 
+  // Translations from Django's JavaScript catalogue (/jsi18n/); English if it didn't load.
+  var gettext = window.gettext || function (text) { return text; };
+  var ngettext = window.ngettext || function (one, many, n) { return n === 1 ? one : many; };
+  var interpolate = window.interpolate || function (text, values) {
+    return text.replace(/%\((\w+)\)s/g, function (_, key) { return values[key]; });
+  };
+
   var MAX_FILE_BYTES = 5 * 1024 * 1024;
 
   var FILE_RULES = {
     attachment: {
       extensions: ['jpg', 'jpeg', 'png', 'webp'],
       types: ['image/jpeg', 'image/png', 'image/webp'],
-      label: 'JPG, JPEG, PNG or WEBP'
+      label: gettext('JPG, JPEG, PNG or WEBP')
     },
     previous_copy: {
       extensions: ['pdf', 'jpg', 'jpeg', 'png'],
       types: ['application/pdf', 'image/jpeg', 'image/png'],
-      label: 'PDF, JPG, JPEG or PNG'
+      label: gettext('PDF, JPG, JPEG or PNG')
     }
   };
 
@@ -72,7 +79,7 @@
   }
 
   function formatSize(bytes) {
-    if (bytes < 1024) return bytes + ' bytes';
+    if (bytes < 1024) return interpolate(gettext('%(count)s bytes'), { count: bytes }, true);
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + ' KB';
     return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
   }
@@ -101,45 +108,45 @@
 
   var validators = {
     citizen_name: function () {
-      var message = requiredText('citizen_name', 'Enter your full name.', 2, 'Your name must have at least 2 characters.');
+      var message = requiredText('citizen_name', gettext('Enter your full name.'), 2, gettext('Your name must have at least 2 characters.'));
       if (message) return message;
-      if (!NAME_PATTERN.test(value('citizen_name'))) return 'Use letters, spaces, full stops, apostrophes or hyphens in your name.';
+      if (!NAME_PATTERN.test(value('citizen_name'))) return gettext('Use letters, spaces, full stops, apostrophes or hyphens in your name.');
       return '';
     },
     citizen_address: function () {
-      return requiredText('citizen_address', 'Enter your residential address.', 10, 'Please enter your full address, including house number and street.');
+      return requiredText('citizen_address', gettext('Enter your residential address.'), 10, gettext('Please enter your full address, including house number and street.'));
     },
     taluk: function () {
-      var message = requiredText('taluk', 'Enter your taluk.', 2, 'Enter a valid taluk name.');
+      var message = requiredText('taluk', gettext('Enter your taluk.'), 2, gettext('Enter a valid taluk name.'));
       if (message) return message;
-      if (!HAS_LETTER.test(value('taluk'))) return 'Enter a valid taluk name.';
+      if (!HAS_LETTER.test(value('taluk'))) return gettext('Enter a valid taluk name.');
       return '';
     },
     description: function () {
-      return requiredText('description', 'Describe the problem you are facing.', 20, 'Please describe the problem in a little more detail (at least 20 characters).');
+      return requiredText('description', gettext('Describe the problem you are facing.'), 20, gettext('Please describe the problem in a little more detail (at least 20 characters).'));
     },
     attachment: function () {
       return state.files.attachment ? checkFile('attachment', state.files.attachment) : '';   // optional
     },
     location: function () {
-      return requiredText('location', 'Enter the area affected by the problem.', 3, 'Please enter the locality, street, village, ward or landmark.');
+      return requiredText('location', gettext('Enter the area affected by the problem.'), 3, gettext('Please enter the locality, street, village, ward or landmark.'));
     },
     impact: function () {
-      return requiredText('impact', 'Explain how this problem affects you.', 10, 'Please explain the effect in a little more detail (at least 10 characters).');
+      return requiredText('impact', gettext('Explain how this problem affects you.'), 10, gettext('Please explain the effect in a little more detail (at least 10 characters).'));
     },
     reported_before: function () {
-      return selectedRadio('reported_before') ? '' : 'Select Yes or No.';
+      return selectedRadio('reported_before') ? '' : gettext('Select Yes or No.');
     },
     previous_reference: function () {
       var text = value('previous_reference');
-      if (text && !REFERENCE_PATTERN.test(text)) return 'Use only letters, numbers, spaces, hyphens, full stops or slashes.';
+      if (text && !REFERENCE_PATTERN.test(text)) return gettext('Use only letters, numbers, spaces, hyphens, full stops or slashes.');
       return '';
     },
     previous_copy: function () {
       return state.files.previous_copy ? checkFile('previous_copy', state.files.previous_copy) : '';   // optional
     },
     declaration: function () {
-      return form.elements.declaration.checked ? '' : 'Please confirm that the information you have provided is accurate.';
+      return form.elements.declaration.checked ? '' : gettext('Please confirm that the information you have provided is accurate.');
     }
   };
 
@@ -147,9 +154,9 @@
     var rule = FILE_RULES[name];
     var extOk = rule.extensions.indexOf(fileExtension(file.name)) !== -1;
     var typeOk = !file.type || rule.types.indexOf(file.type) !== -1;
-    if (!extOk || !typeOk) return '“' + file.name + '” is not an accepted format. Please choose a ' + rule.label + ' file.';
-    if (file.size === 0) return '“' + file.name + '” is empty. Please choose another file.';
-    if (file.size > MAX_FILE_BYTES) return '“' + file.name + '” (' + formatSize(file.size) + ') is larger than the 5 MB limit. Please choose a smaller file.';
+    if (!extOk || !typeOk) return interpolate(gettext('“%(name)s” is not an accepted format. Please choose a %(formats)s file.'), { name: file.name, formats: rule.label }, true);
+    if (file.size === 0) return interpolate(gettext('“%(name)s” is empty. Please choose another file.'), { name: file.name }, true);
+    if (file.size > MAX_FILE_BYTES) return interpolate(gettext('“%(name)s” (%(size)s) is larger than the 5 MB limit. Please choose a smaller file.'), { name: file.name, size: formatSize(file.size) }, true);
     return '';
   }
 
@@ -222,9 +229,9 @@
       errorSummary.hidden = true;
       return;
     }
-    errorSummaryTitle.textContent = errors.length === 1
-      ? 'Please correct 1 problem before submitting'
-      : 'Please correct ' + errors.length + ' problems before submitting';
+    errorSummaryTitle.textContent = interpolate(ngettext('Please correct %(count)s problem before submitting',
+                          'Please correct %(count)s problems before submitting', errors.length),
+                 { count: errors.length }, true);
     errors.forEach(function (error) {
       var item = document.createElement('li');
       var link = document.createElement('a');
@@ -341,7 +348,7 @@
 
     upload.querySelector('.upload__name').textContent = file.name;
     upload.querySelector('.upload__size').textContent =
-      (fileExtension(file.name).toUpperCase() || 'File') + ' · ' + formatSize(file.size);
+      (fileExtension(file.name).toUpperCase() || gettext('File')) + ' · ' + formatSize(file.size);
     drop.hidden = true;
     preview.hidden = false;
     // The Replace and Remove buttons take over keyboard access while a file is selected.
@@ -370,8 +377,8 @@
       if (message) {
         setInputFile(input, state.files[name]);   // never post a rejected file
         setError(name, state.files[name]
-          ? message + ' Your earlier file “' + state.files[name].name + '” is still selected.'
-          : message + ' No file has been attached.');
+          ? message + ' ' + interpolate(gettext('Your earlier file “%(name)s” is still selected.'), { name: state.files[name].name }, true)
+          : message + ' ' + gettext('No file has been attached.'));
         refreshSummary();
         return;
       }
@@ -386,7 +393,7 @@
       var file = state.files[name];
       if (!file || !thumb.getAttribute('src')) return;
       removeFile(name);
-      setError(name, '“' + file.name + '” could not be opened as an image. Please choose another file.');
+      setError(name, interpolate(gettext('“%(name)s” could not be opened as an image. Please choose another file.'), { name: file.name }, true));
       refreshSummary();
     });
 
@@ -436,7 +443,7 @@
     }
     if (typeof clearDialog.showModal === 'function') {
       clearDialog.showModal();
-    } else if (window.confirm('Clear the form? Everything you have entered will be removed.')) {
+    } else if (window.confirm(gettext('Clear the form? Everything you have entered will be removed.'))) {
       clearFields();
     }
   });
@@ -454,7 +461,7 @@
     state.submitting = isSubmitting;
     submitBtn.disabled = isSubmitting;
     clearBtn.disabled = isSubmitting;
-    submitBtn.textContent = isSubmitting ? 'Submitting…' : 'Submit Complaint';
+    submitBtn.textContent = isSubmitting ? gettext('Submitting…') : gettext('Submit Complaint');
     form.setAttribute('aria-busy', String(isSubmitting));
   }
 
@@ -503,15 +510,15 @@
       function done(message, buttonText) {
         status.textContent = message;
         label.textContent = buttonText;
-        setTimeout(function () { label.textContent = 'Copy'; }, 2000);
+        setTimeout(function () { label.textContent = gettext('Copy'); }, 2000);
       }
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(reference).then(
-          function () { done('Reference number copied.', 'Copied'); },
-          function () { done('Could not copy. Please write the reference number down.', 'Copy failed'); }
+          function () { done(gettext('Reference number copied.'), gettext('Copied')); },
+          function () { done(gettext('Could not copy. Please write the reference number down.'), gettext('Copy failed')); }
         );
       } else {
-        done('Copy is not available in this browser. Please write the reference number down.', 'Copy failed');
+        done(gettext('Copy is not available in this browser. Please write the reference number down.'), gettext('Copy failed'));
       }
     });
   }

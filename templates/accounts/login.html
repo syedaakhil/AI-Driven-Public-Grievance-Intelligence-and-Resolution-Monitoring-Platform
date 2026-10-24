@@ -1,31 +1,32 @@
-{% load ui %}<!DOCTYPE html>
-<html lang="en">
+{% load ui i18n %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sign in · Government Corporation</title>
+  <title>{% translate "Sign in · Government Corporation" %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="{% static_v 'css/main.css' %}">
 </head>
 <body class="login-page">
   <main class="login" id="content">
     <div class="login__card">
+      <div class="login__lang">{% include "partials/language_switch.html" with compact=True %}</div>
       <div class="brand brand--centred">
         <span class="brand__mark">{% icon 'building' 'lg' %}</span>
         <span class="brand__text">
-          <span class="brand__name">City <span>Corporation</span></span>
-          <span class="brand__tag">Your city, our responsibility.</span>
+          <span class="brand__name">{% translate "City" context "brand, first word" %} <span>{% translate "Corporation" context "brand, second word" %}</span></span>
+          <span class="brand__tag">{% translate "Your city, our responsibility." %}</span>
         </span>
       </div>
 
-      <h1 class="login__title">Sign in</h1>
-      <p class="login__lead">Select your access type.</p>
+      <h1 class="login__title">{% translate "Sign in" %}</h1>
+      <p class="login__lead">{% translate "Select your access type." %}</p>
 
-      <nav class="seg seg--full login__tabs" aria-label="Access type">
-        <a class="seg__btn" href="{% url 'accounts:login' %}?as=citizen"{% if tab == 'citizen' %} aria-current="page"{% endif %}>Citizen</a>
-        <a class="seg__btn" href="{% url 'accounts:login' %}?as=admin{% if next %}&amp;next={{ next|urlencode }}{% endif %}"{% if tab == 'admin' %} aria-current="page"{% endif %}>Corporation admin</a>
+      <nav class="seg seg--full login__tabs" aria-label="{% translate 'Access type' %}">
+        <a class="seg__btn" href="{% url 'accounts:login' %}?as=citizen"{% if tab == 'citizen' %} aria-current="page"{% endif %}>{% translate "Citizen" %}</a>
+        <a class="seg__btn" href="{% url 'accounts:login' %}?as=admin{% if next %}&amp;next={{ next|urlencode }}{% endif %}"{% if tab == 'admin' %} aria-current="page"{% endif %}>{% translate "Corporation admin" %}</a>
       </nav>
 
       {% include "partials/messages.html" %}
@@ -35,38 +36,38 @@
           {% csrf_token %}
           <input type="hidden" name="next" value="{{ next }}">
           <div class="field">
-            <label for="username">Username</label>
+            <label for="username">{% translate "Username" %}</label>
             <input class="input" id="username" name="username" type="text" autocomplete="username" maxlength="150" required autofocus>
           </div>
           <div class="field">
-            <label for="password">Password</label>
+            <label for="password">{% translate "Password" %}</label>
             <input class="input" id="password" name="password" type="password" autocomplete="current-password" required>
           </div>
-          <button type="submit" class="btn btn--primary btn--block btn--tall">Sign in</button>
+          <button type="submit" class="btn btn--primary btn--block btn--tall">{% translate "Sign in" %}</button>
         </form>
 
       {% elif waiting %}
         <form method="post" action="{% url 'accounts:verify_otp' %}" class="stack stack--tight">
           {% csrf_token %}
-          <p class="login__lead login__lead--flush">Enter the 6-digit OTP sent to <strong>{{ waiting_phone }}</strong>.</p>
+          <p class="login__lead login__lead--flush">{% blocktranslate with phone=waiting_phone %}Enter the 6-digit OTP sent to <strong>{{ phone }}</strong>.{% endblocktranslate %}</p>
           {% if dev_code %}
-            <div class="alert alert--info">{% icon 'info' %}<span><strong>Testing mode:</strong> no SMS provider is set up, so the OTP is shown here and in the server console: <strong>{{ dev_code }}</strong></span></div>
+            <div class="alert alert--info">{% icon 'info' %}<span>{% blocktranslate with code=dev_code %}<strong>Testing mode:</strong> no SMS provider is set up, so the OTP is shown here and in the server console: <strong>{{ code }}</strong>{% endblocktranslate %}</span></div>
           {% endif %}
           <div class="field">
-            <label for="otp">One-time password</label>
+            <label for="otp">{% translate "One-time password" %}</label>
             <input class="input input--otp" id="otp" name="otp" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required autofocus>
           </div>
-          <button type="submit" class="btn btn--primary btn--block btn--tall">Verify and continue</button>
+          <button type="submit" class="btn btn--primary btn--block btn--tall">{% translate "Verify and continue" %}</button>
         </form>
         <div class="login__links">
           <form method="post" action="{% url 'accounts:send_otp' %}">
             {% csrf_token %}
             <input type="hidden" name="phone" value="{{ waiting_digits }}">
-            <button type="submit" class="text-btn">Resend OTP</button>
+            <button type="submit" class="text-btn">{% translate "Resend OTP" %}</button>
           </form>
           <form method="post" action="{% url 'accounts:reset_otp' %}">
             {% csrf_token %}
-            <button type="submit" class="text-btn">Change number</button>
+            <button type="submit" class="text-btn">{% translate "Change number" %}</button>
           </form>
         </div>
 
@@ -74,17 +75,17 @@
         <form method="post" action="{% url 'accounts:send_otp' %}" class="stack stack--tight">
           {% csrf_token %}
           <div class="field">
-            <label for="phone">Mobile number</label>
+            <label for="phone">{% translate "Mobile number" %}</label>
             <div class="phone">
               <span class="phone__code">+91</span>
-              <input class="input" id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel-national" pattern="[6-9][0-9]{9}" maxlength="10" placeholder="10-digit mobile number" required autofocus>
+              <input class="input" id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel-national" pattern="[6-9][0-9]{9}" maxlength="10" placeholder="{% translate '10-digit mobile number' %}" required autofocus>
             </div>
           </div>
-          <button type="submit" class="btn btn--primary btn--block btn--tall">Send OTP</button>
+          <button type="submit" class="btn btn--primary btn--block btn--tall">{% translate "Send OTP" %}</button>
         </form>
       {% endif %}
 
-      <p class="login__note">Official grievance portal of the municipal corporation. Unauthorised access is prohibited.</p>
+      <p class="login__note">{% translate "Official grievance portal of the municipal corporation. Unauthorised access is prohibited." %}</p>
     </div>
   </main>
 </body>

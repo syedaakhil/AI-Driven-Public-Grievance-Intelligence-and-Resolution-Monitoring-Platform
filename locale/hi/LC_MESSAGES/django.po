@@ -1,0 +1,1750 @@
+# Hindi translation of the City Corporation portal.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: City Corporation\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-24 15:24+0530\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: City Corporation team\n"
+"Language-Team: Hindi\n"
+"Language: hi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Please verify your mobile number to continue."
+msgstr "कृपया आगे बढ़ने के लिए अपना मोबाइल नंबर सत्यापित करें।"
+
+#, python-format
+msgid "Please wait %(seconds)s seconds before asking for another OTP."
+msgstr "नया OTP माँगने से पहले कृपया %(seconds)s सेकंड प्रतीक्षा करें।"
+
+msgid "Too many OTP requests for this number. Please try again in an hour."
+msgstr "इस नंबर के लिए बहुत अधिक OTP अनुरोध हो चुके हैं। कृपया एक घंटे बाद फिर से प्रयास करें।"
+
+msgid "We could not send the SMS right now. Please try again later."
+msgstr "हम अभी SMS नहीं भेज सके। कृपया बाद में फिर से प्रयास करें।"
+
+msgid "Please request an OTP first."
+msgstr "कृपया पहले OTP का अनुरोध करें।"
+
+msgid "This OTP has expired. Please request a new one."
+msgstr "इस OTP की समय-सीमा समाप्त हो गई है। कृपया नया OTP माँगें।"
+
+#, python-format
+msgid "Enter the %(length)s-digit OTP."
+msgstr "%(length)s अंकों का OTP दर्ज करें।"
+
+msgid "Too many incorrect attempts. Please request a new OTP."
+msgstr "बहुत अधिक गलत प्रयास। कृपया नया OTP माँगें।"
+
+#, python-format
+msgid "Incorrect OTP. %(left)s attempt left."
+msgid_plural "Incorrect OTP. %(left)s attempts left."
+msgstr[0] "गलत OTP। %(left)s प्रयास बाकी है।"
+msgstr[1] "गलत OTP। %(left)s प्रयास बाकी हैं।"
+
+msgid "Too many failed attempts. Please try again in 15 minutes."
+msgstr "बहुत अधिक असफल प्रयास। कृपया 15 मिनट बाद फिर से प्रयास करें।"
+
+msgid "This account still has a weak password, so it is blocked on the live site. Set a strong one with “manage.py changepassword”."
+msgstr "इस खाते का पासवर्ड अभी भी कमज़ोर है, इसलिए लाइव साइट पर इसे रोक दिया गया है। “manage.py changepassword” से एक मज़बूत पासवर्ड सेट करें।"
+
+msgid "Invalid username or password."
+msgstr "उपयोगकर्ता नाम या पासवर्ड गलत है।"
+
+msgid "Enter a valid 10-digit mobile number starting with 6, 7, 8 or 9."
+msgstr "6, 7, 8 या 9 से शुरू होने वाला 10 अंकों का मान्य मोबाइल नंबर दर्ज करें।"
+
+#, python-format
+msgid "OTP sent to %(phone)s."
+msgstr "OTP %(phone)s पर भेजा गया।"
+
+msgid "You have been signed out."
+msgstr "आप साइन आउट हो गए हैं।"
+
+msgid ""
+"Hi! I can search complaints and email them to the corporation inbox.\n"
+"• Search by name, ID or words: “Lakshmi”, “CC-2026-00042”, “pothole Anna Nagar”\n"
+"• Filter: “open complaints”, “resolved today”, “latest complaints”\n"
+"• Email: “mail me this”, “email me the complaints of Ravi”"
+msgstr ""
+"नमस्ते! मैं शिकायतें खोज सकता हूँ और उन्हें निगम के इनबॉक्स में ईमेल कर सकता हूँ।\n"
+"• नाम, ID या शब्दों से खोजें: “Lakshmi”, “CC-2026-00042”, “pothole Anna Nagar”\n"
+"• फ़िल्टर: “open complaints”, “resolved today”, “latest complaints”\n"
+"• ईमेल: “mail me this”, “मुझे ईमेल भेजो”, “email me the complaints of Ravi”"
+
+msgid "Latest complaints"
+msgstr "नवीनतम शिकायतें"
+
+msgid "Open complaints"
+msgstr "खुली शिकायतें"
+
+msgid "Mail me today's complaints"
+msgstr "आज की शिकायतें मुझे मेल करें"
+
+#, python-format
+msgid "%(count)s record"
+msgid_plural "%(count)s records"
+msgstr[0] "%(count)s रिकॉर्ड"
+msgstr[1] "%(count)s रिकॉर्ड"
+
+#, python-format
+msgid "No records match %(search)s. Try fewer words or another spelling."
+msgstr "%(search)s से कोई रिकॉर्ड मेल नहीं खाता। कम शब्द या दूसरी वर्तनी आज़माएँ।"
+
+#, python-format
+msgid "Showing the top %(shown)s. Say “mail me this” to get all %(total)s by email."
+msgstr "शीर्ष %(shown)s दिखाए जा रहे हैं। सभी %(total)s ईमेल से पाने के लिए “mail me this” लिखें।"
+
+msgid "Say “mail me this” to get them by email."
+msgstr "इन्हें ईमेल से पाने के लिए “mail me this” लिखें।"
+
+#, python-format
+msgid "Found %(records)s for %(search)s."
+msgstr "%(search)s के लिए %(records)s मिले।"
+
+#, python-format
+msgid "You have asked for %(count)s emails in the last hour. Please try again later."
+msgstr "आपने पिछले एक घंटे में %(count)s ईमेल माँगे हैं। कृपया बाद में फिर से प्रयास करें।"
+
+#, python-format
+msgid "No records match %(search)s, so no email was sent."
+msgstr "%(search)s से कोई रिकॉर्ड मेल नहीं खाता, इसलिए कोई ईमेल नहीं भेजा गया।"
+
+#, python-format
+msgid "❌ The email was not sent: %(reason)s"
+msgstr "❌ ईमेल नहीं भेजा गया: %(reason)s"
+
+#, python-format
+msgid "✅ Sent %(records)s (%(search)s) to %(address)s."
+msgstr "✅ %(records)s (%(search)s) %(address)s पर भेजे गए।"
+
+#, python-format
+msgid "(Emails only go to %(address)s; other addresses are ignored.)"
+msgstr "(ईमेल केवल %(address)s पर जाते हैं; दूसरे पते अनदेखे किए जाते हैं।)"
+
+#, python-format
+msgid "status %(statuses)s"
+msgstr "स्थिति %(statuses)s"
+
+msgid "filed today"
+msgstr "आज दर्ज"
+
+msgid "most recent"
+msgstr "सबसे हाल की"
+
+msgid "everything"
+msgstr "सभी"
+
+#, python-format
+msgid "%(taluk)s taluk"
+msgstr "%(taluk)s तालुक"
+
+msgid "Please sign in as a corporation admin to use the assistant."
+msgstr "सहायक का उपयोग करने के लिए कृपया निगम प्रशासक के रूप में साइन इन करें।"
+
+msgid "Too many messages. Please wait a minute and try again."
+msgstr "बहुत अधिक संदेश। कृपया एक मिनट रुककर फिर से प्रयास करें।"
+
+msgid "The message could not be read."
+msgstr "संदेश पढ़ा नहीं जा सका।"
+
+msgid "Type a message first."
+msgstr "पहले कोई संदेश लिखें।"
+
+#, python-format
+msgid "Please keep the message under %(count)s characters."
+msgstr "कृपया संदेश %(count)s अक्षरों से कम रखें।"
+
+msgid "The database is not reachable right now. Please try again in a moment."
+msgstr "डेटाबेस अभी उपलब्ध नहीं है। कृपया थोड़ी देर बाद फिर से प्रयास करें।"
+
+msgid "Something went wrong on our side. Please try again."
+msgstr "हमारी ओर से कुछ गड़बड़ हो गई। कृपया फिर से प्रयास करें।"
+
+msgid "Home"
+msgstr "होम"
+
+msgid "Filed complaint"
+msgstr "दर्ज शिकायत"
+
+msgid "Officers in charge"
+msgstr "प्रभारी अधिकारी"
+
+msgid "Dataset"
+msgstr "डेटासेट"
+
+msgid "Overview"
+msgstr "अवलोकन"
+
+msgid "Filed complaints"
+msgstr "दर्ज शिकायतें"
+
+msgid "Complaints dataset"
+msgstr "शिकायत डेटासेट"
+
+msgid "Complaint details"
+msgstr "शिकायत का विवरण"
+
+msgid "Citizen help desk"
+msgstr "नागरिक सहायता केंद्र"
+
+msgid "Help & support"
+msgstr "सहायता और समर्थन"
+
+#, python-format
+msgid "“%(name)s” is larger than the 5 MB limit. Please choose a smaller file."
+msgstr "“%(name)s” 5 MB की सीमा से बड़ी है। कृपया छोटी फ़ाइल चुनें।"
+
+#, python-format
+msgid "“%(name)s” is not an accepted format. Please choose a %(formats)s file."
+msgstr "“%(name)s” स्वीकार्य प्रारूप में नहीं है। कृपया %(formats)s फ़ाइल चुनें।"
+
+msgid "Yes"
+msgstr "हाँ"
+
+msgid "No"
+msgstr "नहीं"
+
+msgid "Have You Previously Reported This Problem?"
+msgstr "क्या आपने पहले यह समस्या दर्ज की है?"
+
+msgid "Select Yes or No."
+msgstr "हाँ या नहीं चुनें।"
+
+msgid "Please confirm that the information you have provided is accurate."
+msgstr "कृपया पुष्टि करें कि आपके द्वारा दी गई जानकारी सही है।"
+
+msgid "Enter your full name."
+msgstr "अपना पूरा नाम दर्ज करें।"
+
+msgid "Enter your residential address."
+msgstr "अपना आवासीय पता दर्ज करें।"
+
+msgid "Enter your taluk."
+msgstr "अपना तालुक दर्ज करें।"
+
+msgid "Describe the problem you are facing."
+msgstr "आप जिस समस्या का सामना कर रहे हैं, उसका वर्णन करें।"
+
+msgid "Enter the area affected by the problem."
+msgstr "समस्या से प्रभावित क्षेत्र दर्ज करें।"
+
+msgid "Explain how this problem affects you."
+msgstr "बताएँ कि यह समस्या आपको कैसे प्रभावित करती है।"
+
+msgid "Your name must have at least 2 characters."
+msgstr "आपके नाम में कम से कम 2 अक्षर होने चाहिए।"
+
+msgid "Use letters, spaces, full stops, apostrophes or hyphens in your name."
+msgstr "अपने नाम में केवल अक्षर, रिक्त स्थान, पूर्ण विराम, एपॉस्ट्रॉफ़ी या हाइफ़न का उपयोग करें।"
+
+msgid "Please enter your full address, including house number and street."
+msgstr "कृपया मकान नंबर और गली सहित अपना पूरा पता दर्ज करें।"
+
+msgid "Please keep the address under 500 characters."
+msgstr "कृपया पता 500 अक्षरों से कम रखें।"
+
+msgid "Enter a valid taluk name."
+msgstr "मान्य तालुक नाम दर्ज करें।"
+
+msgid "Please describe the problem in a little more detail (at least 20 characters)."
+msgstr "कृपया समस्या का थोड़ा और विस्तार से वर्णन करें (कम से कम 20 अक्षर)।"
+
+msgid "Please keep the description under 2000 characters."
+msgstr "कृपया विवरण 2000 अक्षरों से कम रखें।"
+
+msgid "Please enter the locality, street, village, ward or landmark."
+msgstr "कृपया मोहल्ला, गली, गाँव, वार्ड या कोई पहचान चिह्न दर्ज करें।"
+
+msgid "Please explain the effect in a little more detail (at least 10 characters)."
+msgstr "कृपया प्रभाव को थोड़ा और विस्तार से बताएँ (कम से कम 10 अक्षर)।"
+
+msgid "Please keep this under 1000 characters."
+msgstr "कृपया इसे 1000 अक्षरों से कम रखें।"
+
+msgid "JPG, JPEG, PNG or WEBP"
+msgstr "JPG, JPEG, PNG या WEBP"
+
+msgid "Use only letters, numbers, spaces, hyphens, full stops or slashes."
+msgstr "केवल अक्षर, अंक, रिक्त स्थान, हाइफ़न, पूर्ण विराम या स्लैश का उपयोग करें।"
+
+msgid "PDF, JPG, JPEG or PNG"
+msgstr "PDF, JPG, JPEG या PNG"
+
+msgid "Not assigned"
+msgstr "नियत नहीं"
+
+msgid "Service category"
+msgstr "सेवा श्रेणी"
+
+msgid "Ward"
+msgstr "वार्ड"
+
+msgid "Status"
+msgstr "स्थिति"
+
+msgid "Officer in charge"
+msgstr "प्रभारी अधिकारी"
+
+msgid "Note"
+msgstr "टिप्पणी"
+
+msgid "What was done? (optional)"
+msgstr "क्या किया गया? (वैकल्पिक)"
+
+msgid "Show this note to the citizen"
+msgstr "यह टिप्पणी नागरिक को दिखाएँ"
+
+msgid "The citizen always sees the status. Tick this only for notes written for them."
+msgstr "नागरिक हमेशा स्थिति देखता है। इसे केवल उन्हीं टिप्पणियों के लिए चुनें जो नागरिक के लिए लिखी गई हों।"
+
+msgid "Newest first"
+msgstr "नवीनतम पहले"
+
+msgid "Oldest first"
+msgstr "सबसे पुरानी पहले"
+
+msgid "Priority"
+msgstr "प्राथमिकता"
+
+msgid "Search"
+msgstr "खोजें"
+
+msgid "Search by complaint ID or title"
+msgstr "शिकायत ID या शीर्षक से खोजें"
+
+msgid "All categories"
+msgstr "सभी श्रेणियाँ"
+
+msgid "All wards"
+msgstr "सभी वार्ड"
+
+msgid "All statuses"
+msgstr "सभी स्थितियाँ"
+
+msgid "All priorities"
+msgstr "सभी प्राथमिकताएँ"
+
+msgid "All channels"
+msgstr "सभी माध्यम"
+
+msgid "Sort by"
+msgstr "क्रम"
+
+msgid "All complaints"
+msgstr "सभी शिकायतें"
+
+msgid "Needs category & ward"
+msgstr "श्रेणी और वार्ड आवश्यक"
+
+msgid "Reviewed"
+msgstr "समीक्षा हो चुकी"
+
+msgid "ID, citizen name, taluk or area"
+msgstr "ID, नागरिक का नाम, तालुक या क्षेत्र"
+
+msgid "Review"
+msgstr "समीक्षा"
+
+msgid "Resolution rate"
+msgstr "समाधान दर"
+
+msgid "Assigned complaints"
+msgstr "सौंपी गई शिकायतें"
+
+msgid "Most open complaints"
+msgstr "सबसे अधिक खुली शिकायतें"
+
+msgid "Name (A–Z)"
+msgstr "नाम (A–Z)"
+
+msgid "Search officers"
+msgstr "अधिकारी खोजें"
+
+msgid "Name, designation or area"
+msgstr "नाम, पद या क्षेत्र"
+
+msgid "All departments"
+msgstr "सभी विभाग"
+
+msgid "Department"
+msgstr "विभाग"
+
+msgid "Your name"
+msgstr "आपका नाम"
+
+msgid "Email"
+msgstr "ईमेल"
+
+msgid "Topic"
+msgstr "विषय"
+
+msgid "Message"
+msgstr "संदेश"
+
+msgid "e.g. Arjun"
+msgstr "जैसे अर्जुन"
+
+msgid "How can we help? (at least 15 characters)"
+msgstr "हम कैसे मदद कर सकते हैं? (कम से कम 15 अक्षर)"
+
+msgid "Choose a topic"
+msgstr "विषय चुनें"
+
+msgid "Please enter your name."
+msgstr "कृपया अपना नाम दर्ज करें।"
+
+#, python-format
+msgid "Message should be at least 15 characters (%(count)s so far)."
+msgstr "संदेश कम से कम 15 अक्षरों का होना चाहिए (अब तक %(count)s)।"
+
+#, python-format
+msgid "Ward %(number)s – %(name)s"
+msgstr "वार्ड %(number)s – %(name)s"
+
+msgid "Submitted"
+msgstr "दर्ज"
+
+msgid "Assigned"
+msgstr "सौंपी गई"
+
+msgid "In progress"
+msgstr "प्रगति पर"
+
+msgid "Resolved"
+msgstr "हल हो गई"
+
+msgid "High"
+msgstr "उच्च"
+
+msgid "Medium"
+msgstr "मध्यम"
+
+msgid "Low"
+msgstr "निम्न"
+
+msgid "Portal"
+msgstr "पोर्टल"
+
+msgid "WhatsApp"
+msgstr "व्हाट्सएप"
+
+msgid "X (Twitter)"
+msgstr "X (ट्विटर)"
+
+msgid "Facebook"
+msgstr "फ़ेसबुक"
+
+msgid "Instagram"
+msgstr "इंस्टाग्राम"
+
+msgid "Phone call"
+msgstr "फ़ोन कॉल"
+
+msgid "Walk-in"
+msgstr "स्वयं आकर"
+
+msgid "Using the dashboard"
+msgstr "डैशबोर्ड का उपयोग"
+
+msgid "Filing a complaint"
+msgstr "शिकायत दर्ज करना"
+
+msgid "Tracking a complaint"
+msgstr "शिकायत की स्थिति देखना"
+
+msgid "Accessibility or language"
+msgstr "सुलभता या भाषा"
+
+msgid "Something else"
+msgstr "कुछ और"
+
+msgid "Water supply"
+msgstr "जल आपूर्ति"
+
+msgid "Water Supply Department"
+msgstr "जल आपूर्ति विभाग"
+
+msgid "48 hours"
+msgstr "48 घंटे"
+
+msgid "No supply, low pressure, leaking pipelines or contaminated water."
+msgstr "पानी न आना, कम दबाव, पाइपलाइन में रिसाव या दूषित पानी।"
+
+msgid "Roads & potholes"
+msgstr "सड़कें और गड्ढे"
+
+msgid "Roads & Bridges Department"
+msgstr "सड़क और पुल विभाग"
+
+msgid "7 days"
+msgstr "7 दिन"
+
+msgid "Potholes, damaged roads, broken footpaths and faulty streetlights."
+msgstr "गड्ढे, टूटी सड़कें, टूटे फुटपाथ और खराब स्ट्रीटलाइट।"
+
+msgid "Sewage & drainage"
+msgstr "सीवरेज और जल निकासी"
+
+msgid "Sewerage & Storm Water Department"
+msgstr "सीवरेज और वर्षा जल विभाग"
+
+msgid "72 hours"
+msgstr "72 घंटे"
+
+msgid "Sewage overflow, blocked drains, open manholes and waterlogging."
+msgstr "सीवेज का बहना, बंद नालियाँ, खुले मैनहोल और जलभराव।"
+
+msgid "Sanitation & waste"
+msgstr "स्वच्छता और कचरा"
+
+msgid "Solid Waste Management Department"
+msgstr "ठोस अपशिष्ट प्रबंधन विभाग"
+
+msgid "24 hours"
+msgstr "24 घंटे"
+
+msgid "Missed garbage collection, overflowing bins, debris and open burning."
+msgstr "कचरा न उठाया जाना, भरे हुए कूड़ेदान, मलबा और खुले में जलाना।"
+
+msgid "Central"
+msgstr "मध्य"
+
+msgid "North"
+msgstr "उत्तर"
+
+msgid "East"
+msgstr "पूर्व"
+
+msgid "South"
+msgstr "दक्षिण"
+
+msgid "West"
+msgstr "पश्चिम"
+
+msgid "South-West"
+msgstr "दक्षिण-पश्चिम"
+
+msgid "Lake View"
+msgstr "लेक व्यू"
+
+msgid "IT Corridor"
+msgstr "आईटी कॉरिडोर"
+
+msgid "Egmore"
+msgstr "एग्मोर"
+
+msgid "Tondiarpet"
+msgstr "तोंडियारपेट"
+
+msgid "Mylapore"
+msgstr "मायलापुर"
+
+msgid "Adyar"
+msgstr "अड्यार"
+
+msgid "Anna Nagar"
+msgstr "अन्ना नगर"
+
+msgid "T. Nagar"
+msgstr "टी. नगर"
+
+msgid "Velachery"
+msgstr "वेलाचेरी"
+
+msgid "Perungudi"
+msgstr "पेरुंगुडी"
+
+msgid "Reference"
+msgstr "संदर्भ संख्या"
+
+msgid "Title"
+msgstr "शीर्षक"
+
+msgid "Category"
+msgstr "श्रेणी"
+
+msgid "Location"
+msgstr "स्थान"
+
+msgid "Channel"
+msgstr "माध्यम"
+
+msgid "Officer"
+msgstr "अधिकारी"
+
+msgid "Filed on"
+msgstr "दर्ज करने की तिथि"
+
+msgid "Resolved on"
+msgstr "समाधान की तिथि"
+
+#, python-format
+msgid "Complaint %(reference)s updated. The citizen was sent an SMS about the new status."
+msgstr "शिकायत %(reference)s अपडेट की गई। नागरिक को नई स्थिति के बारे में SMS भेजा गया।"
+
+#, python-format
+msgid "Complaint %(reference)s updated, but the SMS to the citizen could not be sent. See the server log."
+msgstr "शिकायत %(reference)s अपडेट की गई, लेकिन नागरिक को SMS नहीं भेजा जा सका। सर्वर लॉग देखें।"
+
+#, python-format
+msgid "Complaint %(reference)s updated."
+msgstr "शिकायत %(reference)s अपडेट की गई।"
+
+msgid "Nothing changed."
+msgstr "कुछ भी नहीं बदला।"
+
+msgid "Tick “I understand this cannot be undone” to delete the complaint."
+msgstr "शिकायत हटाने के लिए “मैं समझता/समझती हूँ कि इसे वापस नहीं लिया जा सकता” पर टिक करें।"
+
+#, python-format
+msgid "Complaint %(reference)s was deleted."
+msgstr "शिकायत %(reference)s हटा दी गई।"
+
+msgid "Complaint IDs look like CC-2026-00042."
+msgstr "शिकायत ID इस तरह दिखती है: CC-2026-00042।"
+
+#, python-format
+msgid "No complaint with ID %(reference)s was found."
+msgstr "ID %(reference)s वाली कोई शिकायत नहीं मिली।"
+
+#, python-format
+msgid "Thank you. Your enquiry %(reference)s has been recorded."
+msgstr "धन्यवाद। आपकी पूछताछ %(reference)s दर्ज कर ली गई है।"
+
+msgid "Please fix the highlighted fields."
+msgstr "कृपया चिह्नित फ़ील्ड ठीक करें।"
+
+msgid "Register a complaint · City Corporation"
+msgstr "शिकायत दर्ज करें · नगर निगम"
+
+msgid "Register a public complaint with the City Corporation citizen portal."
+msgstr "नगर निगम नागरिक पोर्टल पर सार्वजनिक शिकायत दर्ज करें।"
+
+msgid "Skip to the complaint form"
+msgstr "शिकायत फ़ॉर्म पर जाएँ"
+
+msgid "City Corporation, citizen complaint registration"
+msgstr "नगर निगम, नागरिक शिकायत पंजीकरण"
+
+msgctxt "brand, first word"
+msgid "City"
+msgstr "नगर"
+
+msgctxt "brand, second word"
+msgid "Corporation"
+msgstr "निगम"
+
+msgid "Your city, our responsibility."
+msgstr "आपका शहर, हमारी ज़िम्मेदारी।"
+
+msgid "Citizen portal"
+msgstr "नागरिक पोर्टल"
+
+msgid "Breadcrumb"
+msgstr "पृष्ठ पथ"
+
+msgid "Register a complaint"
+msgstr "शिकायत दर्ज करें"
+
+msgid "Register a Public Complaint"
+msgstr "सार्वजनिक शिकायत दर्ज करें"
+
+msgid "Tell us about the problem affecting you or your community. Provide the details below so the relevant department can review your complaint."
+msgstr "अपनी या अपने समुदाय की समस्या के बारे में हमें बताएँ। नीचे विवरण दें ताकि संबंधित विभाग आपकी शिकायत की समीक्षा कर सके।"
+
+msgid "Your complaint has been registered"
+msgstr "आपकी शिकायत दर्ज हो गई है"
+
+msgid "Your complaint reference number"
+msgstr "आपकी शिकायत की संदर्भ संख्या"
+
+msgid "Copy"
+msgstr "कॉपी करें"
+
+msgid "Keep this reference number to follow up on your complaint. The corporation will review it, assign the service category and ward, and route it to the officer in charge."
+msgstr "अपनी शिकायत पर आगे की जानकारी के लिए यह संदर्भ संख्या संभाल कर रखें। निगम इसकी समीक्षा करेगा, सेवा श्रेणी और वार्ड तय करेगा, और इसे प्रभारी अधिकारी को भेजेगा।"
+
+msgid "Attached files were sent with your complaint and can be viewed only by corporation staff."
+msgstr "संलग्न फ़ाइलें आपकी शिकायत के साथ भेजी गईं और इन्हें केवल निगम कर्मचारी देख सकते हैं।"
+
+msgid "Register another complaint"
+msgstr "एक और शिकायत दर्ज करें"
+
+msgid "Please provide accurate information. Fields marked with <span class=\"req\" aria-hidden=\"true\">*</span><span class=\"sr-only\">an asterisk</span> are required."
+msgstr "कृपया सही जानकारी दें। <span class=\"req\" aria-hidden=\"true\">*</span><span class=\"sr-only\">तारांकन</span> से चिह्नित फ़ील्ड आवश्यक हैं।"
+
+msgid "Please correct the following"
+msgstr "कृपया निम्नलिखित ठीक करें"
+
+msgid "Your details"
+msgstr "आपका विवरण"
+
+msgid "Full Name"
+msgstr "पूरा नाम"
+
+msgid "Enter your full name"
+msgstr "अपना पूरा नाम दर्ज करें"
+
+msgid "Residential Address"
+msgstr "आवासीय पता"
+
+msgid "Enter your house number, street, and address"
+msgstr "अपना मकान नंबर, गली और पता दर्ज करें"
+
+msgid "Taluk"
+msgstr "तालुक"
+
+msgid "Enter or select your taluk"
+msgstr "अपना तालुक दर्ज करें या चुनें"
+
+msgid "Type the name of your taluk as it appears on official documents."
+msgstr "अपने तालुक का नाम वैसे ही लिखें जैसा आधिकारिक दस्तावेज़ों में है।"
+
+msgid "About the problem"
+msgstr "समस्या के बारे में"
+
+msgid "Problem Description"
+msgstr "समस्या का विवरण"
+
+msgid "Example: A large pothole has developed on the main road and causes difficulties for vehicles and pedestrians."
+msgstr "उदाहरण: मुख्य सड़क पर एक बड़ा गड्ढा हो गया है, जिससे वाहनों और पैदल चलने वालों को परेशानी होती है।"
+
+msgid "Describe the public problem clearly"
+msgstr "सार्वजनिक समस्या का स्पष्ट वर्णन करें"
+
+msgid "Upload Problem Photo"
+msgstr "समस्या की फ़ोटो अपलोड करें"
+
+msgid "(optional)"
+msgstr "(वैकल्पिक)"
+
+msgid "The photo should clearly show the reported issue. Accepted formats: JPG, JPEG, PNG or WEBP. Maximum size: 5 MB."
+msgstr "फ़ोटो में बताई गई समस्या साफ़ दिखनी चाहिए। स्वीकार्य प्रारूप: JPG, JPEG, PNG या WEBP। अधिकतम आकार: 5 MB।"
+
+msgid "Choose a photo"
+msgstr "फ़ोटो चुनें"
+
+msgid "JPG, JPEG, PNG or WEBP · up to 5 MB"
+msgstr "JPG, JPEG, PNG या WEBP · 5 MB तक"
+
+msgid "Preview of the selected problem photo"
+msgstr "चुनी गई समस्या फ़ोटो का पूर्वावलोकन"
+
+msgid "Replace"
+msgstr "बदलें"
+
+msgid "Remove"
+msgstr "हटाएँ"
+
+msgid "Affected Area"
+msgstr "प्रभावित क्षेत्र"
+
+msgid "Enter the locality, street, village, ward, or landmark"
+msgstr "मोहल्ला, गली, गाँव, वार्ड या पहचान चिह्न दर्ज करें"
+
+msgid "How Does This Problem Affect You?"
+msgstr "यह समस्या आपको कैसे प्रभावित करती है?"
+
+msgid "Example: It causes traffic congestion, makes walking difficult, or interrupts the water supply."
+msgstr "उदाहरण: इससे यातायात जाम होता है, चलना मुश्किल होता है, या पानी की आपूर्ति बाधित होती है।"
+
+msgid "Explain how this issue affects your daily life or the local community"
+msgstr "बताएँ कि यह समस्या आपके दैनिक जीवन या स्थानीय समुदाय को कैसे प्रभावित करती है"
+
+msgid "Earlier complaint"
+msgstr "पिछली शिकायत"
+
+msgid "Previous Complaint Reference Number"
+msgstr "पिछली शिकायत की संदर्भ संख्या"
+
+msgid "Enter your complaint reference number, if available"
+msgstr "यदि उपलब्ध हो, तो अपनी शिकायत की संदर्भ संख्या दर्ज करें"
+
+msgid "Leave this empty if you no longer have the number."
+msgstr "यदि अब आपके पास संख्या नहीं है, तो इसे खाली छोड़ दें।"
+
+msgid "Upload Previous Complaint Copy"
+msgstr "पिछली शिकायत की प्रति अपलोड करें"
+
+msgid "The document or image should show the earlier complaint details. Accepted formats: PDF, JPG, JPEG or PNG. Maximum size: 5 MB."
+msgstr "दस्तावेज़ या छवि में पिछली शिकायत का विवरण दिखना चाहिए। स्वीकार्य प्रारूप: PDF, JPG, JPEG या PNG। अधिकतम आकार: 5 MB।"
+
+msgid "Choose a file"
+msgstr "फ़ाइल चुनें"
+
+msgid "PDF, JPG, JPEG or PNG · up to 5 MB"
+msgstr "PDF, JPG, JPEG या PNG · 5 MB तक"
+
+msgid "Preview of the selected complaint copy"
+msgstr "चुनी गई शिकायत प्रति का पूर्वावलोकन"
+
+msgid "I confirm that the information I have provided is accurate to the best of my knowledge."
+msgstr "मैं पुष्टि करता/करती हूँ कि मेरे द्वारा दी गई जानकारी मेरी सर्वोत्तम जानकारी के अनुसार सही है।"
+
+msgid "Submit Complaint"
+msgstr "शिकायत जमा करें"
+
+msgid "Clear Form"
+msgstr "फ़ॉर्म साफ़ करें"
+
+msgid "Your complaint is sent to the City Corporation with your verified mobile number."
+msgstr "आपकी शिकायत आपके सत्यापित मोबाइल नंबर के साथ नगर निगम को भेजी जाती है।"
+
+msgid "City Corporation · Citizen complaint registration"
+msgstr "नगर निगम · नागरिक शिकायत पंजीकरण"
+
+msgid "College project — not an official government portal."
+msgstr "कॉलेज प्रोजेक्ट — यह आधिकारिक सरकारी पोर्टल नहीं है।"
+
+msgid "Clear the form?"
+msgstr "फ़ॉर्म साफ़ करें?"
+
+msgid "Everything you have entered, including selected files, will be removed. This cannot be undone."
+msgstr "आपके द्वारा दर्ज सब कुछ, चुनी गई फ़ाइलों सहित, हटा दिया जाएगा। इसे वापस नहीं लिया जा सकता।"
+
+msgid "Keep my details"
+msgstr "मेरा विवरण रखें"
+
+msgid "Clear form"
+msgstr "फ़ॉर्म साफ़ करें"
+
+msgid "Sign in · Government Corporation"
+msgstr "साइन इन · नगर निगम"
+
+msgid "Sign in"
+msgstr "साइन इन करें"
+
+msgid "Select your access type."
+msgstr "अपना पहुँच प्रकार चुनें।"
+
+msgid "Access type"
+msgstr "पहुँच प्रकार"
+
+msgid "Citizen"
+msgstr "नागरिक"
+
+msgid "Corporation admin"
+msgstr "निगम प्रशासक"
+
+msgid "Username"
+msgstr "उपयोगकर्ता नाम"
+
+msgid "Password"
+msgstr "पासवर्ड"
+
+#, python-format
+msgid "Enter the 6-digit OTP sent to <strong>%(phone)s</strong>."
+msgstr "<strong>%(phone)s</strong> पर भेजा गया 6 अंकों का OTP दर्ज करें।"
+
+#, python-format
+msgid "<strong>Testing mode:</strong> no SMS provider is set up, so the OTP is shown here and in the server console: <strong>%(code)s</strong>"
+msgstr "<strong>परीक्षण मोड:</strong> कोई SMS प्रदाता सेट नहीं है, इसलिए OTP यहाँ और सर्वर कंसोल में दिखाया गया है: <strong>%(code)s</strong>"
+
+msgid "One-time password"
+msgstr "वन-टाइम पासवर्ड (OTP)"
+
+msgid "Verify and continue"
+msgstr "सत्यापित करें और आगे बढ़ें"
+
+msgid "Resend OTP"
+msgstr "OTP फिर से भेजें"
+
+msgid "Change number"
+msgstr "नंबर बदलें"
+
+msgid "Mobile number"
+msgstr "मोबाइल नंबर"
+
+msgid "10-digit mobile number"
+msgstr "10 अंकों का मोबाइल नंबर"
+
+msgid "Send OTP"
+msgstr "OTP भेजें"
+
+msgid "Official grievance portal of the municipal corporation. Unauthorised access is prohibited."
+msgstr "नगर निगम का आधिकारिक शिकायत पोर्टल। अनधिकृत पहुँच निषिद्ध है।"
+
+msgid "Citizen help"
+msgstr "नागरिक सहायता"
+
+msgid "Search complaints · Email reports"
+msgstr "शिकायतें खोजें · रिपोर्ट ईमेल करें"
+
+msgid "Close Citizen help"
+msgstr "नागरिक सहायता बंद करें"
+
+msgid "Hi! Type a name, a complaint ID or a few words, and I'll find the matching complaints. Say “mail me this” to get the results by email."
+msgstr "नमस्ते! कोई नाम, शिकायत ID या कुछ शब्द लिखें, मैं मिलती-जुलती शिकायतें ढूँढ दूँगा। परिणाम ईमेल से पाने के लिए “mail me this” लिखें।"
+
+msgid "Search a name, ID or keyword…"
+msgstr "नाम, ID या कीवर्ड खोजें…"
+
+msgid "Send"
+msgstr "भेजें"
+
+msgid "Government Corporation"
+msgstr "नगर निगम"
+
+msgid "City Corporation — public grievance intelligence and resolution portal."
+msgstr "नगर निगम — सार्वजनिक शिकायत विश्लेषण और समाधान पोर्टल।"
+
+msgid "Skip to main content"
+msgstr "मुख्य सामग्री पर जाएँ"
+
+msgid "City Corporation · College project — not an official government portal."
+msgstr "नगर निगम · कॉलेज प्रोजेक्ट — यह आधिकारिक सरकारी पोर्टल नहीं है।"
+
+msgid "Footer"
+msgstr "फ़ुटर"
+
+msgid "Privacy note"
+msgstr "गोपनीयता सूचना"
+
+msgid "Accessibility"
+msgstr "सुलभता"
+
+msgid "Help desk"
+msgstr "सहायता केंद्र"
+
+msgid "My complaints"
+msgstr "मेरी शिकायतें"
+
+msgid "Signed in as"
+msgstr "इस नंबर से साइन इन:"
+
+msgid "Sign out"
+msgstr "साइन आउट"
+
+msgid "City Corporation"
+msgstr "नगर निगम"
+
+msgid "Back to dataset"
+msgstr "डेटासेट पर वापस जाएँ"
+
+#, python-format
+msgid "%(priority)s priority"
+msgstr "%(priority)s प्राथमिकता"
+
+msgid "Not assigned yet"
+msgstr "अभी नियत नहीं"
+
+msgid "Street / landmark"
+msgstr "गली / पहचान चिह्न"
+
+msgid "Received through"
+msgstr "किस माध्यम से मिली"
+
+msgid "Target time"
+msgstr "लक्ष्य समय"
+
+msgid "Citizen address"
+msgstr "नागरिक का पता"
+
+msgid "Effect on citizen"
+msgstr "नागरिक पर प्रभाव"
+
+msgid "Reported before"
+msgstr "पहले दर्ज की गई"
+
+msgid "Ref."
+msgstr "संदर्भ"
+
+msgid "View earlier complaint copy"
+msgstr "पिछली शिकायत की प्रति देखें"
+
+#, python-format
+msgid "Photo attached to complaint %(reference)s"
+msgstr "शिकायत %(reference)s के साथ संलग्न फ़ोटो"
+
+msgid "Activity"
+msgstr "गतिविधि"
+
+msgid "Status recorded."
+msgstr "स्थिति दर्ज की गई।"
+
+msgid "Shown to citizen"
+msgstr "नागरिक को दिखाई गई"
+
+msgid "No activity recorded yet."
+msgstr "अभी तक कोई गतिविधि दर्ज नहीं हुई।"
+
+msgid "Update complaint"
+msgstr "शिकायत अपडेट करें"
+
+msgid "Filed by a citizen. Choose the category and ward to route it to the officer in charge."
+msgstr "नागरिक द्वारा दर्ज। इसे प्रभारी अधिकारी तक भेजने के लिए श्रेणी और वार्ड चुनें।"
+
+msgid "Save update"
+msgstr "अपडेट सहेजें"
+
+msgid "Progress"
+msgstr "प्रगति"
+
+msgid "Pending"
+msgstr "लंबित"
+
+msgid "Delete complaint"
+msgstr "शिकायत हटाएँ"
+
+msgid "Permanently removes this complaint, its activity history and any attached files. The citizen will no longer see it. This cannot be undone."
+msgstr "यह शिकायत, इसका गतिविधि इतिहास और संलग्न फ़ाइलें स्थायी रूप से हट जाएँगी। नागरिक इसे फिर नहीं देख पाएगा। इसे वापस नहीं लिया जा सकता।"
+
+msgid "I understand this cannot be undone"
+msgstr "मैं समझता/समझती हूँ कि इसे वापस नहीं लिया जा सकता"
+
+msgid "Filed complaints · City Corporation"
+msgstr "दर्ज शिकायतें · नगर निगम"
+
+msgid "Complaints registered by citizens through the portal after verifying their mobile number."
+msgstr "नागरिकों द्वारा अपना मोबाइल नंबर सत्यापित करने के बाद पोर्टल पर दर्ज की गई शिकायतें।"
+
+msgid "Summary"
+msgstr "सारांश"
+
+msgid "Filed by citizens"
+msgstr "नागरिकों द्वारा दर्ज"
+
+msgid "Need category &amp; ward"
+msgstr "श्रेणी और वार्ड आवश्यक"
+
+msgid "Assigned or in progress"
+msgstr "सौंपी गई या प्रगति पर"
+
+msgid "Citizen complaints"
+msgstr "नागरिक शिकायतें"
+
+msgid "Apply"
+msgstr "लागू करें"
+
+msgid "Reset"
+msgstr "रीसेट करें"
+
+#, python-format
+msgid "Complaints filed by citizens, %(count)s matching"
+msgstr "नागरिकों द्वारा दर्ज शिकायतें, %(count)s मेल खाती हैं"
+
+msgid "ID"
+msgstr "ID"
+
+msgid "Complaint"
+msgstr "शिकायत"
+
+msgid "Filed"
+msgstr "दर्ज"
+
+msgid "Attachments"
+msgstr "संलग्नक"
+
+msgid "Photo"
+msgstr "फ़ोटो"
+
+msgid "Earlier copy"
+msgstr "पिछली प्रति"
+
+msgid "None"
+msgstr "कोई नहीं"
+
+msgid "Assign category &amp; ward"
+msgstr "श्रेणी और वार्ड तय करें"
+
+msgid "No filed complaints match these filters."
+msgstr "इन फ़िल्टर से कोई दर्ज शिकायत मेल नहीं खाती।"
+
+msgid "Reset filters"
+msgstr "फ़िल्टर रीसेट करें"
+
+msgid "No complaints have been filed by citizens yet."
+msgstr "अभी तक नागरिकों ने कोई शिकायत दर्ज नहीं की है।"
+
+msgid "Citizens sign in with their mobile number on the login page and register complaints there."
+msgstr "नागरिक लॉगिन पेज पर अपने मोबाइल नंबर से साइन इन करते हैं और वहीं शिकायत दर्ज करते हैं।"
+
+msgid "Complaints dataset · City Corporation"
+msgstr "शिकायत डेटासेट · नगर निगम"
+
+msgid "Export CSV"
+msgstr "CSV निर्यात करें"
+
+msgid "File a complaint"
+msgstr "शिकायत दर्ज करें"
+
+msgid "Total complaints"
+msgstr "कुल शिकायतें"
+
+msgid "Open (not yet resolved)"
+msgstr "खुली (अभी हल नहीं हुई)"
+
+msgid "High priority"
+msgstr "उच्च प्राथमिकता"
+
+msgid "Complaints"
+msgstr "शिकायतें"
+
+#, python-format
+msgid "Complaints, %(count)s matching"
+msgstr "शिकायतें, %(count)s मेल खाती हैं"
+
+msgid "No complaints match these filters."
+msgstr "इन फ़िल्टर से कोई शिकायत मेल नहीं खाती।"
+
+msgid "No complaints yet."
+msgstr "अभी कोई शिकायत नहीं है।"
+
+msgid "File the first complaint"
+msgstr "पहली शिकायत दर्ज करें"
+
+msgid "Please keep this reference number to follow up on your complaint. It has been saved in the City Corporation portal for review by the corporation team. This is a college project, so it is not sent to a real government department."
+msgstr "अपनी शिकायत पर आगे की जानकारी के लिए यह संदर्भ संख्या संभाल कर रखें। यह निगम टीम की समीक्षा के लिए नगर निगम पोर्टल में सहेज ली गई है। यह एक कॉलेज प्रोजेक्ट है, इसलिए इसे किसी वास्तविक सरकारी विभाग को नहीं भेजा जाता।"
+
+msgid "Submitted on"
+msgstr "जमा करने की तिथि"
+
+msgid "Name"
+msgstr "नाम"
+
+#, python-format
+msgid "%(phone)s (verified)"
+msgstr "%(phone)s (सत्यापित)"
+
+msgid "Affected area"
+msgstr "प्रभावित क्षेत्र"
+
+msgid "Problem photo"
+msgstr "समस्या की फ़ोटो"
+
+msgid "Attached"
+msgstr "संलग्न"
+
+msgid "Not attached"
+msgstr "संलग्न नहीं"
+
+msgid "copy attached"
+msgstr "प्रति संलग्न"
+
+msgid "Track this complaint"
+msgstr "इस शिकायत की स्थिति देखें"
+
+msgid "For your security, selected files are not kept after an error. Please choose your photo or document again."
+msgstr "आपकी सुरक्षा के लिए, त्रुटि होने पर चुनी गई फ़ाइलें नहीं रखी जातीं। कृपया अपनी फ़ोटो या दस्तावेज़ फिर से चुनें।"
+
+msgid "Your complaint is saved in the City Corporation portal with your verified mobile number. This is a college project and is not an official government service."
+msgstr "आपकी शिकायत आपके सत्यापित मोबाइल नंबर के साथ नगर निगम पोर्टल में सहेजी जाती है। यह एक कॉलेज प्रोजेक्ट है, आधिकारिक सरकारी सेवा नहीं।"
+
+msgid "Your recent complaints"
+msgstr "आपकी हाल की शिकायतें"
+
+#, python-format
+msgid "Track all %(counter)s complaint"
+msgid_plural "Track all %(counter)s complaints"
+msgstr[0] "सभी %(counter)s शिकायत की स्थिति देखें"
+msgstr[1] "सभी %(counter)s शिकायतों की स्थिति देखें"
+
+#, python-format
+msgid "Filed %(date)s"
+msgstr "%(date)s को दर्ज"
+
+msgid "Citizen help desk · City Corporation"
+msgstr "नागरिक सहायता केंद्र · नगर निगम"
+
+msgid "Find the right civic service, learn how complaints are handled, and reach the right department."
+msgstr "सही नागरिक सेवा खोजें, जानें कि शिकायतों पर कैसे कार्रवाई होती है, और सही विभाग तक पहुँचें।"
+
+msgid "Search help topics"
+msgstr "सहायता विषय खोजें"
+
+msgid "Search help topics — e.g. water, track, pothole, garbage"
+msgstr "सहायता विषय खोजें — जैसे जल, सड़क, कचरा, स्थिति"
+
+msgid "Track a complaint"
+msgstr "शिकायत की स्थिति देखें"
+
+msgid "Streetlights"
+msgstr "स्ट्रीटलाइट"
+
+msgid "Garbage"
+msgstr "कचरा"
+
+msgid "Civic services"
+msgstr "नागरिक सेवाएँ"
+
+msgid "Report an issue"
+msgstr "समस्या दर्ज करें"
+
+msgid "Lights not working, flickering lamps or exposed wires. File these under Roads &amp; potholes."
+msgstr "लाइट न जलना, टिमटिमाते लैंप या खुले तार। इन्हें सड़कें और गड्ढे श्रेणी में दर्ज करें।"
+
+msgid "Roads &amp; Bridges Department"
+msgstr "सड़क और पुल विभाग"
+
+msgid "How a complaint is handled"
+msgstr "शिकायत पर कार्रवाई कैसे होती है"
+
+msgid "Registered"
+msgstr "दर्ज"
+
+msgid "The complaint is recorded with its category, ward and the channel it came through."
+msgstr "शिकायत अपनी श्रेणी, वार्ड और जिस माध्यम से आई, उसके साथ दर्ज की जाती है।"
+
+msgid "It goes to the officer responsible for that service in that ward."
+msgstr "यह उस वार्ड में उस सेवा के लिए ज़िम्मेदार अधिकारी को जाती है।"
+
+msgid "The field team works on it; every step is noted on the complaint."
+msgstr "फ़ील्ड टीम इस पर काम करती है; हर कदम शिकायत पर दर्ज होता है।"
+
+msgid "The department closes it, and the citizen can be told using the complaint ID."
+msgstr "विभाग इसे बंद करता है, और शिकायत ID से नागरिक को सूचित किया जा सकता है।"
+
+msgid "Complaint ID"
+msgstr "शिकायत ID"
+
+msgid "e.g. CC-2026-00042"
+msgstr "जैसे CC-2026-00042"
+
+msgid "Check status"
+msgstr "स्थिति देखें"
+
+msgid "Department not assigned yet"
+msgstr "विभाग अभी नियत नहीं"
+
+msgid "Ward not assigned yet"
+msgstr "वार्ड अभी नियत नहीं"
+
+#, python-format
+msgid "filed %(date)s"
+msgstr "%(date)s को दर्ज"
+
+msgid "Open full details"
+msgstr "पूरा विवरण खोलें"
+
+msgid "Latest complaint:"
+msgstr "नवीनतम शिकायत:"
+
+msgid "Departments"
+msgstr "विभाग"
+
+msgid "Departments and the services they handle"
+msgstr "विभाग और उनकी सेवाएँ"
+
+msgid "Handles"
+msgstr "संभालता है"
+
+msgid "Action"
+msgstr "कार्रवाई"
+
+msgid "Frequently asked questions"
+msgstr "अक्सर पूछे जाने वाले प्रश्न"
+
+msgid "There is no water supply in a street. What should we do?"
+msgstr "किसी गली में पानी की आपूर्ति नहीं है। हमें क्या करना चाहिए?"
+
+msgid "Check City news &amp; notices on the Home page for planned maintenance first. Otherwise file it under <strong>Water supply</strong>; the target time is 48 hours."
+msgstr "पहले होम पेज पर नगर समाचार और सूचनाएँ देखें कि कोई नियोजित रखरखाव तो नहीं है। अन्यथा इसे <strong>जल आपूर्ति</strong> में दर्ज करें; लक्ष्य समय 48 घंटे है।"
+
+msgid "Where do potholes and broken streetlights go?"
+msgstr "गड्ढे और टूटी स्ट्रीटलाइट किस श्रेणी में जाती हैं?"
+
+msgid "Both go under <strong>Roads &amp; potholes</strong>. Mention the nearest landmark so the field team can find the spot quickly."
+msgstr "दोनों <strong>सड़कें और गड्ढे</strong> में जाती हैं। सबसे नज़दीकी पहचान चिह्न बताएँ ताकि फ़ील्ड टीम जगह जल्दी ढूँढ सके।"
+
+msgid "Sewage is overflowing on a road. Is this high priority?"
+msgstr "सड़क पर सीवेज बह रहा है। क्या यह उच्च प्राथमिकता है?"
+
+msgid "Yes. Sewage overflow and open manholes are health and safety risks. The complaint form suggests <strong>High</strong> priority when the description mentions them."
+msgstr "हाँ। सीवेज का बहना और खुले मैनहोल स्वास्थ्य और सुरक्षा के लिए खतरा हैं। विवरण में इनका ज़िक्र होने पर शिकायत फ़ॉर्म <strong>उच्च</strong> प्राथमिकता सुझाता है।"
+
+msgid "Garbage has not been collected for days."
+msgstr "कई दिनों से कचरा नहीं उठाया गया है।"
+
+msgid "File it under <strong>Sanitation &amp; waste</strong>; missed collection has a target time of 24 hours."
+msgstr "इसे <strong>स्वच्छता और कचरा</strong> में दर्ज करें; कचरा न उठाए जाने का लक्ष्य समय 24 घंटे है।"
+
+msgid "A complaint came in on WhatsApp or social media. How is it recorded?"
+msgstr "कोई शिकायत व्हाट्सएप या सोशल मीडिया पर आई। उसे कैसे दर्ज किया जाता है?"
+
+msgid "File it as usual and set <strong>Received through</strong> to the channel it came from. The Home dashboard then shows how many complaints arrive through each channel."
+msgstr "इसे सामान्य रूप से दर्ज करें और <strong>किस माध्यम से मिली</strong> में वह माध्यम चुनें। फिर होम डैशबोर्ड दिखाता है कि हर माध्यम से कितनी शिकायतें आती हैं।"
+
+msgid "How can a citizen know the complaint is being handled?"
+msgstr "नागरिक कैसे जान सकता है कि शिकायत पर काम हो रहा है?"
+
+msgid "Share the complaint ID. Its status moves from Submitted → Assigned → In progress → Resolved, and can be checked with <a href=\"#track\">Track a complaint</a>."
+msgstr "शिकायत ID साझा करें। इसकी स्थिति दर्ज → सौंपी गई → प्रगति पर → हल हो गई होती है, और इसे <a href=\"#track\">शिकायत की स्थिति देखें</a> से जाँचा जा सकता है।"
+
+#, python-format
+msgid "No help topics match your search. Try “water”, “track” or “garbage”, or <a href=\"%(support_url)s\">contact support</a>."
+msgstr "आपकी खोज से कोई सहायता विषय मेल नहीं खाता। “जल”, “स्थिति” या “कचरा” आज़माएँ, या <a href=\"%(support_url)s\">सहायता से संपर्क करें</a>।"
+
+msgid "Help &amp; support · City Corporation"
+msgstr "सहायता और समर्थन · नगर निगम"
+
+msgid "Help &amp; support"
+msgstr "सहायता और समर्थन"
+
+msgid "Questions about using the City Corporation portal? Send an enquiry, follow the guide, or adjust accessibility and language settings."
+msgstr "नगर निगम पोर्टल के उपयोग के बारे में प्रश्न हैं? पूछताछ भेजें, मार्गदर्शिका देखें, या सुलभता और भाषा सेटिंग बदलें।"
+
+msgid "Contact support"
+msgstr "सहायता से संपर्क करें"
+
+msgid "Please don't include sensitive personal details."
+msgstr "कृपया संवेदनशील व्यक्तिगत जानकारी न लिखें।"
+
+msgid "Send enquiry"
+msgstr "पूछताछ भेजें"
+
+msgid "Accessibility &amp; language"
+msgstr "सुलभता और भाषा"
+
+msgid "Text size"
+msgstr "अक्षरों का आकार"
+
+msgid "Make all text larger"
+msgstr "सभी अक्षर बड़े करें"
+
+msgid "High contrast"
+msgstr "उच्च कंट्रास्ट"
+
+msgid "Darker text and stronger borders"
+msgstr "गहरे अक्षर और मज़बूत किनारे"
+
+msgid "Reduce motion"
+msgstr "एनिमेशन कम करें"
+
+msgid "Turn off animations"
+msgstr "एनिमेशन बंद करें"
+
+msgid "Language"
+msgstr "भाषा"
+
+msgid "Shows the whole site in English or Hindi"
+msgstr "पूरी साइट अंग्रेज़ी या हिंदी में दिखाता है"
+
+msgid "Settings are saved in this browser. Press <kbd>Tab</kbd> to move between controls and <kbd>Esc</kbd> to close menus."
+msgstr "सेटिंग इस ब्राउज़र में सहेजी जाती हैं। नियंत्रणों के बीच जाने के लिए <kbd>Tab</kbd> और मेनू बंद करने के लिए <kbd>Esc</kbd> दबाएँ।"
+
+msgid "Recent enquiries"
+msgstr "हाल की पूछताछ"
+
+msgid "No enquiries yet."
+msgstr "अभी कोई पूछताछ नहीं।"
+
+msgid "Step-by-step guide"
+msgstr "चरण-दर-चरण मार्गदर्शिका"
+
+msgid "Read the Home dashboard"
+msgstr "होम डैशबोर्ड पढ़ें"
+
+msgid "Switch between monthly and weekly trends, and change the range to the last 3 months."
+msgstr "मासिक और साप्ताहिक रुझानों के बीच बदलें, और अवधि को पिछले 3 महीनों पर करें।"
+
+msgid "Check a ward"
+msgstr "वार्ड जाँचें"
+
+msgid "Click a ward on the map to see its complaints in the Dataset."
+msgstr "डेटासेट में किसी वार्ड की शिकायतें देखने के लिए मानचित्र पर उस वार्ड पर क्लिक करें।"
+
+msgid "Publish notices"
+msgstr "सूचनाएँ प्रकाशित करें"
+
+#, python-format
+msgid "Add city news under <a href=\"%(notices_url)s\">Manage officers &amp; notices</a>."
+msgstr "<a href=\"%(notices_url)s\">अधिकारी और सूचनाएँ प्रबंधित करें</a> में नगर समाचार जोड़ें।"
+
+#, python-format
+msgid "Use <a href=\"%(filed_url)s\">Filed complaint</a> and note the channel it came through."
+msgstr "<a href=\"%(filed_url)s\">दर्ज शिकायत</a> का उपयोग करें और जिस माध्यम से आई, उसे नोट करें।"
+
+msgid "Update its status"
+msgstr "इसकी स्थिति अपडेट करें"
+
+#, python-format
+msgid "Open it from the <a href=\"%(dataset_url)s\">Dataset</a>, assign an officer and record progress."
+msgstr "इसे <a href=\"%(dataset_url)s\">डेटासेट</a> से खोलें, अधिकारी सौंपें और प्रगति दर्ज करें।"
+
+msgid "Follow the officers"
+msgstr "अधिकारियों पर नज़र रखें"
+
+#, python-format
+msgid "See each officer's open and resolved complaints in <a href=\"%(officers_url)s\">Officers in charge</a>."
+msgstr "<a href=\"%(officers_url)s\">प्रभारी अधिकारी</a> में हर अधिकारी की खुली और हल की गई शिकायतें देखें।"
+
+msgid "Who can sign in to this dashboard?"
+msgstr "इस डैशबोर्ड में कौन साइन इन कर सकता है?"
+
+msgid "Corporation admins sign in with a username and password. Citizens sign in with their mobile number and an OTP, and use the complaint registration page."
+msgstr "निगम प्रशासक उपयोगकर्ता नाम और पासवर्ड से साइन इन करते हैं। नागरिक अपने मोबाइल नंबर और OTP से साइन इन करते हैं और शिकायत पंजीकरण पेज का उपयोग करते हैं।"
+
+msgid "Where is complaint data stored?"
+msgstr "शिकायत डेटा कहाँ संग्रहीत होता है?"
+
+#, python-format
+msgid "In this portal's own database. Officers, notices and complaints can also be managed at <a href=\"%(admin_url)s\">/admin/</a>."
+msgstr "इस पोर्टल के अपने डेटाबेस में। अधिकारी, सूचनाएँ और शिकायतें <a href=\"%(admin_url)s\">/admin/</a> पर भी प्रबंधित की जा सकती हैं।"
+
+msgid "Privacy note — what happens to the data entered?"
+msgstr "गोपनीयता सूचना — दर्ज किए गए डेटा का क्या होता है?"
+
+msgid "Complaints, enquiries and photos stay in this portal's database and media folder. Nothing is sent to a government system or to analytics services."
+msgstr "शिकायतें, पूछताछ और फ़ोटो इसी पोर्टल के डेटाबेस और मीडिया फ़ोल्डर में रहती हैं। कुछ भी किसी सरकारी प्रणाली या एनालिटिक्स सेवा को नहीं भेजा जाता।"
+
+msgid "OTP codes are sent only through the SMS provider configured in <code>.env</code>. Fonts, charts and the optional street map load from public CDNs and never receive form data."
+msgstr "OTP कोड केवल <code>.env</code> में सेट किए गए SMS प्रदाता के माध्यम से भेजे जाते हैं। फ़ॉन्ट, चार्ट और वैकल्पिक स्ट्रीट मैप सार्वजनिक CDN से लोड होते हैं और उन्हें कभी फ़ॉर्म डेटा नहीं मिलता।"
+
+msgid "Where do the dashboard numbers come from?"
+msgstr "डैशबोर्ड के आँकड़े कहाँ से आते हैं?"
+
+msgid "They are counted from the complaints in the database. With no complaints yet, the dashboard shows zeros."
+msgstr "ये डेटाबेस में मौजूद शिकायतों से गिने जाते हैं। अभी कोई शिकायत न होने पर डैशबोर्ड शून्य दिखाता है।"
+
+msgid "The charts or street map are not showing."
+msgstr "चार्ट या स्ट्रीट मैप नहीं दिख रहे हैं।"
+
+msgid "They need an internet connection to load their libraries. Everything else works offline, and the illustrated ward map is always available."
+msgstr "उनकी लाइब्रेरी लोड करने के लिए इंटरनेट कनेक्शन चाहिए। बाकी सब ऑफ़लाइन काम करता है, और चित्रित वार्ड मानचित्र हमेशा उपलब्ध रहता है।"
+
+msgid "Your corporation at a glance"
+msgstr "आपका निगम एक नज़र में"
+
+msgid "Date range"
+msgstr "तिथि सीमा"
+
+msgid "Last 3 months"
+msgstr "पिछले 3 महीने"
+
+msgid "Last 6 months"
+msgstr "पिछले 6 महीने"
+
+msgid "Complaints reported"
+msgstr "दर्ज शिकायतें"
+
+msgid "from previous period"
+msgstr "पिछली अवधि से"
+
+#, python-format
+msgid "<b class=\"change\">%(count)s</b> filed by citizens"
+msgstr "<b class=\"change\">%(count)s</b> नागरिकों द्वारा दर्ज"
+
+msgid "Complaints resolved"
+msgstr "हल की गई शिकायतें"
+
+msgid "Works in progress"
+msgstr "प्रगति पर कार्य"
+
+#, python-format
+msgid "<b class=\"change\">%(count)s</b> new complaints awaiting assignment"
+msgstr "<b class=\"change\">%(count)s</b> नई शिकायतें नियत होने की प्रतीक्षा में"
+
+msgid "Charts"
+msgstr "चार्ट"
+
+msgid "Complaint trends"
+msgstr "शिकायत रुझान"
+
+msgid "Trend period"
+msgstr "रुझान अवधि"
+
+msgid "Monthly"
+msgstr "मासिक"
+
+msgid "Weekly"
+msgstr "साप्ताहिक"
+
+msgid "Reported"
+msgstr "दर्ज"
+
+msgid "Bar chart of complaints reported and resolved"
+msgstr "दर्ज और हल की गई शिकायतों का बार चार्ट"
+
+msgid "No complaints in this period yet"
+msgstr "इस अवधि में अभी कोई शिकायत नहीं"
+
+#, python-format
+msgid "Resolution rate %(rate)s%%"
+msgstr "समाधान दर %(rate)s%%"
+
+msgid "no earlier complaints to compare"
+msgstr "तुलना के लिए पहले की कोई शिकायत नहीं"
+
+#, python-format
+msgid "compared to %(rate)s%% in the previous period"
+msgstr "पिछली अवधि के %(rate)s%% की तुलना में"
+
+msgid "Complaints by Social Media and Other Channels"
+msgstr "सोशल मीडिया और अन्य माध्यमों से शिकायतें"
+
+msgid "Open complaints dataset"
+msgstr "शिकायत डेटासेट खोलें"
+
+msgid "Open dataset"
+msgstr "डेटासेट खोलें"
+
+msgid "Doughnut chart of complaints by channel"
+msgstr "माध्यम के अनुसार शिकायतों का डोनट चार्ट"
+
+#, python-format
+msgid "%(counter)s complaint"
+msgid_plural "%(counter)s complaints"
+msgstr[0] "%(counter)s शिकायत"
+msgstr[1] "%(counter)s शिकायतें"
+
+msgid "Civic issues resolved"
+msgstr "हल की गई नागरिक समस्याएँ"
+
+msgid "resolved"
+msgstr "हल"
+
+msgid "Line chart of complaints resolved each month"
+msgstr "हर महीने हल की गई शिकायतों का लाइन चार्ट"
+
+msgid "Neighbourhood and news"
+msgstr "पड़ोस और समाचार"
+
+msgid "Your neighbourhood, mapped"
+msgstr "मानचित्र पर आपका पड़ोस"
+
+msgid "Map style"
+msgstr "मानचित्र शैली"
+
+msgid "Illustrated"
+msgstr "चित्रित"
+
+msgid "Street map"
+msgstr "स्ट्रीट मैप"
+
+msgid "Illustrated map of wards with open complaints"
+msgstr "खुली शिकायतों वाले वार्डों का चित्रित मानचित्र"
+
+#, python-format
+msgid "%(counter)s open complaint"
+msgid_plural "%(counter)s open complaints"
+msgstr[0] "%(counter)s खुली शिकायत"
+msgstr[1] "%(counter)s खुली शिकायतें"
+
+#, python-format
+msgid "Ward %(number)s"
+msgstr "वार्ड %(number)s"
+
+msgid "Illustrative ward boundaries · not to scale"
+msgstr "सांकेतिक वार्ड सीमाएँ · पैमाने के अनुसार नहीं"
+
+msgid "Ward / zone"
+msgstr "वार्ड / क्षेत्र"
+
+msgid "Open"
+msgstr "खुली"
+
+msgid "Explore ward-wise data"
+msgstr "वार्ड-वार डेटा देखें"
+
+msgid "City news &amp; notices"
+msgstr "नगर समाचार और सूचनाएँ"
+
+msgid "View all"
+msgstr "सभी देखें"
+
+msgid "No notices published yet."
+msgstr "अभी कोई सूचना प्रकाशित नहीं हुई।"
+
+msgid "Publish a notice"
+msgstr "सूचना प्रकाशित करें"
+
+msgid "Our city, our shared pride"
+msgstr "हमारा शहर, हमारा साझा गौरव"
+
+msgid "Cleaner streets. Better everyday lives."
+msgstr "साफ़ सड़कें। बेहतर रोज़मर्रा का जीवन।"
+
+msgid "Small actions in your neighbourhood make a big difference to our city."
+msgstr "आपके पड़ोस के छोटे कदम हमारे शहर में बड़ा बदलाव लाते हैं।"
+
+msgid "Explore civic services"
+msgstr "नागरिक सेवाएँ देखें"
+
+msgid "Participate. Report. Make a difference."
+msgstr "भाग लें। रिपोर्ट करें। बदलाव लाएँ।"
+
+msgid "See a civic issue? <strong>Your voice can make a difference.</strong>"
+msgstr "कोई नागरिक समस्या दिखी? <strong>आपकी आवाज़ बदलाव ला सकती है।</strong>"
+
+msgid "Report waste, road or sewage issues"
+msgstr "कचरा, सड़क या सीवेज की समस्या दर्ज करें"
+
+msgid "Close"
+msgstr "बंद करें"
+
+msgid "Report a related issue"
+msgstr "संबंधित समस्या दर्ज करें"
+
+msgid "All city news &amp; notices"
+msgstr "सभी नगर समाचार और सूचनाएँ"
+
+msgid "Officers in charge · City Corporation"
+msgstr "प्रभारी अधिकारी · नगर निगम"
+
+msgid "View as"
+msgstr "इस रूप में देखें"
+
+msgid "Cards"
+msgstr "कार्ड"
+
+msgid "Table"
+msgstr "तालिका"
+
+msgid "Add officer"
+msgstr "अधिकारी जोड़ें"
+
+msgid "Officers listed"
+msgstr "सूचीबद्ध अधिकारी"
+
+msgid "Complaints assigned"
+msgstr "सौंपी गई शिकायतें"
+
+msgid "Average resolution rate"
+msgstr "औसत समाधान दर"
+
+msgid "No officers have been added yet."
+msgstr "अभी तक कोई अधिकारी नहीं जोड़ा गया है।"
+
+msgid "Add the first officer"
+msgstr "पहला अधिकारी जोड़ें"
+
+msgid "No officers match your search."
+msgstr "आपकी खोज से कोई अधिकारी मेल नहीं खाता।"
+
+msgid "Resolution"
+msgstr "समाधान"
+
+msgid "Contact"
+msgstr "संपर्क"
+
+msgid "Resolution progress"
+msgstr "समाधान प्रगति"
+
+msgid "View complaints"
+msgstr "शिकायतें देखें"
+
+msgid "Progress of your complaint with the City Corporation."
+msgstr "नगर निगम में आपकी शिकायत की प्रगति।"
+
+msgid "Service"
+msgstr "सेवा"
+
+msgid "Being reviewed by the corporation"
+msgstr "निगम द्वारा समीक्षा की जा रही है"
+
+msgid "View photo"
+msgstr "फ़ोटो देखें"
+
+msgid "Earlier complaint copy"
+msgstr "पिछली शिकायत की प्रति"
+
+msgid "View copy"
+msgstr "प्रति देखें"
+
+msgid "Your description"
+msgstr "आपका विवरण"
+
+msgid "Updates from the corporation"
+msgstr "निगम की ओर से अपडेट"
+
+#, python-format
+msgid "Status updated to %(status)s."
+msgstr "स्थिति बदलकर %(status)s की गई।"
+
+msgid "No updates yet."
+msgstr "अभी कोई अपडेट नहीं।"
+
+msgid "Back to my complaints"
+msgstr "मेरी शिकायतों पर वापस जाएँ"
+
+msgid "My complaints · City Corporation"
+msgstr "मेरी शिकायतें · नगर निगम"
+
+msgid "Track the complaints you registered with the City Corporation citizen portal."
+msgstr "नगर निगम नागरिक पोर्टल पर दर्ज अपनी शिकायतों की स्थिति देखें।"
+
+#, python-format
+msgid "Every complaint registered with your verified mobile number %(phone)s. Open one to see its progress and updates from the corporation."
+msgstr "आपके सत्यापित मोबाइल नंबर %(phone)s से दर्ज हर शिकायत। उसकी प्रगति और निगम के अपडेट देखने के लिए कोई भी शिकायत खोलें।"
+
+msgid "Your complaints"
+msgstr "आपकी शिकायतें"
+
+msgid "You haven't registered any complaints with this mobile number yet."
+msgstr "आपने अभी तक इस मोबाइल नंबर से कोई शिकायत दर्ज नहीं की है।"
+
+msgid "Pages"
+msgstr "पृष्ठ"
+
+#, python-format
+msgid "Showing %(start)s–%(end)s of %(total)s"
+msgstr "%(total)s में से %(start)s–%(end)s दिखाए जा रहे हैं"
+
+msgid "Previous page"
+msgstr "पिछला पृष्ठ"
+
+msgid "Next page"
+msgstr "अगला पृष्ठ"
+
+msgid "Sidebar"
+msgstr "साइडबार"
+
+msgid "City Corporation home"
+msgstr "नगर निगम होम"
+
+msgid "Close menu"
+msgstr "मेनू बंद करें"
+
+msgid "Municipal corporation services"
+msgstr "नगर निगम सेवाएँ"
+
+msgid "Main menu"
+msgstr "मुख्य मेनू"
+
+msgid "Your neighbourhood matters."
+msgstr "आपका पड़ोस मायने रखता है।"
+
+msgid "Water, roads or drainage? Connect with your corporation."
+msgstr "पानी, सड़क या जल निकासी की समस्या? अपने निगम से जुड़ें।"
+
+msgid "For everyday civic services &amp; assistance."
+msgstr "रोज़मर्रा की नागरिक सेवाओं और सहायता के लिए।"
+
+msgid "Better cities. Better everyday lives."
+msgstr "बेहतर शहर। बेहतर रोज़मर्रा का जीवन।"
+
+msgid "Open menu"
+msgstr "मेनू खोलें"
+
+msgid "Municipal corporation dashboard"
+msgstr "नगर निगम डैशबोर्ड"
+
+msgid "Choose language"
+msgstr "भाषा चुनें"
+
+msgid "Notifications"
+msgstr "सूचनाएँ"
+
+msgid "Latest complaints and notices"
+msgstr "नवीनतम शिकायतें और सूचनाएँ"
+
+msgid "No notifications yet."
+msgstr "अभी कोई सूचना नहीं।"
+
+msgid "Profile menu"
+msgstr "प्रोफ़ाइल मेनू"
+
+#, python-format
+msgid "Signed in as %(name)s"
+msgstr "%(name)s के रूप में साइन इन"
+
+msgid "Accessibility settings"
+msgstr "सुलभता सेटिंग"
+
+msgid "Manage officers &amp; notices"
+msgstr "अधिकारी और सूचनाएँ प्रबंधित करें"

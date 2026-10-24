@@ -5,6 +5,7 @@ from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext, gettext_lazy as _
 
 
 class Category(models.Model):
@@ -23,7 +24,7 @@ class Category(models.Model):
         verbose_name_plural = 'categories'
 
     def __str__(self):
-        return self.name
+        return gettext(self.name)   # Hindi version from reference_i18n.py when there is one
 
 
 class Ward(models.Model):
@@ -37,7 +38,8 @@ class Ward(models.Model):
         ordering = ['number']
 
     def __str__(self):
-        return f'Ward {self.number:02d} – {self.name}'
+        # Ward names are reference data with Hindi versions in reference_i18n.py
+        return gettext('Ward %(number)s – %(name)s') % {'number': f'{self.number:02d}', 'name': gettext(self.name)}
 
 
 class Officer(models.Model):
@@ -58,25 +60,25 @@ class Officer(models.Model):
 
 class Complaint(models.Model):
     class Status(models.TextChoices):
-        SUBMITTED = 'submitted', 'Submitted'
-        ASSIGNED = 'assigned', 'Assigned'
-        IN_PROGRESS = 'in_progress', 'In progress'
-        RESOLVED = 'resolved', 'Resolved'
+        SUBMITTED = 'submitted', _('Submitted')
+        ASSIGNED = 'assigned', _('Assigned')
+        IN_PROGRESS = 'in_progress', _('In progress')
+        RESOLVED = 'resolved', _('Resolved')
 
     class Priority(models.TextChoices):
-        HIGH = 'high', 'High'
-        MEDIUM = 'medium', 'Medium'
-        LOW = 'low', 'Low'
+        HIGH = 'high', _('High')
+        MEDIUM = 'medium', _('Medium')
+        LOW = 'low', _('Low')
 
     class Channel(models.TextChoices):
-        PORTAL = 'portal', 'Portal'
-        WHATSAPP = 'whatsapp', 'WhatsApp'
-        X = 'x', 'X (Twitter)'
-        FACEBOOK = 'facebook', 'Facebook'
-        INSTAGRAM = 'instagram', 'Instagram'
-        PHONE = 'phone', 'Phone call'
-        WALK_IN = 'walk_in', 'Walk-in'
-        EMAIL = 'email', 'Email'
+        PORTAL = 'portal', _('Portal')
+        WHATSAPP = 'whatsapp', _('WhatsApp')
+        X = 'x', _('X (Twitter)')
+        FACEBOOK = 'facebook', _('Facebook')
+        INSTAGRAM = 'instagram', _('Instagram')
+        PHONE = 'phone', _('Phone call')
+        WALK_IN = 'walk_in', _('Walk-in')
+        EMAIL = 'email', _('Email')
 
     OPEN_STATUSES = (Status.SUBMITTED, Status.ASSIGNED, Status.IN_PROGRESS)
 
@@ -215,11 +217,11 @@ class Notice(models.Model):
 
 class SupportEnquiry(models.Model):
     class Topic(models.TextChoices):
-        DASHBOARD = 'dashboard', 'Using the dashboard'
-        FILING = 'filing', 'Filing a complaint'
-        TRACKING = 'tracking', 'Tracking a complaint'
-        ACCESSIBILITY = 'accessibility', 'Accessibility or language'
-        OTHER = 'other', 'Something else'
+        DASHBOARD = 'dashboard', _('Using the dashboard')
+        FILING = 'filing', _('Filing a complaint')
+        TRACKING = 'tracking', _('Tracking a complaint')
+        ACCESSIBILITY = 'accessibility', _('Accessibility or language')
+        OTHER = 'other', _('Something else')
 
     reference = models.CharField(max_length=20, unique=True, editable=False, blank=True)
     name = models.CharField(max_length=80)

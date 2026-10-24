@@ -197,6 +197,10 @@ LIVE_ENV = {
     'REDIS_URL': 'redis://localhost:6379/0',
     'SMS_BACKEND': 'fast2sms',
     'FAST2SMS_API_KEY': 'dummy',
+    'BREVO_API_KEY': 'dummy-brevo-key',
+    'SENDER_EMAIL': 'sender@example.com',
+    'ADMIN_EMAIL': 'govermentowncoporation@gmail.com',
+    'INGEST_API_KEY': 'test-only-ingest-key-0123456789-abcdefghij',
 }
 SETTINGS_KEYS = ['DEBUG', 'SESSION_COOKIE_SECURE', 'CSRF_COOKIE_SECURE', 'SECURE_SSL_REDIRECT',
                  'SECURE_HSTS_SECONDS', 'SECURE_HSTS_INCLUDE_SUBDOMAINS', 'SECURE_HSTS_PRELOAD']

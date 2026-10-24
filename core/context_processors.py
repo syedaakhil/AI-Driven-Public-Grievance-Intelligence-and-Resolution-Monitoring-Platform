@@ -1,24 +1,26 @@
 """Data the shared layout (sidebar, top bar, footer) needs on every page."""
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.formats import date_format
+from django.utils.translation import gettext_lazy as _
 
 # (key, url name, label, icon, badge)
 MAIN_MENU = [
-    ('home', 'grievances:home', 'Home', 'home', ''),
-    ('file', 'grievances:complaint_create', 'Filed complaint', 'file', ''),
-    ('officers', 'grievances:officers', 'Officers in charge', 'building', ''),
-    ('dataset', 'grievances:complaint_list', 'Dataset', 'table', ''),
+    ('home', 'grievances:home', _('Home'), 'home', ''),
+    ('file', 'grievances:complaint_create', _('Filed complaint'), 'file', ''),
+    ('officers', 'grievances:officers', _('Officers in charge'), 'building', ''),
+    ('dataset', 'grievances:complaint_list', _('Dataset'), 'table', ''),
 ]
 
 # url name -> (highlighted menu key, breadcrumb label)
 PAGES = {
-    'home': ('home', 'Overview'),
-    'complaint_create': ('file', 'Filed complaints'),
-    'officers': ('officers', 'Officers in charge'),
-    'complaint_list': ('dataset', 'Complaints dataset'),
-    'complaint_detail': ('dataset', 'Complaint details'),
-    'help_desk': ('help_desk', 'Citizen help desk'),
-    'help_support': ('help_support', 'Help & support'),
+    'home': ('home', _('Overview')),
+    'complaint_create': ('file', _('Filed complaints')),
+    'officers': ('officers', _('Officers in charge')),
+    'complaint_list': ('dataset', _('Complaints dataset')),
+    'complaint_detail': ('dataset', _('Complaint details')),
+    'help_desk': ('help_desk', _('Citizen help desk')),
+    'help_support': ('help_support', _('Help & support')),
 }
 
 
@@ -66,7 +68,7 @@ def _notifications(request):
         {
             'icon': 'file',
             'title': f'{complaint.reference} · {complaint.title}',
-            'meta': f'{complaint.get_status_display()} · {timezone.localtime(complaint.created_at):%d %b %Y}',
+            'meta': f'{complaint.get_status_display()} · {date_format(timezone.localtime(complaint.created_at), "d M Y")}',
             'url': complaint.get_absolute_url(),
         }
         for complaint in Complaint.objects.all()[:3]
@@ -75,7 +77,7 @@ def _notifications(request):
         {
             'icon': notice.icon,
             'title': notice.title,
-            'meta': f'{notice.topic} · {notice.published_on:%d %b %Y}',
+            'meta': f'{notice.topic} · {date_format(notice.published_on, "d M Y")}',
             'url': reverse('grievances:home') + '#news',
         }
         for notice in Notice.objects.filter(is_published=True)[:3]

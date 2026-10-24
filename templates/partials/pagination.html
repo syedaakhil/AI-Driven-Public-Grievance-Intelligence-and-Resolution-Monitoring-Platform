@@ -1,11 +1,11 @@
-{% load ui %}
+{% load ui i18n %}
 {% if page.paginator.count %}
-  <nav class="pager" aria-label="Pages">
-    <span class="pager__info">Showing {{ page.start_index }}–{{ page.end_index }} of {{ page.paginator.count }}</span>
+  <nav class="pager" aria-label="{% translate 'Pages' %}">
+    <span class="pager__info">{% blocktranslate with start=page.start_index end=page.end_index total=page.paginator.count %}Showing {{ start }}–{{ end }} of {{ total }}{% endblocktranslate %}</span>
     {% if page.paginator.num_pages > 1 %}
       <div class="pager__pages">
         {% if page.has_previous %}
-          <a class="pager__btn" href="{% query page=page.previous_page_number %}" aria-label="Previous page">‹</a>
+          <a class="pager__btn" href="{% query page=page.previous_page_number %}" aria-label="{% translate 'Previous page' %}">‹</a>
         {% else %}
           <span class="pager__btn is-disabled" aria-hidden="true">‹</span>
         {% endif %}
@@ -19,7 +19,7 @@
           {% endif %}
         {% endfor %}
         {% if page.has_next %}
-          <a class="pager__btn" href="{% query page=page.next_page_number %}" aria-label="Next page">›</a>
+          <a class="pager__btn" href="{% query page=page.next_page_number %}" aria-label="{% translate 'Next page' %}">›</a>
         {% else %}
           <span class="pager__btn is-disabled" aria-hidden="true">›</span>
         {% endif %}

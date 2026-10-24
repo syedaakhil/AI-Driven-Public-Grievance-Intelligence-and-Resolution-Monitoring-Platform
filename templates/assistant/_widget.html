@@ -1,0 +1,38 @@
+{% load ui i18n %}
+{# "Citizen help" assistant: staff-only chat widget (static/js/assistant.js, static/css/assistant.css) #}
+<div class="assistant" data-assistant data-url="{% url 'assistant:chat' %}">
+  <button type="button" class="assistant__launcher" data-assistant-open aria-controls="assistant-panel" aria-expanded="false">
+    <span class="assistant__launcher-icon" aria-hidden="true">{% icon 'chat' %}<span class="assistant__dot"></span></span>
+    <span class="assistant__launcher-label">{% translate "Citizen help" %}</span>
+  </button>
+
+  <section class="assistant__panel" id="assistant-panel" role="dialog" aria-modal="false" aria-labelledby="assistant-title" hidden>
+    <header class="assistant__head">
+      <span class="assistant__head-icon" aria-hidden="true">{% icon 'chat' %}<span class="assistant__dot"></span></span>
+      <div class="assistant__head-text">
+        <h2 class="assistant__title" id="assistant-title">{% translate "Citizen help" %}</h2>
+        <p class="assistant__subtitle">{% translate "Search complaints · Email reports" %}</p>
+      </div>
+      <button type="button" class="assistant__close" data-assistant-close aria-label="{% translate 'Close Citizen help' %}">{% icon 'x' %}</button>
+    </header>
+
+    <div class="assistant__messages" data-assistant-messages role="log" aria-live="polite" aria-relevant="additions">
+      <div class="assistant__msg assistant__msg--bot">
+        <p>{% translate "Hi! Type a name, a complaint ID or a few words, and I'll find the matching complaints. Say “mail me this” to get the results by email." %}</p>
+      </div>
+      {# Each chip shows translated text but sends the same English request, so it works in every language. #}
+      <div class="assistant__chips" data-assistant-chips>
+        <button type="button" class="assistant__chip" data-assistant-chip data-query="Latest complaints">{% translate "Latest complaints" %}</button>
+        <button type="button" class="assistant__chip" data-assistant-chip data-query="Open complaints">{% translate "Open complaints" %}</button>
+        <button type="button" class="assistant__chip" data-assistant-chip data-query="Mail me today's complaints">{% translate "Mail me today's complaints" %}</button>
+      </div>
+    </div>
+
+    <form class="assistant__form" data-assistant-form autocomplete="off">
+      <label class="sr-only" for="assistant-input">{% translate "Message" %}</label>
+      <input class="assistant__input" id="assistant-input" name="message" type="text" maxlength="500"
+             placeholder="{% translate 'Search a name, ID or keyword…' %}" data-assistant-input>
+      <button type="submit" class="assistant__send" aria-label="{% translate 'Send' %}" data-assistant-send>{% icon 'send' %}</button>
+    </form>
+  </section>
+</div>

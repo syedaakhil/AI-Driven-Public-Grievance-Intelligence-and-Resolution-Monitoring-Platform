@@ -1,7 +1,13 @@
 /* City Corporation — help pages: topic search on the help desk,
-   and the accessibility & language controls on Help & support. */
+   and the accessibility controls on Help & support. Text comes from Django's JavaScript
+   translation catalogue (gettext), so it follows the site language. */
 (function () {
   'use strict';
+
+  var ngettext = window.ngettext || function (one, many, n) { return n === 1 ? one : many; };
+  var interpolate = window.interpolate || function (text, values) {
+    return text.replace(/%\((\w+)\)s/g, function (_, key) { return values[key]; });
+  };
 
   /* ---------- Help desk topic search ---------- */
   var search = document.querySelector('[data-topic-search]');
@@ -28,7 +34,9 @@
       });
       empty.hidden = shown > 0;
       count.textContent = words.length
-        ? shown + ' help topic' + (shown === 1 ? '' : 's') + ' match “' + phrase + '”.'
+        ? interpolate(ngettext('%(count)s help topic matches “%(phrase)s”.',
+                               '%(count)s help topics match “%(phrase)s”.', shown),
+                      { count: shown, phrase: phrase }, true)
         : '';
     };
 
@@ -42,9 +50,9 @@
     });
   }
 
-  /* ---------- Accessibility & language (uses window.CityCorp from app.js) ---------- */
+  /* ---------- Accessibility (uses window.CityCorp from app.js) ---------- */
   var site = window.CityCorp;
-  if (!site || !document.querySelector('[data-pref-text], [data-pref-toggle], [data-pref-lang]')) return;
+  if (!site || !document.querySelector('[data-pref-text], [data-pref-toggle]')) return;
 
   function syncControls() {
     var prefs = site.prefs();
@@ -54,8 +62,6 @@
     document.querySelectorAll('[data-pref-toggle]').forEach(function (box) {
       box.checked = !!prefs[box.getAttribute('data-pref-toggle')];
     });
-    var language = document.querySelector('[data-pref-lang]');
-    if (language) language.value = prefs.lang;
   }
 
   document.querySelectorAll('[data-pref-text]').forEach(function (button) {
@@ -64,10 +70,6 @@
   document.querySelectorAll('[data-pref-toggle]').forEach(function (box) {
     box.addEventListener('change', function () { site.setPref(box.getAttribute('data-pref-toggle'), box.checked); });
   });
-  var languageSelect = document.querySelector('[data-pref-lang]');
-  if (languageSelect) {
-    languageSelect.addEventListener('change', function () { site.setPref('lang', languageSelect.value); });
-  }
   document.addEventListener('citycorp:prefs', syncControls);
   syncControls();
 })();

@@ -89,6 +89,11 @@ REDIS_URL=redis://localhost:6379/0
 DJANGO_ADMIN_USERNAME=admin
 DJANGO_ADMIN_PASSWORD=<a strong password: 8+ characters, not common, not only digits>
 
+BREVO_API_KEY=...            # "Citizen help" emails (daily report, "mail me this")
+SENDER_EMAIL=...             # a sender verified in Brevo
+ADMIN_EMAIL=govermentowncoporation@gmail.com   # locked in code; any other value stops all emails
+INGEST_API_KEY=...           # 32+ random characters; see INGEST_API.md
+
 SMS_BACKEND=msg91            # or fast2sms / twilio, with that provider's keys below
 MSG91_AUTH_KEY=...
 MSG91_OTP_TEMPLATE_ID=...
@@ -195,6 +200,61 @@ Notes:
 sudo journalctl -u citycorp -f
 ```
 
+### The daily 9 AM report email
+
+The website itself does not send the 9 AM email. A systemd **timer** starts
+`manage.py send_daily_report` at 09:00 India time. The command sends at most once per day: it records
+the day in the database first, so a second run (restart, double trigger) sends nothing. Emails only ever
+go to `govermentowncoporation@gmail.com`.
+
+1. In `.env`, set `BREVO_API_KEY` and `SENDER_EMAIL` (a sender verified in Brevo).
+2. Create `/etc/systemd/system/citycorp-report.service`:
+
+```ini
+[Unit]
+Description=City Corporation daily complaints report
+
+[Service]
+Type=oneshot
+User=citycorp
+WorkingDirectory=/srv/citycorp/app
+ExecStart=/srv/citycorp/venv/bin/python manage.py send_daily_report
+```
+
+3. Create `/etc/systemd/system/citycorp-report.timer`. `Persistent=true` means that if the server was off
+   at 9:00, the report goes out as soon as it is back on (the same day):
+
+```ini
+[Unit]
+Description=Send the City Corporation report at 9:00 AM India time
+
+[Timer]
+OnCalendar=*-*-* 09:00:00 Asia/Kolkata
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+```
+
+4. Turn it on, and check when it will next run:
+
+```bash
+sudo systemctl daemon-reload
+```
+
+```bash
+sudo systemctl enable --now citycorp-report.timer
+```
+
+```bash
+systemctl list-timers citycorp-report.timer
+```
+
+**What must keep running:** the server machine (powered on, with internet access to `api.brevo.com`),
+the database, and systemd (always running on Ubuntu). gunicorn does not need to be up for the report.
+Every attempt is listed in Django admin under **Citizen help assistant → Email logs** and **Report runs**,
+and in `journalctl -u citycorp-report`. To send a test right now, run `manage.py send_daily_report --force`.
+
 ## 8. Put nginx and HTTPS in front
 
 Create `/etc/nginx/sites-available/citycorp`:
@@ -275,6 +335,8 @@ sudo systemctl restart citycorp
 ```
 
 Run `python manage.py test` on your own computer before every update.
+
+The English/Hindi translations ship as compiled `locale/hi/LC_MESSAGES/*.mo` files in git, so the server doesn't need GNU gettext. Install it (`sudo apt install -y gettext`) only if you want to run `makemessages` or `compilemessages` on the server.
 
 ## Troubleshooting
 

@@ -1,68 +1,68 @@
-{% load ui %}<!DOCTYPE html>
-<html lang="en">
+{% load ui i18n %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Register a complaint · City Corporation</title>
-  <meta name="description" content="Register a public complaint with the City Corporation citizen portal.">
+  <title>{% translate "Register a complaint · City Corporation" %}</title>
+  <meta name="description" content="{% translate 'Register a public complaint with the City Corporation citizen portal.' %}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="{% static_v 'css/citizen.css' %}">
 </head>
 <body>
-  <a class="skip-link" href="#main">Skip to main content</a>
+  <a class="skip-link" href="#main">{% translate "Skip to main content" %}</a>
 
   {% include "grievances/_citizen_header.html" %}
 
   <main class="page" id="main" tabindex="-1">
-    <nav class="breadcrumb" aria-label="Breadcrumb">
+    <nav class="breadcrumb" aria-label="{% translate 'Breadcrumb' %}">
       <ol>
-        <li>Citizen portal</li>
-        <li aria-current="page">Register a complaint</li>
+        <li>{% translate "Citizen portal" %}</li>
+        <li aria-current="page">{% translate "Register a complaint" %}</li>
       </ol>
     </nav>
 
     {% include "partials/messages.html" %}
 
     <div class="page-head">
-      <h1>Register a Public Complaint</h1>
-      <p class="page-head__sub">Tell us about the problem affecting you or your community. Provide the details below so the relevant department can review your complaint.</p>
+      <h1>{% translate "Register a Public Complaint" %}</h1>
+      <p class="page-head__sub">{% translate "Tell us about the problem affecting you or your community. Provide the details below so the relevant department can review your complaint." %}</p>
     </div>
 
     {% if submitted %}
       <section class="card success" id="successPanel" aria-labelledby="successTitle" tabindex="-1">
         <div class="success__icon" aria-hidden="true">{% icon 'check' 'lg' %}</div>
-        <h2 class="success__title" id="successTitle">Your complaint has been registered</h2>
-        <p class="success__label">Your complaint reference number</p>
+        <h2 class="success__title" id="successTitle">{% translate "Your complaint has been registered" %}</h2>
+        <p class="success__label">{% translate "Your complaint reference number" %}</p>
         <div class="success__ref-row">
           <p class="success__ref" id="successRef">{{ submitted.reference }}</p>
           <button type="button" class="btn btn--secondary btn--sm" id="copyRef">
-            {% icon 'file' 'sm' %}<span>Copy</span>
+            {% icon 'file' 'sm' %}<span>{% translate "Copy" %}</span>
           </button>
         </div>
         <p class="sr-only" id="copyStatus" role="status" aria-live="polite"></p>
 
         <div class="alert alert--info">
           {% icon 'info' %}
-          <p>Please keep this reference number to follow up on your complaint. It has been saved in the City Corporation portal for review by the corporation team. This is a college project, so it is not sent to a real government department.</p>
+          <p>{% translate "Please keep this reference number to follow up on your complaint. It has been saved in the City Corporation portal for review by the corporation team. This is a college project, so it is not sent to a real government department." %}</p>
         </div>
 
         <dl class="summary">
-          <dt>Submitted on</dt><dd>{{ submitted.created_at|date:"d M Y, h:i A" }}</dd>
-          <dt>Name</dt><dd>{{ submitted.citizen_name }}</dd>
-          <dt>Mobile number</dt><dd>{{ masked_phone }} (verified)</dd>
-          <dt>Taluk</dt><dd>{{ submitted.taluk }}</dd>
-          <dt>Affected area</dt><dd>{{ submitted.location }}</dd>
-          <dt>Problem photo</dt><dd>{% if submitted.attachment %}Attached{% else %}Not attached{% endif %}</dd>
-          <dt>Reported before</dt>
-          <dd>{% if submitted.previously_reported %}Yes{% if submitted.previous_reference %} · Ref. {{ submitted.previous_reference }}{% endif %}{% if submitted.previous_copy %} · copy attached{% endif %}{% else %}No{% endif %}</dd>
-          <dt>Status</dt><dd>{{ submitted.get_status_display }}</dd>
+          <dt>{% translate "Submitted on" %}</dt><dd>{{ submitted.created_at|date:"d M Y, h:i A" }}</dd>
+          <dt>{% translate "Name" %}</dt><dd>{{ submitted.citizen_name }}</dd>
+          <dt>{% translate "Mobile number" %}</dt><dd>{% blocktranslate with phone=masked_phone %}{{ phone }} (verified){% endblocktranslate %}</dd>
+          <dt>{% translate "Taluk" %}</dt><dd>{{ submitted.taluk }}</dd>
+          <dt>{% translate "Affected area" %}</dt><dd>{{ submitted.location }}</dd>
+          <dt>{% translate "Problem photo" %}</dt><dd>{% if submitted.attachment %}{% translate "Attached" %}{% else %}{% translate "Not attached" %}{% endif %}</dd>
+          <dt>{% translate "Reported before" %}</dt>
+          <dd>{% if submitted.previously_reported %}{% translate "Yes" %}{% if submitted.previous_reference %} · {% translate "Ref." %} {{ submitted.previous_reference }}{% endif %}{% if submitted.previous_copy %} · {% translate "copy attached" %}{% endif %}{% else %}{% translate "No" %}{% endif %}</dd>
+          <dt>{% translate "Status" %}</dt><dd>{{ submitted.get_status_display }}</dd>
         </dl>
 
         <div class="actions actions--center">
-          <a class="btn btn--secondary" href="{% url 'grievances:track_detail' submitted.reference %}">Track this complaint</a>
-          <a class="btn btn--primary" href="{% url 'grievances:complaint_registration' %}">Register another complaint</a>
+          <a class="btn btn--secondary" href="{% url 'grievances:track_detail' submitted.reference %}">{% translate "Track this complaint" %}</a>
+          <a class="btn btn--primary" href="{% url 'grievances:complaint_registration' %}">{% translate "Register another complaint" %}</a>
         </div>
       </section>
     {% else %}
@@ -70,20 +70,20 @@
         {% csrf_token %}
         <div class="alert alert--info" id="formIntro">
           {% icon 'info' %}
-          <p>Please provide accurate information. Fields marked with <span class="req" aria-hidden="true">*</span><span class="sr-only">an asterisk</span> are required.</p>
+          <p>{% blocktranslate %}Please provide accurate information. Fields marked with <span class="req" aria-hidden="true">*</span><span class="sr-only">an asterisk</span> are required.{% endblocktranslate %}</p>
         </div>
 
         <div class="alert alert--error" id="errorSummary" tabindex="-1" role="alert" {% if not form.errors %}hidden{% endif %}>
           {% icon 'alert' %}
           <div>
-            <h2 class="alert__title" id="errorSummaryTitle">Please correct the following</h2>
+            <h2 class="alert__title" id="errorSummaryTitle">{% translate "Please correct the following" %}</h2>
             <ul class="alert__list" id="errorSummaryList">
               {% for field in form %}{% for error in field.errors %}
                 <li><a href="#{{ field.name }}">{{ error }}</a></li>
               {% endfor %}{% endfor %}
               {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
             </ul>
-            {% if form.errors %}<p class="alert__note">For your security, selected files are not kept after an error. Please choose your photo or document again.</p>{% endif %}
+            {% if form.errors %}<p class="alert__note">{% translate "For your security, selected files are not kept after an error. Please choose your photo or document again." %}</p>{% endif %}
           </div>
         </div>
 
@@ -91,36 +91,36 @@
         <section class="form-section" aria-labelledby="sec-person">
           <h2 class="form-section__title" id="sec-person">
             <span class="form-section__icon" aria-hidden="true">{% icon 'user' %}</span>
-            Your details
+            {% translate "Your details" %}
           </h2>
 
           <div class="field" data-field="citizen_name">
-            <label class="field__label" for="citizen_name">Full Name <span class="req" aria-hidden="true">*</span></label>
-            <input class="input" id="citizen_name" name="citizen_name" type="text" placeholder="Enter your full name"
+            <label class="field__label" for="citizen_name">{% translate "Full Name" %} <span class="req" aria-hidden="true">*</span></label>
+            <input class="input" id="citizen_name" name="citizen_name" type="text" placeholder="{% translate 'Enter your full name' %}"
                    value="{{ form.citizen_name.value|default:'' }}" autocomplete="name" maxlength="80" required
                    aria-describedby="citizen_name-error" aria-invalid="{% if form.citizen_name.errors %}true{% else %}false{% endif %}">
             <p class="field__error" id="citizen_name-error">{{ form.citizen_name.errors.0 }}</p>
           </div>
 
           <div class="field" data-field="citizen_address">
-            <label class="field__label" for="citizen_address">Residential Address <span class="req" aria-hidden="true">*</span></label>
+            <label class="field__label" for="citizen_address">{% translate "Residential Address" %} <span class="req" aria-hidden="true">*</span></label>
             <textarea class="input textarea" id="citizen_address" name="citizen_address" rows="3"
-                      placeholder="Enter your house number, street, and address" autocomplete="street-address"
+                      placeholder="{% translate 'Enter your house number, street, and address' %}" autocomplete="street-address"
                       maxlength="500" required aria-describedby="citizen_address-error"
                       aria-invalid="{% if form.citizen_address.errors %}true{% else %}false{% endif %}">{{ form.citizen_address.value|default:'' }}</textarea>
             <p class="field__error" id="citizen_address-error">{{ form.citizen_address.errors.0 }}</p>
           </div>
 
           <div class="field" data-field="taluk">
-            <label class="field__label" for="taluk">Taluk <span class="req" aria-hidden="true">*</span></label>
-            <input class="input" id="taluk" name="taluk" type="text" placeholder="Enter or select your taluk"
+            <label class="field__label" for="taluk">{% translate "Taluk" %} <span class="req" aria-hidden="true">*</span></label>
+            <input class="input" id="taluk" name="taluk" type="text" placeholder="{% translate 'Enter or select your taluk' %}"
                    value="{{ form.taluk.value|default:'' }}" list="taluk-suggestions" autocomplete="off" maxlength="80" required
                    aria-describedby="taluk-help taluk-error" aria-invalid="{% if form.taluk.errors %}true{% else %}false{% endif %}">
             <!-- Only taluks already entered in earlier complaints; citizens can type any name -->
             <datalist id="taluk-suggestions">
               {% for taluk in taluks %}<option value="{{ taluk }}"></option>{% endfor %}
             </datalist>
-            <p class="field__help" id="taluk-help">Type the name of your taluk as it appears on official documents.</p>
+            <p class="field__help" id="taluk-help">{% translate "Type the name of your taluk as it appears on official documents." %}</p>
             <p class="field__error" id="taluk-error">{{ form.taluk.errors.0 }}</p>
           </div>
         </section>
@@ -129,14 +129,14 @@
         <section class="form-section" aria-labelledby="sec-problem">
           <h2 class="form-section__title" id="sec-problem">
             <span class="form-section__icon" aria-hidden="true">{% icon 'alert' %}</span>
-            About the problem
+            {% translate "About the problem" %}
           </h2>
 
           <div class="field" data-field="description">
-            <label class="field__label" for="description">Problem Description <span class="req" aria-hidden="true">*</span></label>
-            <p class="field__help" id="description-help">Example: A large pothole has developed on the main road and causes difficulties for vehicles and pedestrians.</p>
+            <label class="field__label" for="description">{% translate "Problem Description" %} <span class="req" aria-hidden="true">*</span></label>
+            <p class="field__help" id="description-help">{% translate "Example: A large pothole has developed on the main road and causes difficulties for vehicles and pedestrians." %}</p>
             <textarea class="input textarea textarea--lg" id="description" name="description" rows="6"
-                      placeholder="Describe the public problem clearly" maxlength="2000" required
+                      placeholder="{% translate 'Describe the public problem clearly' %}" maxlength="2000" required
                       aria-describedby="description-help description-count description-error"
                       aria-invalid="{% if form.description.errors %}true{% else %}false{% endif %}">{{ form.description.value|default:'' }}</textarea>
             <p class="field__count" id="description-count" aria-live="polite">0 / 2000</p>
@@ -144,26 +144,26 @@
           </div>
 
           <div class="field" data-field="attachment">
-            <span class="field__label" id="attachment-label">Upload Problem Photo <span class="optional">(optional)</span></span>
-            <p class="field__help" id="attachment-help">The photo should clearly show the reported issue. Accepted formats: JPG, JPEG, PNG or WEBP. Maximum size: 5 MB.</p>
+            <span class="field__label" id="attachment-label">{% translate "Upload Problem Photo" %} <span class="optional">{% translate "(optional)" %}</span></span>
+            <p class="field__help" id="attachment-help">{% translate "The photo should clearly show the reported issue. Accepted formats: JPG, JPEG, PNG or WEBP. Maximum size: 5 MB." %}</p>
             <div class="upload" data-upload="attachment" data-invalid="{% if form.attachment.errors %}true{% else %}false{% endif %}">
               <input class="upload__input" id="attachment" name="attachment" type="file"
                      accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                      aria-labelledby="attachment-label" aria-describedby="attachment-help attachment-error">
               <label class="upload__drop" for="attachment">
                 <span class="upload__drop-icon" aria-hidden="true">{% icon 'upload' %}</span>
-                <span class="upload__drop-title">Choose a photo</span>
-                <span class="upload__drop-meta">JPG, JPEG, PNG or WEBP · up to 5 MB</span>
+                <span class="upload__drop-title">{% translate "Choose a photo" %}</span>
+                <span class="upload__drop-meta">{% translate "JPG, JPEG, PNG or WEBP · up to 5 MB" %}</span>
               </label>
               <div class="upload__preview" hidden>
-                <img class="upload__thumb" alt="Preview of the selected problem photo">
+                <img class="upload__thumb" alt="{% translate 'Preview of the selected problem photo' %}">
                 <div class="upload__info">
                   <p class="upload__name"></p>
                   <p class="upload__size"></p>
                 </div>
                 <div class="upload__actions">
-                  <button type="button" class="btn btn--secondary btn--sm" data-action="replace">Replace</button>
-                  <button type="button" class="btn btn--danger btn--sm" data-action="remove">Remove</button>
+                  <button type="button" class="btn btn--secondary btn--sm" data-action="replace">{% translate "Replace" %}</button>
+                  <button type="button" class="btn btn--danger btn--sm" data-action="remove">{% translate "Remove" %}</button>
                 </div>
               </div>
             </div>
@@ -171,19 +171,19 @@
           </div>
 
           <div class="field" data-field="location">
-            <label class="field__label" for="location">Affected Area <span class="req" aria-hidden="true">*</span></label>
+            <label class="field__label" for="location">{% translate "Affected Area" %} <span class="req" aria-hidden="true">*</span></label>
             <input class="input" id="location" name="location" type="text"
-                   placeholder="Enter the locality, street, village, ward, or landmark" maxlength="200" required
+                   placeholder="{% translate 'Enter the locality, street, village, ward, or landmark' %}" maxlength="200" required
                    value="{{ form.location.value|default:'' }}" aria-describedby="location-error"
                    aria-invalid="{% if form.location.errors %}true{% else %}false{% endif %}">
             <p class="field__error" id="location-error">{{ form.location.errors.0 }}</p>
           </div>
 
           <div class="field" data-field="impact">
-            <label class="field__label" for="impact">How Does This Problem Affect You? <span class="req" aria-hidden="true">*</span></label>
-            <p class="field__help" id="impact-help">Example: It causes traffic congestion, makes walking difficult, or interrupts the water supply.</p>
+            <label class="field__label" for="impact">{% translate "How Does This Problem Affect You?" %} <span class="req" aria-hidden="true">*</span></label>
+            <p class="field__help" id="impact-help">{% translate "Example: It causes traffic congestion, makes walking difficult, or interrupts the water supply." %}</p>
             <textarea class="input textarea" id="impact" name="impact" rows="4"
-                      placeholder="Explain how this issue affects your daily life or the local community" maxlength="1000" required
+                      placeholder="{% translate 'Explain how this issue affects your daily life or the local community' %}" maxlength="1000" required
                       aria-describedby="impact-help impact-count impact-error"
                       aria-invalid="{% if form.impact.errors %}true{% else %}false{% endif %}">{{ form.impact.value|default:'' }}</textarea>
             <p class="field__count" id="impact-count" aria-live="polite">0 / 1000</p>
@@ -195,22 +195,22 @@
         <section class="form-section" aria-labelledby="sec-previous">
           <h2 class="form-section__title" id="sec-previous">
             <span class="form-section__icon" aria-hidden="true">{% icon 'refresh' %}</span>
-            Earlier complaint
+            {% translate "Earlier complaint" %}
           </h2>
 
           <fieldset class="field fieldset" data-field="reported_before" aria-describedby="reported_before-error"
                     aria-invalid="{% if form.reported_before.errors %}true{% else %}false{% endif %}">
-            <legend class="field__label">Have You Previously Reported This Problem? <span class="req" aria-hidden="true">*</span></legend>
+            <legend class="field__label">{% translate "Have You Previously Reported This Problem?" %} <span class="req" aria-hidden="true">*</span></legend>
             <div class="choices">
               <label class="choice">
                 <input type="radio" id="reported_before" name="reported_before" value="yes" required aria-controls="previousDetails"
                        {% if form.reported_before.value == 'yes' %}checked{% endif %}>
-                <span>Yes</span>
+                <span>{% translate "Yes" %}</span>
               </label>
               <label class="choice">
                 <input type="radio" id="reported_before_no" name="reported_before" value="no" aria-controls="previousDetails"
                        {% if form.reported_before.value == 'no' %}checked{% endif %}>
-                <span>No</span>
+                <span>{% translate "No" %}</span>
               </label>
             </div>
             <p class="field__error" id="reported_before-error">{{ form.reported_before.errors.0 }}</p>
@@ -218,38 +218,38 @@
 
           <div class="subpanel" id="previousDetails" {% if form.reported_before.value != 'yes' %}hidden{% endif %}>
             <div class="field" data-field="previous_reference">
-              <label class="field__label" for="previous_reference">Previous Complaint Reference Number <span class="optional">(optional)</span></label>
+              <label class="field__label" for="previous_reference">{% translate "Previous Complaint Reference Number" %} <span class="optional">{% translate "(optional)" %}</span></label>
               <input class="input" id="previous_reference" name="previous_reference" type="text"
-                     placeholder="Enter your complaint reference number, if available" maxlength="50" autocomplete="off"
+                     placeholder="{% translate 'Enter your complaint reference number, if available' %}" maxlength="50" autocomplete="off"
                      value="{{ form.previous_reference.value|default:'' }}"
                      aria-describedby="previous_reference-help previous_reference-error"
                      aria-invalid="{% if form.previous_reference.errors %}true{% else %}false{% endif %}">
-              <p class="field__help" id="previous_reference-help">Leave this empty if you no longer have the number.</p>
+              <p class="field__help" id="previous_reference-help">{% translate "Leave this empty if you no longer have the number." %}</p>
               <p class="field__error" id="previous_reference-error">{{ form.previous_reference.errors.0 }}</p>
             </div>
 
             <div class="field" data-field="previous_copy">
-              <span class="field__label" id="previous_copy-label">Upload Previous Complaint Copy <span class="optional">(optional)</span></span>
-              <p class="field__help" id="previous_copy-help">The document or image should show the earlier complaint details. Accepted formats: PDF, JPG, JPEG or PNG. Maximum size: 5 MB.</p>
+              <span class="field__label" id="previous_copy-label">{% translate "Upload Previous Complaint Copy" %} <span class="optional">{% translate "(optional)" %}</span></span>
+              <p class="field__help" id="previous_copy-help">{% translate "The document or image should show the earlier complaint details. Accepted formats: PDF, JPG, JPEG or PNG. Maximum size: 5 MB." %}</p>
               <div class="upload" data-upload="previous_copy" data-invalid="{% if form.previous_copy.errors %}true{% else %}false{% endif %}">
                 <input class="upload__input" id="previous_copy" name="previous_copy" type="file"
                        accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
                        aria-labelledby="previous_copy-label" aria-describedby="previous_copy-help previous_copy-error">
                 <label class="upload__drop" for="previous_copy">
                   <span class="upload__drop-icon" aria-hidden="true">{% icon 'upload' %}</span>
-                  <span class="upload__drop-title">Choose a file</span>
-                  <span class="upload__drop-meta">PDF, JPG, JPEG or PNG · up to 5 MB</span>
+                  <span class="upload__drop-title">{% translate "Choose a file" %}</span>
+                  <span class="upload__drop-meta">{% translate "PDF, JPG, JPEG or PNG · up to 5 MB" %}</span>
                 </label>
                 <div class="upload__preview" hidden>
-                  <img class="upload__thumb" alt="Preview of the selected complaint copy" hidden>
+                  <img class="upload__thumb" alt="{% translate 'Preview of the selected complaint copy' %}" hidden>
                   <span class="upload__file-icon" aria-hidden="true" hidden>{% icon 'file' 'lg' %}</span>
                   <div class="upload__info">
                     <p class="upload__name"></p>
                     <p class="upload__size"></p>
                   </div>
                   <div class="upload__actions">
-                    <button type="button" class="btn btn--secondary btn--sm" data-action="replace">Replace</button>
-                    <button type="button" class="btn btn--danger btn--sm" data-action="remove">Remove</button>
+                    <button type="button" class="btn btn--secondary btn--sm" data-action="replace">{% translate "Replace" %}</button>
+                    <button type="button" class="btn btn--danger btn--sm" data-action="remove">{% translate "Remove" %}</button>
                   </div>
                 </div>
               </div>
@@ -265,16 +265,16 @@
               <input type="checkbox" id="declaration" name="declaration" required aria-describedby="declaration-error"
                      {% if form.declaration.value %}checked{% endif %}
                      aria-invalid="{% if form.declaration.errors %}true{% else %}false{% endif %}">
-              <span>I confirm that the information I have provided is accurate to the best of my knowledge. <span class="req" aria-hidden="true">*</span></span>
+              <span>{% translate "I confirm that the information I have provided is accurate to the best of my knowledge." %} <span class="req" aria-hidden="true">*</span></span>
             </label>
             <p class="field__error" id="declaration-error">{{ form.declaration.errors.0 }}</p>
           </div>
 
           <div class="actions">
-            <button type="submit" class="btn btn--primary" id="submitBtn">Submit Complaint</button>
-            <button type="button" class="btn btn--secondary" id="clearBtn">Clear Form</button>
+            <button type="submit" class="btn btn--primary" id="submitBtn">{% translate "Submit Complaint" %}</button>
+            <button type="button" class="btn btn--secondary" id="clearBtn">{% translate "Clear Form" %}</button>
           </div>
-          <p class="form-footer__note">Your complaint is saved in the City Corporation portal with your verified mobile number. This is a college project and is not an official government service.</p>
+          <p class="form-footer__note">{% translate "Your complaint is saved in the City Corporation portal with your verified mobile number. This is a college project and is not an official government service." %}</p>
         </div>
       </form>
     {% endif %}
@@ -282,8 +282,8 @@
     {% if my_complaints %}
       <section class="card mine" aria-labelledby="mine-title">
         <div class="mine__head">
-          <h2 class="mine__title" id="mine-title">Your recent complaints</h2>
-          <a class="mine__all" href="{% url 'grievances:track_list' %}">Track all {{ my_complaint_count }} complaint{{ my_complaint_count|pluralize }}</a>
+          <h2 class="mine__title" id="mine-title">{% translate "Your recent complaints" %}</h2>
+          <a class="mine__all" href="{% url 'grievances:track_list' %}">{% blocktranslate count counter=my_complaint_count %}Track all {{ counter }} complaint{% plural %}Track all {{ counter }} complaints{% endblocktranslate %}</a>
         </div>
         <ul class="mine__list">
           {% for complaint in my_complaints %}
@@ -291,7 +291,7 @@
               <div>
                 <a class="mine__ref" href="{% url 'grievances:track_detail' complaint.reference %}">{{ complaint.reference }}</a>
                 <p class="mine__text">{{ complaint.title }}</p>
-                <p class="mine__date">Filed {{ complaint.created_at|date:"d M Y" }}</p>
+                <p class="mine__date">{% blocktranslate with date=complaint.created_at|date:"d M Y" %}Filed {{ date }}{% endblocktranslate %}</p>
               </div>
               <span class="badge badge--{{ complaint.status }}">{{ complaint.get_status_display }}</span>
             </li>
@@ -302,18 +302,19 @@
   </main>
 
   <footer class="site-footer">
-    <p>© City Corporation · College project — not an official government portal.</p>
+    <p>© {% translate "City Corporation · College project — not an official government portal." %}</p>
   </footer>
 
   <dialog class="dialog" id="clearDialog" aria-labelledby="clearDialogTitle" aria-describedby="clearDialogText">
-    <h2 class="dialog__title" id="clearDialogTitle">Clear the form?</h2>
-    <p class="dialog__text" id="clearDialogText">Everything you have entered, including selected files, will be removed. This cannot be undone.</p>
+    <h2 class="dialog__title" id="clearDialogTitle">{% translate "Clear the form?" %}</h2>
+    <p class="dialog__text" id="clearDialogText">{% translate "Everything you have entered, including selected files, will be removed. This cannot be undone." %}</p>
     <div class="actions actions--end">
-      <button type="button" class="btn btn--secondary" data-dialog="cancel">Keep my details</button>
-      <button type="button" class="btn btn--danger-solid" data-dialog="confirm">Clear form</button>
+      <button type="button" class="btn btn--secondary" data-dialog="cancel">{% translate "Keep my details" %}</button>
+      <button type="button" class="btn btn--danger-solid" data-dialog="confirm">{% translate "Clear form" %}</button>
     </div>
   </dialog>
 
+  <script src="{% url 'javascript-catalog' %}"></script>
   <script src="{% static_v 'js/citizen-complaint.js' %}"></script>
 </body>
 </html>

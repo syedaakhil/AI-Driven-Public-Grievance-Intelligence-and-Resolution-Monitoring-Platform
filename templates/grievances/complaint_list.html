@@ -1,65 +1,65 @@
 {% extends "base.html" %}
-{% load ui humanize %}
+{% load ui humanize i18n %}
 
-{% block title %}Complaints dataset · City Corporation{% endblock %}
+{% block title %}{% translate "Complaints dataset · City Corporation" %}{% endblock %}
 
 {% block content %}
 <div class="head">
-  <h1 class="head__title">Complaints dataset</h1>
+  <h1 class="head__title">{% translate "Complaints dataset" %}</h1>
   <div class="head__tools">
-    <a class="btn btn--ghost btn--sm" href="{% url 'grievances:complaint_export' %}{% query page='' %}">{% icon 'download' 'sm' %}Export CSV</a>
-    <a class="btn btn--primary btn--sm" href="{% url 'grievances:complaint_create' %}">{% icon 'file' 'sm' %}File a complaint</a>
+    <a class="btn btn--ghost btn--sm" href="{% url 'grievances:complaint_export' %}{% query page='' %}">{% icon 'download' 'sm' %}{% translate "Export CSV" %}</a>
+    <a class="btn btn--primary btn--sm" href="{% url 'grievances:complaint_create' %}">{% icon 'file' 'sm' %}{% translate "File a complaint" %}</a>
   </div>
 </div>
 
-<section class="grid grid--4 section" aria-label="Summary">
-  <div class="card mini"><span class="tile">{% icon 'list' %}</span><div><strong>{{ summary.total|intcomma }}</strong><span>Total complaints</span></div></div>
-  <div class="card mini"><span class="tile tile--orange">{% icon 'clock' %}</span><div><strong>{{ summary.open|intcomma }}</strong><span>Open (not yet resolved)</span></div></div>
-  <div class="card mini"><span class="tile tile--green">{% icon 'check' %}</span><div><strong>{{ summary.resolved|intcomma }}</strong><span>Resolved</span></div></div>
-  <div class="card mini"><span class="tile tile--red">{% icon 'alert' %}</span><div><strong>{{ summary.high|intcomma }}</strong><span>High priority</span></div></div>
+<section class="grid grid--4 section" aria-label="{% translate 'Summary' %}">
+  <div class="card mini"><span class="tile">{% icon 'list' %}</span><div><strong>{{ summary.total|intcomma }}</strong><span>{% translate "Total complaints" %}</span></div></div>
+  <div class="card mini"><span class="tile tile--orange">{% icon 'clock' %}</span><div><strong>{{ summary.open|intcomma }}</strong><span>{% translate "Open (not yet resolved)" %}</span></div></div>
+  <div class="card mini"><span class="tile tile--green">{% icon 'check' %}</span><div><strong>{{ summary.resolved|intcomma }}</strong><span>{% translate "Resolved" %}</span></div></div>
+  <div class="card mini"><span class="tile tile--red">{% icon 'alert' %}</span><div><strong>{{ summary.high|intcomma }}</strong><span>{% translate "High priority" %}</span></div></div>
 </section>
 
 <section class="card" aria-labelledby="table-title">
-  <h2 class="sr-only" id="table-title">Complaints</h2>
+  <h2 class="sr-only" id="table-title">{% translate "Complaints" %}</h2>
   <form method="get" class="filters" role="search">
     <div class="field filters__search">
       <label for="{{ form.q.id_for_label }}">{{ form.q.label }}</label>
       <div class="search">{% icon 'search' 'sm' %}{{ form.q }}</div>
     </div>
-    <div class="field"><label for="{{ form.category.id_for_label }}">Category</label>{{ form.category }}</div>
-    <div class="field"><label for="{{ form.ward.id_for_label }}">Ward</label>{{ form.ward }}</div>
-    <div class="field"><label for="{{ form.status.id_for_label }}">Status</label>{{ form.status }}</div>
-    <div class="field"><label for="{{ form.priority.id_for_label }}">Priority</label>{{ form.priority }}</div>
-    <div class="field"><label for="{{ form.channel.id_for_label }}">Channel</label>{{ form.channel }}</div>
-    <div class="field"><label for="{{ form.sort.id_for_label }}">Sort by</label>{{ form.sort }}</div>
+    <div class="field"><label for="{{ form.category.id_for_label }}">{% translate "Category" %}</label>{{ form.category }}</div>
+    <div class="field"><label for="{{ form.ward.id_for_label }}">{% translate "Ward" %}</label>{{ form.ward }}</div>
+    <div class="field"><label for="{{ form.status.id_for_label }}">{% translate "Status" %}</label>{{ form.status }}</div>
+    <div class="field"><label for="{{ form.priority.id_for_label }}">{% translate "Priority" %}</label>{{ form.priority }}</div>
+    <div class="field"><label for="{{ form.channel.id_for_label }}">{% translate "Channel" %}</label>{{ form.channel }}</div>
+    <div class="field"><label for="{{ form.sort.id_for_label }}">{% translate "Sort by" %}</label>{{ form.sort }}</div>
     <div class="filters__actions">
-      <button type="submit" class="btn btn--primary">Apply</button>
-      <a class="btn btn--ghost" href="{% url 'grievances:complaint_list' %}">{% icon 'refresh' 'sm' %}Reset</a>
+      <button type="submit" class="btn btn--primary">{% translate "Apply" %}</button>
+      <a class="btn btn--ghost" href="{% url 'grievances:complaint_list' %}">{% icon 'refresh' 'sm' %}{% translate "Reset" %}</a>
     </div>
   </form>
 
   <div class="table-wrap">
     <table class="table">
-      <caption class="sr-only">Complaints, {{ page.paginator.count }} matching</caption>
+      <caption class="sr-only">{% blocktranslate with count=page.paginator.count %}Complaints, {{ count }} matching{% endblocktranslate %}</caption>
       <thead>
         <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Complaint</th>
-          <th scope="col">Category</th>
-          <th scope="col">Ward</th>
-          <th scope="col">Channel</th>
-          <th scope="col">Filed</th>
-          <th scope="col">Priority</th>
-          <th scope="col">Status</th>
+          <th scope="col">{% translate "ID" %}</th>
+          <th scope="col">{% translate "Complaint" %}</th>
+          <th scope="col">{% translate "Category" %}</th>
+          <th scope="col">{% translate "Ward" %}</th>
+          <th scope="col">{% translate "Channel" %}</th>
+          <th scope="col">{% translate "Filed" %}</th>
+          <th scope="col">{% translate "Priority" %}</th>
+          <th scope="col">{% translate "Status" %}</th>
         </tr>
       </thead>
       <tbody>
         {% for complaint in page %}
           <tr>
             <td class="table__id"><a href="{{ complaint.get_absolute_url }}">{{ complaint.reference }}</a></td>
-            <td class="table__title"><a href="{{ complaint.get_absolute_url }}">{{ complaint.title }}</a><small>{% if complaint.location %}{{ complaint.location }}{% elif complaint.ward %}{{ complaint.ward.area }}{% endif %}</small></td>
-            <td>{% if complaint.category %}{{ complaint.category.name }}<small>{{ complaint.category.department }}</small>{% else %}<span class="muted">Not assigned</span>{% endif %}</td>
-            <td class="nowrap">{% if complaint.ward %}{{ complaint.ward }}<small>{{ complaint.ward.area }}</small>{% else %}<span class="muted">Not assigned</span>{% if complaint.taluk %}<small>{{ complaint.taluk }} taluk</small>{% endif %}{% endif %}</td>
+            <td class="table__title"><a href="{{ complaint.get_absolute_url }}">{{ complaint.title }}</a><small>{% if complaint.location %}{{ complaint.location }}{% elif complaint.ward %}{{ complaint.ward.area|tr }}{% endif %}</small></td>
+            <td>{% if complaint.category %}{{ complaint.category.name|tr }}<small>{{ complaint.category.department|tr }}</small>{% else %}<span class="muted">{% translate "Not assigned" %}</span>{% endif %}</td>
+            <td class="nowrap">{% if complaint.ward %}{{ complaint.ward }}<small>{{ complaint.ward.area|tr }}</small>{% else %}<span class="muted">{% translate "Not assigned" %}</span>{% if complaint.taluk %}<small>{% blocktranslate with taluk=complaint.taluk %}{{ taluk }} taluk{% endblocktranslate %}</small>{% endif %}{% endif %}</td>
             <td class="nowrap">{{ complaint.get_channel_display }}</td>
             <td class="nowrap">{{ complaint.created_at|date:"d M Y" }}</td>
             <td><span class="badge badge--{{ complaint.priority }}">{{ complaint.get_priority_display }}</span></td>
@@ -70,11 +70,11 @@
             <td colspan="8">
               <div class="empty">
                 {% if filtered %}
-                  <p>No complaints match these filters.</p>
-                  <a class="link" href="{% url 'grievances:complaint_list' %}">Reset filters</a>
+                  <p>{% translate "No complaints match these filters." %}</p>
+                  <a class="link" href="{% url 'grievances:complaint_list' %}">{% translate "Reset filters" %}</a>
                 {% else %}
-                  <p>No complaints yet.</p>
-                  <a class="link" href="{% url 'grievances:complaint_create' %}">File the first complaint {% icon 'arrow-right' 'sm' %}</a>
+                  <p>{% translate "No complaints yet." %}</p>
+                  <a class="link" href="{% url 'grievances:complaint_create' %}">{% translate "File the first complaint" %} {% icon 'arrow-right' 'sm' %}</a>
                 {% endif %}
               </div>
             </td>

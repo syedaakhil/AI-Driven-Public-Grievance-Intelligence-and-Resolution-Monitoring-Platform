@@ -6,6 +6,7 @@ from django.contrib.staticfiles import finders
 from django.templatetags.static import static
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
+from django.utils.translation import gettext
 
 register = template.Library()
 
@@ -32,6 +33,8 @@ ICONS = {
     'trend-up': '<path d="m3.5 16.5 5.5-5.5 4 4 7.5-7.5"/><path d="M15 7.5h5.5V13"/>',
     'menu': '<path d="M4 6.5h16M4 12h16M4 17.5h16"/>',
     'x': '<path d="m6.5 6.5 11 11M17.5 6.5l-11 11"/>',
+    'chat': '<path d="M4 5.5h11a1.5 1.5 0 0 1 1.5 1.5v6a1.5 1.5 0 0 1-1.5 1.5H9l-3.5 3v-3H4A1.5 1.5 0 0 1 2.5 13V7A1.5 1.5 0 0 1 4 5.5z"/><path d="M16.5 9.5H20a1.5 1.5 0 0 1 1.5 1.5v5.5A1.5 1.5 0 0 1 20 18h-1v2.5L16 18h-4.5"/><path d="M6.5 10h6"/>',
+    'send': '<path d="M20.5 3.5 10 14"/><path d="M20.5 3.5 14 20.5l-4-6.5-6.5-4z"/>',
     'search': '<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.3-4.3"/>',
     'mail': '<rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="m4 7.5 8 5.5 8-5.5"/>',
     'upload': '<path d="M12 15.5V4.5M7.5 9 12 4.5 16.5 9"/><path d="M4.5 15.5v3a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-3"/>',
@@ -75,6 +78,16 @@ def static_v(path):
 @register.filter
 def absolute(value):
     return abs(value)
+
+
+@register.filter
+def tr(value):
+    """
+    Translate text stored in the database, such as a category or ward name, into the visitor's
+    language. Only text listed in grievances/reference_i18n.py has a Hindi version; anything else
+    (citizens' own words, officer names) is shown unchanged.
+    """
+    return gettext(str(value)) if value not in (None, '') else value
 
 
 @register.simple_tag(takes_context=True)

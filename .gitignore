@@ -19,3 +19,6 @@ htmlcov/
 
 # Local Claude Code settings (launch.json for the preview server is shared)
 .claude/settings.local.json
+
+# Daily-report log written by run_daily_report.bat
+logs/

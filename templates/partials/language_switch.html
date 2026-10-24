@@ -1,0 +1,12 @@
+{% load i18n %}{% get_current_language as current_language %}{% get_available_languages as site_languages %}{% get_language_info_list for site_languages as languages %}
+{# English / हिंदी switch: each language is named in its own script. Posts to django.views.i18n.set_language, which remembers the choice in a cookie. #}
+<form class="langswitch{% if compact %} langswitch--compact{% endif %}" action="{% url 'set_language' %}" method="post">
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ request.get_full_path }}">
+  {% for language in languages %}{% with code=language.code %}
+    <button type="submit" name="language" value="{{ code }}" lang="{{ code }}"
+            class="{% if compact %}langswitch__option{% else %}menu__item{% endif %}"
+            {% if not compact %}role="menuitemradio"{% endif %}
+            aria-{% if compact %}pressed{% else %}checked{% endif %}="{% if code == current_language %}true{% else %}false{% endif %}">{{ language.name_local }}</button>
+  {% endwith %}{% endfor %}
+</form>

@@ -1,100 +1,100 @@
 {% extends "base.html" %}
-{% load ui %}
+{% load ui i18n %}
 
-{% block title %}Citizen help desk · City Corporation{% endblock %}
+{% block title %}{% translate "Citizen help desk · City Corporation" %}{% endblock %}
 
 {% block content %}
 <section class="hero section">
-  <h1 class="hero__title">Citizen help desk</h1>
-  <p class="hero__text">Find the right civic service, learn how complaints are handled, and reach the right department.</p>
+  <h1 class="hero__title">{% translate "Citizen help desk" %}</h1>
+  <p class="hero__text">{% translate "Find the right civic service, learn how complaints are handled, and reach the right department." %}</p>
   <div class="search search--hero">
     {% icon 'search' 'sm' %}
-    <label class="sr-only" for="topic-search">Search help topics</label>
-    <input class="input" id="topic-search" type="search" placeholder="Search help topics — e.g. water, track, pothole, garbage" autocomplete="off" data-topic-search>
+    <label class="sr-only" for="topic-search">{% translate "Search help topics" %}</label>
+    <input class="input" id="topic-search" type="search" placeholder="{% translate 'Search help topics — e.g. water, track, pothole, garbage' %}" autocomplete="off" data-topic-search>
   </div>
   <div class="hero__tags">
-    <button type="button" class="tag" data-topic-tag="water">Water supply</button>
-    <button type="button" class="tag" data-topic-tag="track">Track a complaint</button>
-    <button type="button" class="tag" data-topic-tag="streetlight">Streetlights</button>
-    <button type="button" class="tag" data-topic-tag="garbage">Garbage</button>
+    <button type="button" class="tag" data-topic-tag="water">{% translate "Water supply" %}</button>
+    <button type="button" class="tag" data-topic-tag="track">{% translate "Track a complaint" %}</button>
+    <button type="button" class="tag" data-topic-tag="streetlight">{% translate "Streetlights" %}</button>
+    <button type="button" class="tag" data-topic-tag="garbage">{% translate "Garbage" %}</button>
   </div>
 </section>
 
 <p class="muted small section" data-topic-count aria-live="polite"></p>
 
 <section class="section" aria-labelledby="services-title">
-  <h2 class="section__title" id="services-title" data-topic-heading>Civic services</h2>
+  <h2 class="section__title" id="services-title" data-topic-heading>{% translate "Civic services" %}</h2>
   <div class="grid grid--auto">
     {% for category in categories %}
       <article class="card service" data-topic="{{ category.name }} {{ category.slug }} {{ category.description }} {{ category.department }}">
         <span class="tile tile--lg">{% icon category.icon %}</span>
-        <h3 class="service__title">{{ category.name }}</h3>
-        <p class="service__text">{{ category.description }}</p>
+        <h3 class="service__title">{{ category.name|tr }}</h3>
+        <p class="service__text">{{ category.description|tr }}</p>
         <div class="service__tags">
-          <span class="badge badge--plain">{{ category.department }}</span>
-          <span class="badge badge--assigned">{% icon 'clock' 'sm' %}{{ category.target_time }}</span>
+          <span class="badge badge--plain">{{ category.department|tr }}</span>
+          <span class="badge badge--assigned">{% icon 'clock' 'sm' %}{{ category.target_time|tr }}</span>
         </div>
-        <a class="link" href="{% url 'grievances:complaint_create' %}?category={{ category.slug }}">Report an issue {% icon 'arrow-right' 'sm' %}</a>
+        <a class="link" href="{% url 'grievances:complaint_create' %}?category={{ category.slug }}">{% translate "Report an issue" %} {% icon 'arrow-right' 'sm' %}</a>
       </article>
     {% endfor %}
     <article class="card service" data-topic="streetlight light lamp pole wire roads">
       <span class="tile tile--lg">{% icon 'road' %}</span>
-      <h3 class="service__title">Streetlights</h3>
-      <p class="service__text">Lights not working, flickering lamps or exposed wires. File these under Roads &amp; potholes.</p>
-      <div class="service__tags"><span class="badge badge--plain">Roads &amp; Bridges Department</span></div>
-      <a class="link" href="{% url 'grievances:complaint_create' %}?category=roads">Report an issue {% icon 'arrow-right' 'sm' %}</a>
+      <h3 class="service__title">{% translate "Streetlights" %}</h3>
+      <p class="service__text">{% translate "Lights not working, flickering lamps or exposed wires. File these under Roads &amp; potholes." %}</p>
+      <div class="service__tags"><span class="badge badge--plain">{% translate "Roads &amp; Bridges Department" %}</span></div>
+      <a class="link" href="{% url 'grievances:complaint_create' %}?category=roads">{% translate "Report an issue" %} {% icon 'arrow-right' 'sm' %}</a>
     </article>
   </div>
 </section>
 
 <div class="split section">
   <section class="card" data-topic="report file complaint how steps photo ward category channel" aria-labelledby="report-title">
-    <h2 class="card__title" id="report-title">How a complaint is handled</h2>
+    <h2 class="card__title" id="report-title">{% translate "How a complaint is handled" %}</h2>
     <ol class="steps">
-      <li><strong>Registered</strong>The complaint is recorded with its category, ward and the channel it came through.</li>
-      <li><strong>Assigned</strong>It goes to the officer responsible for that service in that ward.</li>
-      <li><strong>In progress</strong>The field team works on it; every step is noted on the complaint.</li>
-      <li><strong>Resolved</strong>The department closes it, and the citizen can be told using the complaint ID.</li>
+      <li><strong>{% translate "Registered" %}</strong>{% translate "The complaint is recorded with its category, ward and the channel it came through." %}</li>
+      <li><strong>{% translate "Assigned" %}</strong>{% translate "It goes to the officer responsible for that service in that ward." %}</li>
+      <li><strong>{% translate "In progress" %}</strong>{% translate "The field team works on it; every step is noted on the complaint." %}</li>
+      <li><strong>{% translate "Resolved" %}</strong>{% translate "The department closes it, and the citizen can be told using the complaint ID." %}</li>
     </ol>
-    <a class="btn btn--primary mt-16" href="{% url 'grievances:complaint_create' %}">File a complaint {% icon 'arrow-right' 'sm' %}</a>
+    <a class="btn btn--primary mt-16" href="{% url 'grievances:complaint_create' %}">{% translate "File a complaint" %} {% icon 'arrow-right' 'sm' %}</a>
   </section>
 
   <section class="card" id="track" data-topic="track status id complaint progress check" aria-labelledby="track-title">
-    <h2 class="card__title" id="track-title">Track a complaint</h2>
+    <h2 class="card__title" id="track-title">{% translate "Track a complaint" %}</h2>
     <form method="get" action="#track" class="stack stack--tight mt-12">
       <div class="field{% if track_error %} has-error{% endif %}">
-        <label for="ref">Complaint ID</label>
-        <input class="input" id="ref" name="ref" value="{{ reference }}" placeholder="e.g. CC-2026-00042" maxlength="20" autocomplete="off">
+        <label for="ref">{% translate "Complaint ID" %}</label>
+        <input class="input" id="ref" name="ref" value="{{ reference }}" placeholder="{% translate 'e.g. CC-2026-00042' %}" maxlength="20" autocomplete="off">
         {% if track_error %}<p class="field__error">{{ track_error }}</p>{% endif %}
       </div>
-      <button type="submit" class="btn btn--primary btn--block">Check status</button>
+      <button type="submit" class="btn btn--primary btn--block">{% translate "Check status" %}</button>
     </form>
     {% if tracked %}
       <div class="result">
         <div class="result__top"><strong>{{ tracked.reference }}</strong><span class="badge badge--{{ tracked.status }}">{{ tracked.get_status_display }}</span></div>
         <p class="result__title">{{ tracked.title }}</p>
-        <p class="muted small">{{ tracked.category.department|default:"Department not assigned yet" }} · {{ tracked.ward|default:"Ward not assigned yet" }} · filed {{ tracked.created_at|date:"d M Y" }}</p>
-        <a class="link" href="{{ tracked.get_absolute_url }}">Open full details {% icon 'arrow-right' 'sm' %}</a>
+        <p class="muted small">{% if tracked.category %}{{ tracked.category.department|tr }}{% else %}{% translate "Department not assigned yet" %}{% endif %} · {% if tracked.ward %}{{ tracked.ward }}{% else %}{% translate "Ward not assigned yet" %}{% endif %} · {% blocktranslate with date=tracked.created_at|date:"d M Y" %}filed {{ date }}{% endblocktranslate %}</p>
+        <a class="link" href="{{ tracked.get_absolute_url }}">{% translate "Open full details" %} {% icon 'arrow-right' 'sm' %}</a>
       </div>
     {% elif latest and not reference %}
-      <p class="muted small mt-12">Latest complaint: <a href="?ref={{ latest.reference }}#track">{{ latest.reference }}</a></p>
+      <p class="muted small mt-12">{% translate "Latest complaint:" %} <a href="?ref={{ latest.reference }}#track">{{ latest.reference }}</a></p>
     {% endif %}
   </section>
 </div>
 
 <section class="card section" data-topic="contact department office target time" aria-labelledby="departments-title">
-  <h2 class="card__title" id="departments-title">Departments</h2>
+  <h2 class="card__title" id="departments-title">{% translate "Departments" %}</h2>
   <div class="table-wrap mt-12">
     <table class="table table--boxed">
-      <caption class="sr-only">Departments and the services they handle</caption>
-      <thead><tr><th scope="col">Department</th><th scope="col">Handles</th><th scope="col">Target time</th><th scope="col"><span class="sr-only">Action</span></th></tr></thead>
+      <caption class="sr-only">{% translate "Departments and the services they handle" %}</caption>
+      <thead><tr><th scope="col">{% translate "Department" %}</th><th scope="col">{% translate "Handles" %}</th><th scope="col">{% translate "Target time" %}</th><th scope="col"><span class="sr-only">{% translate "Action" %}</span></th></tr></thead>
       <tbody>
         {% for category in categories %}
           <tr>
-            <td><strong>{{ category.department }}</strong></td>
-            <td>{{ category.name }}</td>
-            <td class="nowrap">{{ category.target_time }}</td>
-            <td><a class="link" href="{% url 'grievances:complaint_create' %}?category={{ category.slug }}">File a complaint</a></td>
+            <td><strong>{{ category.department|tr }}</strong></td>
+            <td>{{ category.name|tr }}</td>
+            <td class="nowrap">{{ category.target_time|tr }}</td>
+            <td><a class="link" href="{% url 'grievances:complaint_create' %}?category={{ category.slug }}">{% translate "File a complaint" %}</a></td>
           </tr>
         {% endfor %}
       </tbody>
@@ -103,34 +103,34 @@
 </section>
 
 <section aria-labelledby="faq-title">
-  <h2 class="section__title" id="faq-title" data-topic-heading>Frequently asked questions</h2>
+  <h2 class="section__title" id="faq-title" data-topic-heading>{% translate "Frequently asked questions" %}</h2>
   <div class="faqs">
     <details class="faq" data-topic="water no supply low pressure tanker">
-      <summary>There is no water supply in a street. What should we do?</summary>
-      <div class="faq__body"><p>Check City news &amp; notices on the Home page for planned maintenance first. Otherwise file it under <strong>Water supply</strong>; the target time is 48 hours.</p></div>
+      <summary>{% translate "There is no water supply in a street. What should we do?" %}</summary>
+      <div class="faq__body"><p>{% blocktranslate %}Check City news &amp; notices on the Home page for planned maintenance first. Otherwise file it under <strong>Water supply</strong>; the target time is 48 hours.{% endblocktranslate %}</p></div>
     </details>
     <details class="faq" data-topic="pothole road damaged footpath streetlight light">
-      <summary>Where do potholes and broken streetlights go?</summary>
-      <div class="faq__body"><p>Both go under <strong>Roads &amp; potholes</strong>. Mention the nearest landmark so the field team can find the spot quickly.</p></div>
+      <summary>{% translate "Where do potholes and broken streetlights go?" %}</summary>
+      <div class="faq__body"><p>{% blocktranslate %}Both go under <strong>Roads &amp; potholes</strong>. Mention the nearest landmark so the field team can find the spot quickly.{% endblocktranslate %}</p></div>
     </details>
     <details class="faq" data-topic="sewage drainage overflow manhole smell flood">
-      <summary>Sewage is overflowing on a road. Is this high priority?</summary>
-      <div class="faq__body"><p>Yes. Sewage overflow and open manholes are health and safety risks. The complaint form suggests <strong>High</strong> priority when the description mentions them.</p></div>
+      <summary>{% translate "Sewage is overflowing on a road. Is this high priority?" %}</summary>
+      <div class="faq__body"><p>{% blocktranslate %}Yes. Sewage overflow and open manholes are health and safety risks. The complaint form suggests <strong>High</strong> priority when the description mentions them.{% endblocktranslate %}</p></div>
     </details>
     <details class="faq" data-topic="garbage waste bin collection sanitation debris">
-      <summary>Garbage has not been collected for days.</summary>
-      <div class="faq__body"><p>File it under <strong>Sanitation &amp; waste</strong>; missed collection has a target time of 24 hours.</p></div>
+      <summary>{% translate "Garbage has not been collected for days." %}</summary>
+      <div class="faq__body"><p>{% blocktranslate %}File it under <strong>Sanitation &amp; waste</strong>; missed collection has a target time of 24 hours.{% endblocktranslate %}</p></div>
     </details>
     <details class="faq" data-topic="social media whatsapp twitter facebook channel">
-      <summary>A complaint came in on WhatsApp or social media. How is it recorded?</summary>
-      <div class="faq__body"><p>File it as usual and set <strong>Received through</strong> to the channel it came from. The Home dashboard then shows how many complaints arrive through each channel.</p></div>
+      <summary>{% translate "A complaint came in on WhatsApp or social media. How is it recorded?" %}</summary>
+      <div class="faq__body"><p>{% blocktranslate %}File it as usual and set <strong>Received through</strong> to the channel it came from. The Home dashboard then shows how many complaints arrive through each channel.{% endblocktranslate %}</p></div>
     </details>
     <details class="faq" data-topic="track status id complaint progress">
-      <summary>How can a citizen know the complaint is being handled?</summary>
-      <div class="faq__body"><p>Share the complaint ID. Its status moves from Submitted → Assigned → In progress → Resolved, and can be checked with <a href="#track">Track a complaint</a>.</p></div>
+      <summary>{% translate "How can a citizen know the complaint is being handled?" %}</summary>
+      <div class="faq__body"><p>{% blocktranslate %}Share the complaint ID. Its status moves from Submitted → Assigned → In progress → Resolved, and can be checked with <a href="#track">Track a complaint</a>.{% endblocktranslate %}</p></div>
     </details>
   </div>
-  <p class="no-results" data-topic-empty hidden>No help topics match your search. Try “water”, “track” or “garbage”, or <a href="{% url 'grievances:help_support' %}">contact support</a>.</p>
+  <p class="no-results" data-topic-empty hidden>{% url 'grievances:help_support' as support_url %}{% blocktranslate %}No help topics match your search. Try “water”, “track” or “garbage”, or <a href="{{ support_url }}">contact support</a>.{% endblocktranslate %}</p>
 </section>
 {% endblock %}
 

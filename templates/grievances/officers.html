@@ -1,25 +1,25 @@
 {% extends "base.html" %}
-{% load ui humanize %}
+{% load ui humanize i18n %}
 
-{% block title %}Officers in charge · City Corporation{% endblock %}
+{% block title %}{% translate "Officers in charge · City Corporation" %}{% endblock %}
 
 {% block content %}
 <div class="head">
-  <h1 class="head__title">Officers in charge</h1>
+  <h1 class="head__title">{% translate "Officers in charge" %}</h1>
   <div class="head__tools">
-    <div class="seg" role="group" aria-label="View as">
-      <a class="seg__btn" href="{% query view='' %}"{% if view == 'cards' %} aria-current="true"{% endif %}>Cards</a>
-      <a class="seg__btn" href="{% query view='table' %}"{% if view == 'table' %} aria-current="true"{% endif %}>Table</a>
+    <div class="seg" role="group" aria-label="{% translate 'View as' %}">
+      <a class="seg__btn" href="{% query view='' %}"{% if view == 'cards' %} aria-current="true"{% endif %}>{% translate "Cards" %}</a>
+      <a class="seg__btn" href="{% query view='table' %}"{% if view == 'table' %} aria-current="true"{% endif %}>{% translate "Table" %}</a>
     </div>
-    <a class="btn btn--ghost btn--sm" href="{% url 'admin:grievances_officer_add' %}">{% icon 'user' 'sm' %}Add officer</a>
+    <a class="btn btn--ghost btn--sm" href="{% url 'admin:grievances_officer_add' %}">{% icon 'user' 'sm' %}{% translate "Add officer" %}</a>
   </div>
 </div>
 
-<section class="grid grid--4 section" aria-label="Summary">
-  <div class="card mini"><span class="tile">{% icon 'users' %}</span><div><strong>{{ totals.count }}</strong><span>Officers listed</span></div></div>
-  <div class="card mini"><span class="tile tile--orange">{% icon 'file' %}</span><div><strong>{{ totals.assigned|intcomma }}</strong><span>Complaints assigned</span></div></div>
-  <div class="card mini"><span class="tile tile--green">{% icon 'check' %}</span><div><strong>{% if average_rate is None %}—{% else %}{{ average_rate }}%{% endif %}</strong><span>Average resolution rate</span></div></div>
-  <div class="card mini"><span class="tile">{% icon 'clock' %}</span><div><strong>{{ open_total|intcomma }}</strong><span>Open complaints</span></div></div>
+<section class="grid grid--4 section" aria-label="{% translate 'Summary' %}">
+  <div class="card mini"><span class="tile">{% icon 'users' %}</span><div><strong>{{ totals.count }}</strong><span>{% translate "Officers listed" %}</span></div></div>
+  <div class="card mini"><span class="tile tile--orange">{% icon 'file' %}</span><div><strong>{{ totals.assigned|intcomma }}</strong><span>{% translate "Complaints assigned" %}</span></div></div>
+  <div class="card mini"><span class="tile tile--green">{% icon 'check' %}</span><div><strong>{% if average_rate is None %}—{% else %}{{ average_rate }}%{% endif %}</strong><span>{% translate "Average resolution rate" %}</span></div></div>
+  <div class="card mini"><span class="tile">{% icon 'clock' %}</span><div><strong>{{ open_total|intcomma }}</strong><span>{% translate "Open complaints" %}</span></div></div>
 </section>
 
 <section class="card section">
@@ -29,40 +29,40 @@
       <label for="{{ form.q.id_for_label }}">{{ form.q.label }}</label>
       <div class="search">{% icon 'search' 'sm' %}{{ form.q }}</div>
     </div>
-    <div class="field"><label for="{{ form.category.id_for_label }}">Department</label>{{ form.category }}</div>
-    <div class="field"><label for="{{ form.ward.id_for_label }}">Ward</label>{{ form.ward }}</div>
-    <div class="field"><label for="{{ form.sort.id_for_label }}">Sort by</label>{{ form.sort }}</div>
+    <div class="field"><label for="{{ form.category.id_for_label }}">{% translate "Department" %}</label>{{ form.category }}</div>
+    <div class="field"><label for="{{ form.ward.id_for_label }}">{% translate "Ward" %}</label>{{ form.ward }}</div>
+    <div class="field"><label for="{{ form.sort.id_for_label }}">{% translate "Sort by" %}</label>{{ form.sort }}</div>
     <div class="filters__actions">
-      <button type="submit" class="btn btn--primary">Apply</button>
-      <a class="btn btn--ghost" href="{% url 'grievances:officers' %}">{% icon 'refresh' 'sm' %}Reset</a>
+      <button type="submit" class="btn btn--primary">{% translate "Apply" %}</button>
+      <a class="btn btn--ghost" href="{% url 'grievances:officers' %}">{% icon 'refresh' 'sm' %}{% translate "Reset" %}</a>
     </div>
   </form>
 </section>
 
 {% if not any_officers %}
   <div class="card empty">
-    <p>No officers have been added yet.</p>
-    <a class="link" href="{% url 'admin:grievances_officer_add' %}">Add the first officer {% icon 'arrow-right' 'sm' %}</a>
+    <p>{% translate "No officers have been added yet." %}</p>
+    <a class="link" href="{% url 'admin:grievances_officer_add' %}">{% translate "Add the first officer" %} {% icon 'arrow-right' 'sm' %}</a>
   </div>
 {% elif not officers %}
   <div class="card empty">
-    <p>No officers match your search.</p>
-    <a class="link" href="{% url 'grievances:officers' %}">Reset filters</a>
+    <p>{% translate "No officers match your search." %}</p>
+    <a class="link" href="{% url 'grievances:officers' %}">{% translate "Reset filters" %}</a>
   </div>
 {% elif view == 'table' %}
   <div class="card card--flush">
     <div class="table-wrap">
       <table class="table">
-        <caption class="sr-only">Officers in charge</caption>
+        <caption class="sr-only">{% translate "Officers in charge" %}</caption>
         <thead>
-          <tr><th scope="col">Officer</th><th scope="col">Department</th><th scope="col">Ward</th><th scope="col">Assigned</th><th scope="col">Open</th><th scope="col">Resolution</th><th scope="col"><span class="sr-only">Contact</span></th></tr>
+          <tr><th scope="col">{% translate "Officer" %}</th><th scope="col">{% translate "Department" %}</th><th scope="col">{% translate "Ward" %}</th><th scope="col">{% translate "Assigned" %}</th><th scope="col">{% translate "Open" %}</th><th scope="col">{% translate "Resolution" %}</th><th scope="col"><span class="sr-only">{% translate "Contact" %}</span></th></tr>
         </thead>
         <tbody>
           {% for officer in officers %}
             <tr>
               <td><div class="person"><span class="person__avatar" aria-hidden="true">{{ officer.name|slice:":1" }}</span><span><strong>{{ officer.name }}</strong><small>{{ officer.designation }}</small></span></div></td>
-              <td>{{ officer.category.department }}</td>
-              <td class="nowrap">{{ officer.ward }}<small>{{ officer.ward.area }}</small></td>
+              <td>{{ officer.category.department|tr }}</td>
+              <td class="nowrap">{{ officer.ward }}<small>{{ officer.ward.area|tr }}</small></td>
               <td>{{ officer.assigned }}</td>
               <td>{{ officer.open }}</td>
               <td class="nowrap"><div class="rate"><span class="bar{% if officer.rate >= 80 %} bar--green{% elif officer.rate < 60 %} bar--orange{% endif %}"><span style="width:{{ officer.rate }}%"></span></span><b>{{ officer.rate }}%</b></div></td>
@@ -82,21 +82,21 @@
           <span><strong class="officer__name">{{ officer.name }}</strong><small>{{ officer.designation }}</small></span>
         </div>
         <ul class="officer__meta">
-          <li>{% icon officer.category.icon 'sm' %}{{ officer.category.department }}</li>
-          <li>{% icon 'pin' 'sm' %}{{ officer.ward }} · {{ officer.ward.area }}</li>
+          <li>{% icon officer.category.icon 'sm' %}{{ officer.category.department|tr }}</li>
+          <li>{% icon 'pin' 'sm' %}{{ officer.ward }} · {{ officer.ward.area|tr }}</li>
         </ul>
         <div class="officer__numbers">
-          <div><strong>{{ officer.assigned }}</strong><span>Assigned</span></div>
-          <div><strong>{{ officer.resolved }}</strong><span>Resolved</span></div>
-          <div><strong>{{ officer.open }}</strong><span>Open</span></div>
+          <div><strong>{{ officer.assigned }}</strong><span>{% translate "Assigned" %}</span></div>
+          <div><strong>{{ officer.resolved }}</strong><span>{% translate "Resolved" %}</span></div>
+          <div><strong>{{ officer.open }}</strong><span>{% translate "Open" %}</span></div>
         </div>
         <div class="officer__rate">
-          <div class="officer__rate-top"><span>Resolution progress</span><b>{{ officer.rate }}%</b></div>
-          <span class="bar{% if officer.rate >= 80 %} bar--green{% elif officer.rate < 60 %} bar--orange{% endif %}" role="progressbar" aria-label="Resolution progress" aria-valuenow="{{ officer.rate }}" aria-valuemin="0" aria-valuemax="100"><span style="width:{{ officer.rate }}%"></span></span>
+          <div class="officer__rate-top"><span>{% translate "Resolution progress" %}</span><b>{{ officer.rate }}%</b></div>
+          <span class="bar{% if officer.rate >= 80 %} bar--green{% elif officer.rate < 60 %} bar--orange{% endif %}" role="progressbar" aria-label="{% translate 'Resolution progress' %}" aria-valuenow="{{ officer.rate }}" aria-valuemin="0" aria-valuemax="100"><span style="width:{{ officer.rate }}%"></span></span>
         </div>
         <div class="actions actions--tight">
           {% include "grievances/_officer_contact.html" %}
-          <a class="btn btn--ghost btn--sm" href="{% url 'grievances:complaint_list' %}?ward={{ officer.ward.pk }}&amp;category={{ officer.category.pk }}">View complaints</a>
+          <a class="btn btn--ghost btn--sm" href="{% url 'grievances:complaint_list' %}?ward={{ officer.ward.pk }}&amp;category={{ officer.category.pk }}">{% translate "View complaints" %}</a>
         </div>
       </article>
     {% endfor %}
