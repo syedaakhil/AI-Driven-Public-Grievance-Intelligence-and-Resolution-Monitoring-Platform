@@ -2,8 +2,10 @@
 __pycache__/
 *.pyc
 db.sqlite3
-media/
-staticfiles/
+media/*
+!media/.gitkeep
+staticfiles/*
+!staticfiles/.gitkeep
 .env
 .coverage
 htmlcov/

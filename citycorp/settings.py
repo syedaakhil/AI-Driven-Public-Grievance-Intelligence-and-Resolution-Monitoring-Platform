@@ -37,12 +37,41 @@ def env_list(name, default=''):
     return [item.strip() for item in os.environ.get(name, default).split(',') if item.strip()]
 
 
+PYMYSQL_PREFIX = 'mysql+pymysql://'
+
+
+def use_pymysql():
+    """
+    Let PyMySQL (pure Python) stand in for mysqlclient. Django 6 refuses drivers that report a
+    version below 2.2.1, and PyMySQL reports 1.4.6, so it is told to report 2.2.1.
+    """
+    import pymysql
+    pymysql.install_as_MySQLdb()
+    pymysql.version_info = (2, 2, 1, 'final', 0)
+
+
 def database_settings(url):
-    """DATABASE_URL (e.g. postgres://user:pass@host:5432/citycorp), or SQLite in db.sqlite3 when empty."""
+    """
+    DATABASE_URL, or SQLite in db.sqlite3 when empty. Examples:
+      postgres://user:pass@host:5432/citycorp
+      mysql://user:pass@host:3306/citycorp_db          (driver: mysqlclient)
+      mysql+pymysql://user:pass@host:3306/citycorp_db  (driver: PyMySQL)
+    """
     if not url:
         return {'ENGINE': 'django.db.backends.sqlite3', 'NAME': BASE_DIR / 'db.sqlite3'}
+    if url.startswith(PYMYSQL_PREFIX):
+        use_pymysql()
+        url = 'mysql://' + url[len(PYMYSQL_PREFIX):]
     # Keep connections open between requests, and check them before reuse.
-    return dj_database_url.parse(url, conn_max_age=600, conn_health_checks=True)
+    config = dj_database_url.parse(url, conn_max_age=600, conn_health_checks=True)
+    if config['ENGINE'] == 'django.db.backends.mysql':
+        # utf8mb4 stores every character (Tamil, Hindi, emoji); strict mode rejects bad data instead
+        # of silently truncating it (and silences Django's mysql.W002 check).
+        config.setdefault('OPTIONS', {}).update({
+            'charset': 'utf8mb4',
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        })
+    return config
 
 
 def cache_settings(url):

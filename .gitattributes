@@ -1,0 +1,4 @@
+# Keep each script's line endings right on every computer:
+# Windows cmd needs CRLF in .bat files; bash fails on CRLF in .sh files ("$'\r': command not found").
+*.bat text eol=crlf
+*.sh  text eol=lf

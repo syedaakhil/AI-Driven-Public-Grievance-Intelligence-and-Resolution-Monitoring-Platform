@@ -38,7 +38,11 @@ Open pages through `runserver` on port 8000. VS Code Live Server (port 5500) can
     - HTTPS protection is on: secure cookies, SSL redirect and HSTS. It's controlled by `DJANGO_HTTPS` and `DJANGO_BEHIND_PROXY`.
     - Weak passwords such as the demo `admin`/`1234` are refused at sign-in (`accounts/backends.py`).
     - `accounts/migrations/0002` stops `migrate` while the admin still has `1234`. It reads `settings.PRODUCTION`, which the test runner doesn't change, unlike `DEBUG`.
-  - `DATABASE_URL` selects PostgreSQL, through `database_settings()`. Without it, SQLite is used.
+  - `DATABASE_URL` selects PostgreSQL or MySQL, through `database_settings()`. Without it, SQLite is used.
+    - `mysql://` uses mysqlclient. `mysql+pymysql://` uses PyMySQL through `use_pymysql()`, which also makes PyMySQL report version 2.2.1, because Django 6 refuses older drivers.
+    - MySQL connections always get `charset=utf8mb4` and `STRICT_TRANS_TABLES`.
+    - **The local `.env` points at MySQL.** To run the tests on SQLite without MySQL, set `DATABASE_URL=sqlite:///db.sqlite3` in the environment first; a real environment variable wins over `.env`.
+  - `setup.bat` (Windows) and `setup.sh` (Linux/macOS) do first-time setup: venv, packages, `.env` from `.env.example`, and migrate. `.gitattributes` keeps them CRLF and LF respectively.
   - `REDIS_URL` selects the Redis cache, through `cache_settings()`. Without it, the cache is per-process memory, so the OTP and login rate limits aren't shared between workers.
   - whitenoise serves `/static/`. With DEBUG off it uses hashed, compressed files, so `collectstatic` is needed. In development and tests it uses plain files.
   - All dependencies are pinned in `requirements.txt`. Deployment steps are in `DEPLOY.md`.

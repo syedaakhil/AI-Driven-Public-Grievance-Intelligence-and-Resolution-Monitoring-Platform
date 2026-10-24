@@ -155,6 +155,32 @@ class SettingsTests(SimpleTestCase):
         self.assertEqual(db['OPTIONS'], {'sslmode': 'require'})
         self.assertEqual(db['CONN_MAX_AGE'], 600)
 
+    def test_mysql_url_gets_utf8mb4_and_strict_mode(self):
+        db = project_settings.database_settings('mysql://root:s3cret@127.0.0.1:3306/citycorp_db')
+        self.assertEqual(db['ENGINE'], 'django.db.backends.mysql')
+        self.assertEqual((db['NAME'], db['USER'], db['PASSWORD'], db['HOST'], db['PORT']),
+                         ('citycorp_db', 'root', 's3cret', '127.0.0.1', 3306))
+        self.assertEqual(db['OPTIONS'], {'charset': 'utf8mb4', 'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"})
+
+    def test_mysql_url_options_are_kept(self):
+        db = project_settings.database_settings('mysql://u:p@db.internal:3306/citycorp_db?ssl_mode=REQUIRED')
+        self.assertEqual(db['OPTIONS']['ssl_mode'], 'REQUIRED')
+        self.assertEqual(db['OPTIONS']['charset'], 'utf8mb4')
+
+    def test_pymysql_url_switches_driver(self):
+        with mock.patch.object(project_settings, 'use_pymysql') as use_pymysql:
+            db = project_settings.database_settings('mysql+pymysql://root:s3cret@127.0.0.1:3306/citycorp_db')
+        use_pymysql.assert_called_once_with()
+        self.assertEqual(db['ENGINE'], 'django.db.backends.mysql')
+        self.assertEqual((db['NAME'], db['HOST'], db['PORT']), ('citycorp_db', '127.0.0.1', 3306))
+        self.assertEqual(db['OPTIONS']['charset'], 'utf8mb4')
+
+    def test_postgres_gets_no_mysql_options(self):
+        with mock.patch.object(project_settings, 'use_pymysql') as use_pymysql:
+            db = project_settings.database_settings('postgres://u:p@localhost:5432/citycorp')
+        use_pymysql.assert_not_called()
+        self.assertNotIn('charset', db.get('OPTIONS', {}))
+
     def test_redis_url_selects_redis_cache(self):
         self.assertTrue(project_settings.cache_settings('')['BACKEND'].endswith('LocMemCache'))
         cache_config = project_settings.cache_settings('redis://localhost:6379/1')
@@ -203,6 +229,19 @@ class ProductionSettingsTests(SimpleTestCase):
     def test_debug_on_leaves_https_off(self):
         values = self.load_settings({'DJANGO_DEBUG': '1'})
         self.assertFalse(any(values[key] for key in SETTINGS_KEYS[1:]))
+
+    def test_django_loads_its_mysql_backend_with_either_driver(self):
+        # Importing the backend runs Django's "mysqlclient 2.2.1 or newer" check; no server is needed.
+        script = ('import django; django.setup(); from django.db import connections; '
+                  'c = connections["default"]; print(c.vendor, c.Database.__name__, c.Database.version_info[:3])')
+        for url, driver in (('mysql://root:pw@127.0.0.1:3306/citycorp_db', 'MySQLdb'),
+                            ('mysql+pymysql://root:pw@127.0.0.1:3306/citycorp_db', 'pymysql')):
+            with self.subTest(url=url.split(':')[0]):
+                result = self.run_django({'DJANGO_DEBUG': '1', 'DATABASE_URL': url}, '-c', script)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                vendor, module, version = result.stdout.strip().splitlines()[-1].split(' ', 2)
+                self.assertEqual((vendor, module), ('mysql', driver))
+                self.assertGreaterEqual(eval(version), (2, 2, 1))
 
     def test_check_deploy_has_no_warnings_with_live_settings(self):
         result = self.run_django(LIVE_ENV, 'manage.py', 'check', '--deploy', '--fail-level', 'WARNING')

@@ -14,3 +14,7 @@ psycopg==3.3.6            # PostgreSQL driver
 psycopg-binary==3.3.6
 typing_extensions==4.16.0
 redis==8.1.0              # shared cache (OTP and login rate limits) when REDIS_URL is set
+
+# --- MySQL (when DATABASE_URL starts with mysql:// or mysql+pymysql://) ---
+mysqlclient==2.2.4        # mysql://  (Linux needs: sudo apt install pkg-config default-libmysqlclient-dev build-essential)
+PyMySQL==1.1.1            # mysql+pymysql://  (pure Python, no compiler needed)

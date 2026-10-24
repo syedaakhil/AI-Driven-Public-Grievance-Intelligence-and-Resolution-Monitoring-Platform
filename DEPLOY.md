@@ -42,6 +42,28 @@ sudo -u postgres psql -c "CREATE DATABASE citycorp OWNER citycorp;"
 sudo adduser --system --group --home /srv/citycorp citycorp
 ```
 
+**Using MySQL instead of PostgreSQL?** The portal also supports MySQL 8.0.11 or newer:
+
+1. Install the server and the build tools that `mysqlclient` needs:
+
+```bash
+sudo apt install -y mysql-server pkg-config default-libmysqlclient-dev build-essential python3-dev
+```
+
+2. Create the database and a user:
+
+```bash
+sudo mysql -e "CREATE DATABASE citycorp_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; CREATE USER 'citycorp'@'localhost' IDENTIFIED BY 'CHOOSE-A-STRONG-DB-PASSWORD'; GRANT ALL PRIVILEGES ON citycorp_db.* TO 'citycorp'@'localhost';"
+```
+
+3. In step 4, use this instead of the PostgreSQL URL:
+
+```ini
+DATABASE_URL=mysql://citycorp:CHOOSE-A-STRONG-DB-PASSWORD@localhost:3306/citycorp_db
+```
+
+To skip the build tools, use `mysql+pymysql://…` instead, which uses the pure-Python driver. For backups (step 10), use `mysqldump citycorp_db` in place of `pg_dump`.
+
 Copy the project to `/srv/citycorp/app`, using `git clone` or `scp`. **Don't** copy `.venv/`,
 `db.sqlite3`, `media/` or your local `.env`. Then create the virtual environment:
 
