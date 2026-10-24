@@ -45,7 +45,7 @@ Open pages through `runserver` on port 8000. VS Code Live Server (port 5500) can
   - `setup.bat` (Windows) and `setup.sh` (Linux/macOS) do first-time setup: venv, packages, `.env` from `.env.example`, and migrate. `.gitattributes` keeps them CRLF and LF respectively.
   - `REDIS_URL` selects the Redis cache, through `cache_settings()`. Without it, the cache is per-process memory, so the OTP and login rate limits aren't shared between workers.
   - whitenoise serves `/static/`. With DEBUG off it uses hashed, compressed files, so `collectstatic` is needed. In development and tests it uses plain files.
-  - All dependencies are pinned in `requirements.txt`. Deployment steps are in `DEPLOY.md`.
+  - All dependencies are pinned in `requirements.txt`. `mysqlclient` is kept apart in `requirements-mysql.txt` (which includes `requirements.txt`), because it needs MySQL C libraries that hosts like Vercel don't have; this PC uses it. Deployment steps are in `DEPLOY.md`.
   - `manage.py check --deploy` also runs `accounts/checks.py`, which flags the console SMS backend (W001), a per-process cache (W002) and the dev secret key (E001). `ProductionSettingsTests` runs the check in a subprocess with live-site variables and expects no warnings.
   - Uploads go to `media/` but are **never served from `/media/`**. They're opened through `grievances:complaint_file` (`/complaints/<ref>/files/photo|previous-copy/`). Link to that view, never to `FileField.url`.
     - Staff can open any complaint's files. A verified citizen can open only their own (via `_citizen_complaints`); another citizen gets a 404, and anyone else is sent to login.

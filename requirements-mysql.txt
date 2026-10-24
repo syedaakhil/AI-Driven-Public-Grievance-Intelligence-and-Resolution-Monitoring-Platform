@@ -1,0 +1,6 @@
+# For DATABASE_URL=mysql://... (the mysqlclient driver). Install this instead of requirements.txt:
+#   pip install -r requirements-mysql.txt
+# Linux needs the C libraries first: sudo apt install pkg-config default-libmysqlclient-dev build-essential python3-dev
+# (mysql+pymysql://... needs only requirements.txt.)
+-r requirements.txt
+mysqlclient==2.2.4

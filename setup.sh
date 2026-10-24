@@ -22,8 +22,8 @@ source .venv/bin/activate
 echo "[2/5] Upgrading pip ..."
 pip install --upgrade pip
 
-echo "[3/5] Installing packages from requirements.txt ..."
-pip install -r requirements.txt
+echo "[3/5] Installing packages from requirements-mysql.txt ..."
+pip install -r requirements-mysql.txt
 
 echo "[4/5] Checking the .env settings file ..."
 if [ ! -f .env ]; then

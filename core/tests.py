@@ -213,3 +213,16 @@ class TranslationFileTests(TestCase):
             self.assertEqual(translation.pgettext('brand, first word', 'City'), 'नगर')
             self.assertEqual(translation.ngettext('%(count)s record', '%(count)s records', 2) % {'count': 2},
                              '2 रिकॉर्ड')
+
+
+class RequirementsTests(TestCase):
+    def test_requirements_install_without_mysql_c_libraries(self):
+        # Hosts like Vercel install requirements.txt and can't build mysqlclient; it lives in requirements-mysql.txt.
+        base = Path(settings.BASE_DIR)
+        packages = [line.split('==')[0].strip().lower() for line in (base / 'requirements.txt').read_text().splitlines()
+                    if line.strip() and not line.startswith('#')]
+        self.assertNotIn('mysqlclient', packages)
+        self.assertIn('pymysql', packages)
+        mysql = (base / 'requirements-mysql.txt').read_text()
+        self.assertIn('-r requirements.txt', mysql)
+        self.assertIn('mysqlclient==', mysql)

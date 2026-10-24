@@ -56,13 +56,15 @@ sudo apt install -y mysql-server pkg-config default-libmysqlclient-dev build-ess
 sudo mysql -e "CREATE DATABASE citycorp_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; CREATE USER 'citycorp'@'localhost' IDENTIFIED BY 'CHOOSE-A-STRONG-DB-PASSWORD'; GRANT ALL PRIVILEGES ON citycorp_db.* TO 'citycorp'@'localhost';"
 ```
 
-3. In step 4, use this instead of the PostgreSQL URL:
+3. When you create the virtual environment below, install `requirements-mysql.txt` instead of `requirements.txt` (it adds `mysqlclient`).
+
+4. In step 4, use this instead of the PostgreSQL URL:
 
 ```ini
 DATABASE_URL=mysql://citycorp:CHOOSE-A-STRONG-DB-PASSWORD@localhost:3306/citycorp_db
 ```
 
-To skip the build tools, use `mysql+pymysql://…` instead, which uses the pure-Python driver. For backups (step 10), use `mysqldump citycorp_db` in place of `pg_dump`.
+To skip the build tools, use `mysql+pymysql://…` instead, which uses the pure-Python driver from `requirements.txt`. For backups (step 10), use `mysqldump citycorp_db` in place of `pg_dump`.
 
 Copy the project to `/srv/citycorp/app`, using `git clone` or `scp`. **Don't** copy `.venv/`,
 `db.sqlite3`, `media/` or your local `.env`. Then create the virtual environment:
