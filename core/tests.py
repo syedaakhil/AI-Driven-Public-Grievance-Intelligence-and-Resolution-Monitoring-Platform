@@ -181,7 +181,7 @@ class HindiChatTests(TestCase):
         complaint = make_complaint()
         self.say('TEST Lakshmi')
         with self.settings(BREVO_API_KEY='test-brevo-key', SENDER_EMAIL='sender@example.com',
-                           ADMIN_EMAIL='govermentowncoporation@gmail.com'), \
+                           ADMIN_EMAIL='govermentowncorporation@gmail.com'), \
                 mock.patch('urllib.request.urlopen', return_value=BrevoReply()) as urlopen:
             data = self.say('मुझे ईमेल भेजो')
         self.assertEqual(data['email']['status'], 'sent')

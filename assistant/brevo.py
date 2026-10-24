@@ -17,7 +17,7 @@ from .models import EmailLog
 logger = logging.getLogger(__name__)
 
 BREVO_URL = 'https://api.brevo.com/v3/smtp/email'
-ONLY_RECIPIENT = 'govermentowncoporation@gmail.com'
+ONLY_RECIPIENT = 'govermentowncorporation@gmail.com'
 TIMEOUT_SECONDS = 15
 
 

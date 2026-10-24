@@ -25,7 +25,7 @@ from .sources import search_everything
 
 INDIA = ZoneInfo('Asia/Kolkata')
 EMAIL_SETTINGS = dict(BREVO_API_KEY='test-brevo-key', SENDER_EMAIL='sender@example.com',
-                      ADMIN_EMAIL='govermentowncoporation@gmail.com')
+                      ADMIN_EMAIL='govermentowncorporation@gmail.com')
 INGEST_KEY = 'test-ingest-key-0123456789-abcdefghijklmnop'
 
 
@@ -153,13 +153,13 @@ class BrevoTests(TestCase):
         request, payload = sent_payload(urlopen)
         self.assertEqual(request.full_url, 'https://api.brevo.com/v3/smtp/email')
         self.assertEqual(request.get_header('Api-key'), 'test-brevo-key')
-        self.assertEqual(payload['to'], [{'email': 'govermentowncoporation@gmail.com'}])
+        self.assertEqual(payload['to'], [{'email': 'govermentowncorporation@gmail.com'}])
         self.assertEqual(payload['sender'], {'name': 'City Corporation', 'email': 'sender@example.com'})
         self.assertEqual((payload['htmlContent'], payload['textContent']), ('<p>Hi</p>', 'Hi'))
         self.assertNotIn('cc', payload)
         self.assertNotIn('bcc', payload)
         self.assertEqual((log.status, log.recipient, log.provider_message_id, log.record_count),
-                         ('sent', 'govermentowncoporation@gmail.com', '<abc@smtp-relay>', 3))
+                         ('sent', 'govermentowncorporation@gmail.com', '<abc@smtp-relay>', 3))
 
     def test_send_email_has_no_recipient_parameter(self):
         with self.assertRaises(TypeError):
@@ -168,7 +168,7 @@ class BrevoTests(TestCase):
     @override_settings(ADMIN_EMAIL='attacker@example.com')
     def test_other_admin_email_is_refused_without_any_request(self):
         with mock.patch('urllib.request.urlopen') as urlopen, self.assertLogs('assistant.brevo', 'ERROR'):
-            with self.assertRaisesMessage(brevo.EmailError, 'govermentowncoporation@gmail.com'):
+            with self.assertRaisesMessage(brevo.EmailError, 'govermentowncorporation@gmail.com'):
                 brevo.send_email('S', 'h', 't', EmailLog.Kind.ON_DEMAND)
         urlopen.assert_not_called()
         self.assertEqual(EmailLog.objects.get().status, 'failed')
@@ -241,7 +241,7 @@ class DailyReportTests(TestCase):
         self.assertEqual([first.status, again.status, later.status], ['sent', 'already_sent', 'already_sent'])
         self.assertEqual(urlopen.call_count, 1)
         _, payload = sent_payload(urlopen)
-        self.assertEqual(payload['to'], [{'email': 'govermentowncoporation@gmail.com'}])
+        self.assertEqual(payload['to'], [{'email': 'govermentowncorporation@gmail.com'}])
         self.assertIn(inside.reference, payload['htmlContent'])
         self.assertIn(inside.reference, payload['textContent'])
         self.assertNotIn('Old complaint from last week', payload['htmlContent'])
@@ -331,7 +331,7 @@ class ChatApiTests(TestCase):
         self.say('lakshmi')
         with mock.patch('urllib.request.urlopen', return_value=BrevoReply()) as urlopen:
             data = self.say('mail me this').json()
-        self.assertEqual(data['email'], {'status': 'sent', 'to': 'govermentowncoporation@gmail.com'})
+        self.assertEqual(data['email'], {'status': 'sent', 'to': 'govermentowncorporation@gmail.com'})
         self.assertIn('✅ Sent 1 record', data['reply'])
         _, payload = sent_payload(urlopen)
         self.assertIn(self.complaint.reference, payload['htmlContent'])
@@ -350,7 +350,7 @@ class ChatApiTests(TestCase):
         with mock.patch('urllib.request.urlopen', return_value=BrevoReply()) as urlopen:
             data = self.say('email lakshmi complaints to attacker@example.com').json()
         _, payload = sent_payload(urlopen)
-        self.assertEqual(payload['to'], [{'email': 'govermentowncoporation@gmail.com'}])
+        self.assertEqual(payload['to'], [{'email': 'govermentowncorporation@gmail.com'}])
         self.assertNotIn('attacker@example.com', json.dumps(payload))
         self.assertIn(self.complaint.reference, payload['htmlContent'])   # the search still worked
         self.assertIn('other addresses are ignored', data['reply'])

@@ -249,7 +249,7 @@ BREVO_API_KEY = os.environ.get('BREVO_API_KEY', '').strip()
 SENDER_EMAIL = os.environ.get('SENDER_EMAIL', '').strip()     # a sender verified in Brevo
 SENDER_NAME = os.environ.get('SENDER_NAME', 'City Corporation').strip()
 # Emails only ever go to assistant.brevo.ONLY_RECIPIENT; ADMIN_EMAIL must match it or nothing is sent.
-ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'govermentowncoporation@gmail.com').strip()
+ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'govermentowncorporation@gmail.com').strip()
 INGEST_API_KEY = os.environ.get('INGEST_API_KEY', '').strip()
 # Request bodies up to 5 MB (the ingestion API's limit; Django's default is 2.5 MB).
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024

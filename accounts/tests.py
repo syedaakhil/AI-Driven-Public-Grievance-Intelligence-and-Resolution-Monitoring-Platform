@@ -199,7 +199,7 @@ LIVE_ENV = {
     'FAST2SMS_API_KEY': 'dummy',
     'BREVO_API_KEY': 'dummy-brevo-key',
     'SENDER_EMAIL': 'sender@example.com',
-    'ADMIN_EMAIL': 'govermentowncoporation@gmail.com',
+    'ADMIN_EMAIL': 'govermentowncorporation@gmail.com',
     'INGEST_API_KEY': 'test-only-ingest-key-0123456789-abcdefghij',
 }
 SETTINGS_KEYS = ['DEBUG', 'SESSION_COOKIE_SECURE', 'CSRF_COOKIE_SECURE', 'SECURE_SSL_REDIRECT',

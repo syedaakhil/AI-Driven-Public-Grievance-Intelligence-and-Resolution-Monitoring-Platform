@@ -85,7 +85,7 @@ Open pages through `runserver` on port 8000. VS Code Live Server (port 5500) can
   - `search.py`: `parse_query` (reference, status/today/recent filters, stopwords; email addresses removed) and `score`, which is case-insensitive, matches parts of words, and accepts spelling within `difflib` 0.8.
   - `intents.py`: rule-based "email me…" detection with an exact typo list. There's no fuzzy matching there, so "main" never becomes "mail".
   - **Email:** `brevo.send_email(subject, html, text, kind)` has **no recipient parameter**.
-    - It sends only to `brevo.ONLY_RECIPIENT` (`govermentowncoporation@gmail.com`).
+    - It sends only to `brevo.ONLY_RECIPIENT` (`govermentowncorporation@gmail.com`).
     - `ADMIN_EMAIL` must equal that address, and `check_only_recipient()` guards the payload.
     - Every attempt is written to `EmailLog`. Never add a way to choose recipients.
   - **Daily report:** `reports.py` plus `manage.py send_daily_report [--force] [--dry-run]`.

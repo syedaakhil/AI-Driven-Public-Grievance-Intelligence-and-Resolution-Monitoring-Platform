@@ -93,7 +93,7 @@ DJANGO_ADMIN_PASSWORD=<a strong password: 8+ characters, not common, not only di
 
 BREVO_API_KEY=...            # "Citizen help" emails (daily report, "mail me this")
 SENDER_EMAIL=...             # a sender verified in Brevo
-ADMIN_EMAIL=govermentowncoporation@gmail.com   # locked in code; any other value stops all emails
+ADMIN_EMAIL=govermentowncorporation@gmail.com   # locked in code; any other value stops all emails
 INGEST_API_KEY=...           # 32+ random characters; see INGEST_API.md
 
 SMS_BACKEND=msg91            # or fast2sms / twilio, with that provider's keys below
@@ -207,7 +207,7 @@ sudo journalctl -u citycorp -f
 The website itself does not send the 9 AM email. A systemd **timer** starts
 `manage.py send_daily_report` at 09:00 India time. The command sends at most once per day: it records
 the day in the database first, so a second run (restart, double trigger) sends nothing. Emails only ever
-go to `govermentowncoporation@gmail.com`.
+go to `govermentowncorporation@gmail.com`.
 
 1. In `.env`, set `BREVO_API_KEY` and `SENDER_EMAIL` (a sender verified in Brevo).
 2. Create `/etc/systemd/system/citycorp-report.service`:
