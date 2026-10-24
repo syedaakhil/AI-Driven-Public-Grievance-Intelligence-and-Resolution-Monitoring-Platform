@@ -1,0 +1,21 @@
+# Run:  .venv\Scripts\python.exe -m coverage run manage.py test
+#       .venv\Scripts\python.exe -m coverage report
+[run]
+branch = True
+source =
+    accounts
+    citycorp
+    core
+    grievances
+omit =
+    */tests.py
+    citycorp/asgi.py
+    citycorp/wsgi.py
+
+[report]
+show_missing = True
+skip_covered = False
+precision = 1
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.:

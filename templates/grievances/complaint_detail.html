@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% load ui %}
+
+{% block title %}{{ complaint.reference }} · City Corporation{% endblock %}
+
+{% block content %}
+<a class="back" href="{% url 'grievances:complaint_list' %}">{% icon 'arrow-left' 'sm' %}Back to dataset</a>
+
+<div class="head">
+  <div>
+    <p class="kicker">{{ complaint.reference }}</p>
+    <h1 class="head__title">{{ complaint.title }}</h1>
+  </div>
+  <div class="head__tools">
+    <span class="badge badge--{{ complaint.priority }}">{{ complaint.get_priority_display }} priority</span>
+    <span class="badge badge--{{ complaint.status }}">{{ complaint.get_status_display }}</span>
+  </div>
+</div>
+
+<div class="split">
+  <div class="stack">
+    <section class="card" aria-labelledby="details-title">
+      <h2 class="card__title" id="details-title">Complaint details</h2>
+      <p class="prose">{{ complaint.description|linebreaksbr }}</p>
+      <dl class="facts">
+        <dt>Category</dt><dd>{{ complaint.category.name|default:"Not assigned yet" }}</dd>
+        <dt>Department</dt><dd>{{ complaint.category.department|default:"—" }}</dd>
+        <dt>Ward</dt><dd>{% if complaint.ward %}{{ complaint.ward }} ({{ complaint.ward.area }}){% else %}Not assigned yet{% endif %}</dd>
+        <dt>Street / landmark</dt><dd>{{ complaint.location|default:"—" }}</dd>
+        {% if complaint.taluk %}<dt>Taluk</dt><dd>{{ complaint.taluk }}</dd>{% endif %}
+        <dt>Received through</dt><dd>{{ complaint.get_channel_display }}</dd>
+        <dt>Filed on</dt><dd>{{ complaint.created_at|date:"d M Y, h:i A" }}</dd>
+        <dt>Target time</dt><dd>{{ complaint.category.target_time|default:"—" }}</dd>
+        <dt>Officer in charge</dt><dd>{% if complaint.officer %}{{ complaint.officer.name }}, {{ complaint.officer.designation }}{% else %}Not assigned yet{% endif %}</dd>
+        <dt>Citizen</dt><dd>{{ complaint.citizen_name }} · {{ complaint.citizen_contact }}</dd>
+        {% if complaint.citizen_address %}<dt>Citizen address</dt><dd>{{ complaint.citizen_address|linebreaksbr }}</dd>{% endif %}
+        {% if complaint.impact %}<dt>Effect on citizen</dt><dd>{{ complaint.impact|linebreaksbr }}</dd>{% endif %}
+        {% if complaint.previously_reported is not None %}
+          <dt>Reported before</dt>
+          <dd>
+            {% if complaint.previously_reported %}Yes{% if complaint.previous_reference %} · Ref. {{ complaint.previous_reference }}{% endif %}{% if complaint.previous_copy %} · <a href="{% url 'grievances:complaint_file' complaint.reference 'previous-copy' %}" target="_blank" rel="noopener">View earlier complaint copy</a>{% endif %}{% else %}No{% endif %}
+          </dd>
+        {% endif %}
+        {% if complaint.resolved_at %}<dt>Resolved on</dt><dd>{{ complaint.resolved_at|date:"d M Y, h:i A" }}</dd>{% endif %}
+      </dl>
+      {% if complaint.attachment %}
+        {% url 'grievances:complaint_file' complaint.reference 'photo' as photo_url %}
+        <a class="photo" href="{{ photo_url }}" target="_blank" rel="noopener">
+          <img src="{{ photo_url }}" alt="Photo attached to complaint {{ complaint.reference }}">
+        </a>
+      {% endif %}
+    </section>
+
+    <section class="card" aria-labelledby="activity-title">
+      <h2 class="card__title" id="activity-title">Activity</h2>
+      <ul class="activity">
+        {% for update in activity %}
+          <li>
+            <span class="badge badge--{{ update.status }}">{{ update.get_status_display }}</span>
+            <div>
+              <p>{{ update.note|default:"Status recorded." }}</p>
+              <small>{{ update.created_at|date:"d M Y, h:i A" }}{% if update.author %} · {{ update.author.get_full_name|default:update.author.username }}{% endif %}{% if update.is_public %} · Shown to citizen{% endif %}</small>
+            </div>
+          </li>
+        {% empty %}
+          <li class="muted small">No activity recorded yet.</li>
+        {% endfor %}
+      </ul>
+    </section>
+  </div>
+
+  <aside class="stack">
+    <section class="card" aria-labelledby="update-title">
+      <h2 class="card__title" id="update-title">Update complaint</h2>
+      <form method="post" class="stack stack--tight mt-16">
+        {% csrf_token %}
+        {% if complaint.needs_review %}
+          <p class="muted small">Filed by a citizen. Choose the category and ward to route it to the officer in charge.</p>
+        {% endif %}
+        {% include "partials/field.html" with field=form.category %}
+        {% include "partials/field.html" with field=form.ward %}
+        {% include "partials/field.html" with field=form.status %}
+        {% include "partials/field.html" with field=form.officer %}
+        {% include "partials/field.html" with field=form.note %}
+        <label class="check" for="{{ form.share_note.id_for_label }}">
+          {{ form.share_note }}
+          <span>{{ form.share_note.label }}<small>{{ form.share_note.help_text }}</small></span>
+        </label>
+        <button type="submit" class="btn btn--primary btn--block">Save update</button>
+      </form>
+    </section>
+
+    <section class="card" aria-labelledby="progress-title">
+      <h2 class="card__title" id="progress-title">Progress</h2>
+      <ol class="timeline">
+        {% for step in timeline %}
+          <li class="timeline__step timeline__step--{{ step.state }}">
+            <span class="timeline__dot" aria-hidden="true"></span>
+            <span><strong>{{ step.label }}</strong><small>{% if step.when %}{{ step.when|date:"d M Y, h:i A" }}{% elif step.state == 'pending' %}Pending{% else %}—{% endif %}</small></span>
+          </li>
+        {% endfor %}
+      </ol>
+    </section>
+
+    {% if perms.grievances.delete_complaint %}
+      <section class="card card--danger" aria-labelledby="delete-title">
+        <h2 class="card__title" id="delete-title">Delete complaint</h2>
+        <p class="muted small mt-6">Permanently removes this complaint, its activity history and any attached files. The citizen will no longer see it. This cannot be undone.</p>
+        <form method="post" action="{% url 'grievances:complaint_delete' complaint.reference %}" class="stack stack--tight mt-16">
+          {% csrf_token %}
+          <label class="check">
+            <input type="checkbox" name="confirm" value="yes" required>
+            <span>I understand this cannot be undone</span>
+          </label>
+          <button type="submit" class="btn btn--danger btn--block">{% icon 'trash' 'sm' %}Delete complaint</button>
+        </form>
+      </section>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

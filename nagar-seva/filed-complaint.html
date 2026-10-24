@@ -1,0 +1,293 @@
+<!DOCTYPE html>{% load ui %}
+{# Django template, served at /citizen/complaint/ (grievances.views.citizen_complaint_page). Run with runserver, not Live Server. #}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Register a complaint · City Corporation</title>
+  <meta name="description" content="Register a public complaint with the City Corporation citizen portal.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="{% static_v 'nagar-seva/css/style.css' %}">
+</head>
+<body>
+  <a class="skip-link" href="#complaintForm">Skip to the complaint form</a>
+
+  <!-- Reusable line icons -->
+  <svg width="0" height="0" class="sr-only" aria-hidden="true" focusable="false">
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-3.5 4.5-5 8-5s6.5 1.5 8 5"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/></symbol>
+    <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8l-5-5z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h10"/></symbol>
+  </svg>
+
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="{% url 'grievances:citizen_complaint_page' %}" aria-label="City Corporation, citizen complaint registration">
+        <img class="brand__logo" src="{% static_v 'nagar-seva/assets/images/emblem.svg' %}" alt="" width="40" height="40">
+        <span>
+          <span class="brand__name"><span class="brand__city">City</span> <span class="brand__corp">Corporation</span></span>
+          <span class="brand__tagline">Your city, our responsibility.</span>
+        </span>
+      </a>
+      <span class="site-header__label">Citizen portal</span>
+    </div>
+  </header>
+
+  <main class="page" id="main">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <ol>
+        <li>Citizen portal</li>
+        <li aria-current="page">Register a complaint</li>
+      </ol>
+    </nav>
+
+    <div class="page-head">
+      <h1>Register a Public Complaint</h1>
+      <p class="page-head__sub">Tell us about the problem affecting you or your community. Provide the details below so the relevant department can review your complaint.</p>
+    </div>
+
+    <!-- Shown after the server has registered the complaint -->
+    <section class="card success" id="successPanel" aria-labelledby="successTitle" tabindex="-1" hidden>
+      <div class="success__icon" aria-hidden="true"><svg class="icon icon--lg"><use href="#i-check"/></svg></div>
+      <h2 class="success__title" id="successTitle">Your complaint has been registered</h2>
+      <p class="success__label">Your complaint reference number</p>
+      <div class="success__ref-row">
+        <p class="success__ref" id="successRef"></p>
+        <button type="button" class="btn btn--secondary btn--sm" id="copyRef">
+          <svg class="icon icon--sm" aria-hidden="true"><use href="#i-copy"/></svg>
+          <span>Copy</span>
+        </button>
+      </div>
+      <p class="sr-only" id="copyStatus" role="status" aria-live="polite"></p>
+
+      <div class="alert alert--info">
+        <svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>
+        <p>Keep this reference number to follow up on your complaint. The corporation will review it, assign the service category and ward, and route it to the officer in charge.</p>
+      </div>
+
+      <dl class="summary" id="successSummary"></dl>
+
+      <p class="success__note">Attached files were sent with your complaint and can be viewed only by corporation staff.</p>
+
+      <div class="actions actions--center">
+        <button type="button" class="btn btn--primary" id="newComplaint">Register another complaint</button>
+      </div>
+    </section>
+
+    <form class="card form" id="complaintForm" novalidate aria-describedby="formIntro"
+          action="{% url 'grievances:api_complaints' %}" data-login-url="{% url 'accounts:login' %}">
+      {% csrf_token %}
+      <div class="alert alert--info" id="formIntro">
+        <svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>
+        <p>Please provide accurate information. Fields marked with <span class="req" aria-hidden="true">*</span><span class="sr-only">an asterisk</span> are required.</p>
+      </div>
+
+      <div class="alert alert--error" id="errorSummary" tabindex="-1" role="alert" hidden>
+        <svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>
+        <div>
+          <h2 class="alert__title" id="errorSummaryTitle">Please correct the following</h2>
+          <ul class="alert__list" id="errorSummaryList"></ul>
+        </div>
+      </div>
+
+      <!-- Section 1 -->
+      <section class="form-section" aria-labelledby="sec-person">
+        <h2 class="form-section__title" id="sec-person">
+          <span class="form-section__icon" aria-hidden="true"><svg class="icon"><use href="#i-user"/></svg></span>
+          Your details
+        </h2>
+
+        <div class="field" data-field="fullName">
+          <label class="field__label" for="fullName">Full Name <span class="req" aria-hidden="true">*</span></label>
+          <input class="input" id="fullName" name="fullName" type="text" placeholder="Enter your full name"
+                 autocomplete="name" maxlength="100" required aria-describedby="fullName-error">
+          <p class="field__error" id="fullName-error"></p>
+        </div>
+
+        <div class="field" data-field="address">
+          <label class="field__label" for="address">Residential Address <span class="req" aria-hidden="true">*</span></label>
+          <textarea class="input textarea" id="address" name="address" rows="3"
+                    placeholder="Enter your house number, street, and address" autocomplete="street-address"
+                    maxlength="500" required aria-describedby="address-error"></textarea>
+          <p class="field__error" id="address-error"></p>
+        </div>
+
+        <div class="field" data-field="taluk">
+          <label class="field__label" for="taluk">Taluk <span class="req" aria-hidden="true">*</span></label>
+          <input class="input" id="taluk" name="taluk" type="text" placeholder="Enter or select your taluk"
+                 list="talukSuggestions" autocomplete="off" maxlength="80" required
+                 aria-describedby="taluk-help taluk-error">
+          <!-- Taluks from complaints already registered -->
+          <datalist id="talukSuggestions">{% for taluk in taluks %}<option value="{{ taluk }}"></option>{% endfor %}</datalist>
+          <p class="field__help" id="taluk-help">Type the name of your taluk as it appears on official documents.</p>
+          <p class="field__error" id="taluk-error"></p>
+        </div>
+      </section>
+
+      <!-- Section 2 -->
+      <section class="form-section" aria-labelledby="sec-problem">
+        <h2 class="form-section__title" id="sec-problem">
+          <span class="form-section__icon" aria-hidden="true"><svg class="icon"><use href="#i-alert"/></svg></span>
+          About the problem
+        </h2>
+
+        <div class="field" data-field="description">
+          <label class="field__label" for="description">Problem Description <span class="req" aria-hidden="true">*</span></label>
+          <p class="field__help" id="description-help">Example: A large pothole has developed on the main road and causes difficulties for vehicles and pedestrians.</p>
+          <textarea class="input textarea textarea--lg" id="description" name="description" rows="6"
+                    placeholder="Describe the public problem clearly" maxlength="2000" required
+                    aria-describedby="description-help description-count description-error"></textarea>
+          <p class="field__count" id="description-count" aria-live="polite">0 / 2000</p>
+          <p class="field__error" id="description-error"></p>
+        </div>
+
+        <div class="field" data-field="photo">
+          <span class="field__label" id="photo-label">Upload Problem Photo <span class="optional">(optional)</span></span>
+          <p class="field__help" id="photo-help">The photo should clearly show the reported issue. Accepted formats: JPG, JPEG, PNG or WEBP. Maximum size: 5 MB.</p>
+          <div class="upload" data-upload="photo">
+            <input class="upload__input" id="photo" name="photo" type="file"
+                   accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                   aria-labelledby="photo-label" aria-describedby="photo-help photo-error">
+            <label class="upload__drop" for="photo">
+              <span class="upload__drop-icon" aria-hidden="true"><svg class="icon"><use href="#i-upload"/></svg></span>
+              <span class="upload__drop-title">Choose a photo</span>
+              <span class="upload__drop-meta">JPG, JPEG, PNG or WEBP · up to 5 MB</span>
+            </label>
+            <div class="upload__preview" hidden>
+              <img class="upload__thumb" alt="Preview of the selected problem photo">
+              <div class="upload__info">
+                <p class="upload__name"></p>
+                <p class="upload__size"></p>
+              </div>
+              <div class="upload__actions">
+                <button type="button" class="btn btn--secondary btn--sm" data-action="replace">Replace</button>
+                <button type="button" class="btn btn--danger btn--sm" data-action="remove">Remove</button>
+              </div>
+            </div>
+          </div>
+          <p class="field__error" id="photo-error"></p>
+        </div>
+
+        <div class="field" data-field="affectedArea">
+          <label class="field__label" for="affectedArea">Affected Area <span class="req" aria-hidden="true">*</span></label>
+          <input class="input" id="affectedArea" name="affectedArea" type="text"
+                 placeholder="Enter the locality, street, village, ward, or landmark" maxlength="200" required
+                 aria-describedby="affectedArea-error">
+          <p class="field__error" id="affectedArea-error"></p>
+        </div>
+
+        <div class="field" data-field="impact">
+          <label class="field__label" for="impact">How Does This Problem Affect You? <span class="req" aria-hidden="true">*</span></label>
+          <p class="field__help" id="impact-help">Example: It causes traffic congestion, makes walking difficult, or interrupts the water supply.</p>
+          <textarea class="input textarea" id="impact" name="impact" rows="4"
+                    placeholder="Explain how this issue affects your daily life or the local community" maxlength="1000" required
+                    aria-describedby="impact-help impact-count impact-error"></textarea>
+          <p class="field__count" id="impact-count" aria-live="polite">0 / 1000</p>
+          <p class="field__error" id="impact-error"></p>
+        </div>
+      </section>
+
+      <!-- Section 3 -->
+      <section class="form-section" aria-labelledby="sec-previous">
+        <h2 class="form-section__title" id="sec-previous">
+          <span class="form-section__icon" aria-hidden="true"><svg class="icon"><use href="#i-history"/></svg></span>
+          Earlier complaint
+        </h2>
+
+        <fieldset class="field fieldset" data-field="previouslyReported" aria-describedby="previouslyReported-error">
+          <legend class="field__label">Have You Previously Reported This Problem? <span class="req" aria-hidden="true">*</span></legend>
+          <div class="choices">
+            <label class="choice">
+              <input type="radio" id="previouslyReportedYes" name="previouslyReported" value="yes" required aria-controls="previousDetails">
+              <span>Yes</span>
+            </label>
+            <label class="choice">
+              <input type="radio" id="previouslyReportedNo" name="previouslyReported" value="no" aria-controls="previousDetails">
+              <span>No</span>
+            </label>
+          </div>
+          <p class="field__error" id="previouslyReported-error"></p>
+        </fieldset>
+
+        <div class="subpanel" id="previousDetails" hidden>
+          <div class="field" data-field="previousReference">
+            <label class="field__label" for="previousReference">Previous Complaint Reference Number <span class="optional">(optional)</span></label>
+            <input class="input" id="previousReference" name="previousReference" type="text"
+                   placeholder="Enter your complaint reference number, if available" maxlength="50"
+                   autocomplete="off" aria-describedby="previousReference-help previousReference-error">
+            <p class="field__help" id="previousReference-help">Leave this empty if you no longer have the number.</p>
+            <p class="field__error" id="previousReference-error"></p>
+          </div>
+
+          <div class="field" data-field="previousCopy">
+            <span class="field__label" id="previousCopy-label">Upload Previous Complaint Copy <span class="optional">(optional)</span></span>
+            <p class="field__help" id="previousCopy-help">The document or image should show the earlier complaint details. Accepted formats: PDF, JPG, JPEG or PNG. Maximum size: 5 MB.</p>
+            <div class="upload" data-upload="previousCopy">
+              <input class="upload__input" id="previousCopy" name="previousCopy" type="file"
+                     accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                     aria-labelledby="previousCopy-label" aria-describedby="previousCopy-help previousCopy-error">
+              <label class="upload__drop" for="previousCopy">
+                <span class="upload__drop-icon" aria-hidden="true"><svg class="icon"><use href="#i-upload"/></svg></span>
+                <span class="upload__drop-title">Choose a file</span>
+                <span class="upload__drop-meta">PDF, JPG, JPEG or PNG · up to 5 MB</span>
+              </label>
+              <div class="upload__preview" hidden>
+                <img class="upload__thumb" alt="Preview of the selected complaint copy" hidden>
+                <span class="upload__file-icon" aria-hidden="true" hidden><svg class="icon icon--lg"><use href="#i-file"/></svg></span>
+                <div class="upload__info">
+                  <p class="upload__name"></p>
+                  <p class="upload__size"></p>
+                </div>
+                <div class="upload__actions">
+                  <button type="button" class="btn btn--secondary btn--sm" data-action="replace">Replace</button>
+                  <button type="button" class="btn btn--danger btn--sm" data-action="remove">Remove</button>
+                </div>
+              </div>
+            </div>
+            <p class="field__error" id="previousCopy-error"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Submission -->
+      <div class="form-footer">
+        <div class="field" data-field="declaration">
+          <label class="checkbox">
+            <input type="checkbox" id="declaration" name="declaration" required aria-describedby="declaration-error">
+            <span>I confirm that the information I have provided is accurate to the best of my knowledge. <span class="req" aria-hidden="true">*</span></span>
+          </label>
+          <p class="field__error" id="declaration-error"></p>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn btn--primary" id="submitBtn">Submit Complaint</button>
+          <button type="button" class="btn btn--secondary" id="clearBtn">Clear Form</button>
+        </div>
+        <p class="form-footer__note">Your complaint is sent to the City Corporation with your verified mobile number.</p>
+      </div>
+    </form>
+  </main>
+
+  <footer class="site-footer">
+    <p>© City Corporation · Citizen complaint registration</p>
+    <p>College project — not an official government portal.</p>
+  </footer>
+
+  <dialog class="dialog" id="clearDialog" aria-labelledby="clearDialogTitle" aria-describedby="clearDialogText">
+    <h2 class="dialog__title" id="clearDialogTitle">Clear the form?</h2>
+    <p class="dialog__text" id="clearDialogText">Everything you have entered, including selected files, will be removed. This cannot be undone.</p>
+    <div class="actions actions--end">
+      <button type="button" class="btn btn--secondary" data-dialog="cancel">Keep my details</button>
+      <button type="button" class="btn btn--danger-solid" data-dialog="confirm">Clear form</button>
+    </div>
+  </dialog>
+
+  <script src="{% static_v 'nagar-seva/js/complaint-form.js' %}"></script>
+</body>
+</html>

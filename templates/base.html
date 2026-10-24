@@ -1,0 +1,40 @@
+{% load ui %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Government Corporation{% endblock %}</title>
+  <meta name="description" content="City Corporation — public grievance intelligence and resolution portal.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="{% static_v 'css/main.css' %}">
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to main content</a>
+  {% include "partials/sidebar.html" %}
+
+  <div class="shell">
+    {% include "partials/topbar.html" %}
+    <main class="page" id="content" tabindex="-1">
+      {% include "partials/messages.html" %}
+      {% block content %}{% endblock %}
+    </main>
+    <footer class="footer">
+      <span>© {{ year }} City Corporation · College project — not an official government portal.</span>
+      <nav class="footer__links" aria-label="Footer">
+        <a href="{% url 'grievances:help_support' %}#privacy">Privacy note</a>
+        <a href="{% url 'grievances:help_support' %}#accessibility">Accessibility</a>
+        <a href="{% url 'grievances:complaint_list' %}">Dataset</a>
+        <a href="{% url 'grievances:help_desk' %}">Help desk</a>
+      </nav>
+    </footer>
+  </div>
+
+  <!-- Submitted by "Sign out" in the profile menu -->
+  <form id="logout-form" method="post" action="{% url 'accounts:logout' %}" hidden>{% csrf_token %}</form>
+
+  <script src="{% static_v 'js/app.js' %}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

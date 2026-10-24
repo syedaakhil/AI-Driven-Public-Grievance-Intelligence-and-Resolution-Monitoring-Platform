@@ -1,0 +1,6 @@
+# Development and testing only (not needed on the server).
+#   .venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+#   .venv\Scripts\python.exe -m coverage run manage.py test
+#   .venv\Scripts\python.exe -m coverage report        (settings in .coveragerc)
+-r requirements.txt
+coverage==7.17.0

@@ -1,0 +1,20 @@
+{% load ui %}
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="brand" href="{% url 'grievances:complaint_registration' %}" aria-label="City Corporation, citizen complaint registration">
+      <img class="brand__logo" src="{% static_v 'img/emblem.svg' %}" alt="" width="40" height="40">
+      <span>
+        <span class="brand__name"><span class="brand__city">City</span> <span class="brand__corp">Corporation</span></span>
+        <span class="brand__tagline">Your city, our responsibility.</span>
+      </span>
+    </a>
+    <div class="site-header__user">
+      <a class="btn btn--secondary btn--sm" href="{% url 'grievances:track_list' %}"{% if request.resolver_match.url_name == 'track_list' or request.resolver_match.url_name == 'track_detail' %} aria-current="page"{% endif %}>{% icon 'list' 'sm' %}<span class="site-header__label">My complaints</span></a>
+      <span class="site-header__phone">{% icon 'phone' 'sm' %}<span><span class="sr-only">Signed in as </span>{{ masked_phone }}</span></span>
+      <form method="post" action="{% url 'accounts:logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn--secondary btn--sm">{% icon 'logout' 'sm' %}<span class="site-header__label">Sign out</span></button>
+      </form>
+    </div>
+  </div>
+</header>

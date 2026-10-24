@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+{% load ui humanize %}
+
+{% block title %}Government Corporation{% endblock %}
+
+{% block content %}
+<div class="head">
+  <h1 class="head__title">Your corporation at a glance</h1>
+  <form method="get" class="head__tools">
+    <label class="sr-only" for="range">Date range</label>
+    <select class="select select--sm" id="range" name="range" data-autosubmit>
+      <option value="3"{% if range_months == 3 %} selected{% endif %}>Last 3 months</option>
+      <option value="6"{% if range_months == 6 %} selected{% endif %}>Last 6 months</option>
+    </select>
+    <noscript><button type="submit" class="btn btn--ghost btn--sm">Apply</button></noscript>
+  </form>
+</div>
+
+<section class="grid grid--3 section" aria-label="Summary">
+  <article class="card stat">
+    <div class="stat__top">
+      <h2 class="stat__label">Complaints reported</h2>
+      <span class="tile">{% icon 'file' %}</span>
+    </div>
+    <p class="stat__value">{{ stats.reported|intcomma }}</p>
+    <p class="stat__note">{% include "partials/change.html" with value=stats.reported_change %} from previous period · <b class="change">{{ stats.citizen_filed|intcomma }}</b> filed by citizens</p>
+  </article>
+  <article class="card stat">
+    <div class="stat__top">
+      <h2 class="stat__label">Complaints resolved</h2>
+      <span class="tile tile--green">{% icon 'check' %}</span>
+    </div>
+    <p class="stat__value">{{ stats.resolved|intcomma }}</p>
+    <p class="stat__note">{% include "partials/change.html" with value=stats.resolved_change %} from previous period</p>
+  </article>
+  <article class="card stat">
+    <div class="stat__top">
+      <h2 class="stat__label">Works in progress</h2>
+      <span class="tile tile--orange">{% icon 'road' %}</span>
+    </div>
+    <p class="stat__value">{{ stats.working|intcomma }}</p>
+    <p class="stat__note"><b class="change">{{ stats.waiting|intcomma }}</b> new complaints awaiting assignment</p>
+  </article>
+</section>
+
+<section class="grid grid--charts section" aria-label="Charts">
+  <article class="card">
+    <div class="card__head">
+      <h2 class="card__title">Complaint trends</h2>
+      <div class="seg" role="group" aria-label="Trend period">
+        <button type="button" class="seg__btn" aria-pressed="true" data-trend="monthly">Monthly</button>
+        <button type="button" class="seg__btn" aria-pressed="false" data-trend="weekly">Weekly</button>
+      </div>
+    </div>
+    <div class="legend legend--inline" aria-hidden="true">
+      <span><i class="swatch" style="--swatch:#2E5487"></i>Reported</span>
+      <span><i class="swatch" style="--swatch:#A9C1DE"></i>Resolved</span>
+    </div>
+    <div class="chart"><canvas id="trend-chart" role="img" aria-label="Bar chart of complaints reported and resolved"></canvas></div>
+    <p class="card__foot">
+      {% icon 'trend-up' 'sm' %}
+      {% if stats.rate is None %}
+        <strong>No complaints in this period yet</strong>
+      {% else %}
+        <strong>Resolution rate {{ stats.rate }}%</strong>
+        {% if stats.rate_before is None %}<span>no earlier complaints to compare</span>{% else %}<span>compared to {{ stats.rate_before }}% in the previous period</span>{% endif %}
+      {% endif %}
+    </p>
+  </article>
+
+  <article class="card">
+    <div class="card__head">
+      <h2 class="card__title">Complaints by Social Media and Other Channels</h2>
+      <a class="icon-btn icon-btn--sm" href="{% url 'grievances:complaint_list' %}" aria-label="Open complaints dataset" title="Open dataset">{% icon 'arrow-right' 'sm' %}</a>
+    </div>
+    <div class="donut">
+      <canvas id="channel-chart" role="img" aria-label="Doughnut chart of complaints by channel"></canvas>
+      <div class="donut__centre"><strong>{{ stats.reported|intcomma }}</strong><span>Total complaints</span></div>
+    </div>
+    <ul class="legend legend--grid">
+      {% for channel in stats.channels %}
+        <li title="{{ channel.count }} complaint{{ channel.count|pluralize }}"><i class="swatch" style="--swatch:{{ channel.colour }}"></i>{{ channel.label }}<b>{{ channel.share }}%</b></li>
+      {% endfor %}
+    </ul>
+  </article>
+
+  <article class="card">
+    <div class="card__head">
+      <h2 class="card__title">Civic issues resolved</h2>
+      <span class="chip chip--green">{% include "partials/change.html" with value=stats.resolved_change %}</span>
+    </div>
+    <p class="metric">{{ stats.resolved|intcomma }}<small>resolved</small></p>
+    <div class="chart chart--sm"><canvas id="resolved-chart" role="img" aria-label="Line chart of complaints resolved each month"></canvas></div>
+  </article>
+</section>
+
+<section class="grid grid--feature section" aria-label="Neighbourhood and news">
+  <article class="card">
+    <div class="card__head">
+      <h2 class="card__title">Your neighbourhood, mapped</h2>
+      <div class="seg" role="group" aria-label="Map style">
+        <button type="button" class="seg__btn" aria-pressed="true" data-map="illustrated">Illustrated</button>
+        <button type="button" class="seg__btn" aria-pressed="false" data-map="street">Street map</button>
+      </div>
+    </div>
+    <div class="wardmap">
+      <div>
+        <div class="wardmap__canvas" id="ward-map">
+          <svg viewBox="0 0 300 250" role="img" aria-labelledby="ward-map-title">
+            <title id="ward-map-title">Illustrated map of wards with open complaints</title>
+            <defs>
+              <pattern id="map-grid" width="15" height="15" patternUnits="userSpaceOnUse">
+                <path d="M15 0H0V15" fill="none" stroke="#E2E8F0" stroke-width="1"/>
+              </pattern>
+            </defs>
+            <rect width="300" height="250" fill="url(#map-grid)"/>
+            {% for ward in stats.wards %}
+              <a href="{% url 'grievances:complaint_list' %}?ward={{ ward.pk }}" class="wardmap__area" data-ward="{{ ward.pk }}">
+                <title>{{ ward }} ({{ ward.area }}): {{ ward.open_count }} open complaint{{ ward.open_count|pluralize }}</title>
+                <polygon points="{{ ward.shape }}" fill="{{ ward.fill }}"/>
+              </a>
+            {% endfor %}
+            <path class="wardmap__river" d="M8 180 C 56 156, 88 182, 132 166 S 206 140, 246 156 S 282 182, 296 172"/>
+            <path class="wardmap__river wardmap__river--line" d="M8 180 C 56 156, 88 182, 132 166 S 206 140, 246 156 S 282 182, 296 172"/>
+            {% for ward in stats.wards %}
+              <circle cx="{{ ward.pin_x }}" cy="{{ ward.pin_y }}" r="4.5" fill="#263B5B"/>
+              <text class="wardmap__label" x="{{ ward.pin_x|add:'-13' }}" y="{{ ward.pin_y|add:'14' }}">Ward {{ ward.number|stringformat:'02d' }}</text>
+            {% endfor %}
+          </svg>
+          <div class="wardmap__street" id="street-map" data-complaints-url="{% url 'grievances:complaint_list' %}" hidden></div>
+        </div>
+        <p class="wardmap__caption" id="map-caption">Illustrative ward boundaries · not to scale</p>
+      </div>
+      <div class="wardlist">
+        <div class="wardlist__head"><span>Ward / zone</span><span>Open</span></div>
+        {% for ward in stats.wards %}
+          <a class="wardrow" data-ward="{{ ward.pk }}" href="{% url 'grievances:complaint_list' %}?ward={{ ward.pk }}">
+            <span class="wardrow__top"><span>{{ ward }}</span><b>{{ ward.open_count }}</b></span>
+            <span class="bar"><span style="width:{{ ward.bar }}%"></span></span>
+          </a>
+        {% endfor %}
+        {% if stats.unassigned.open %}
+          <a class="wardrow" href="{% url 'grievances:complaint_create' %}?review=pending">
+            <span class="wardrow__top"><span>Ward not assigned yet</span><b>{{ stats.unassigned.open }}</b></span>
+            <span class="bar bar--orange"><span style="width:{{ stats.unassigned.bar }}%"></span></span>
+          </a>
+        {% endif %}
+        <a class="link" href="{% url 'grievances:complaint_list' %}?sort=ward">Explore ward-wise data {% icon 'arrow-right' 'sm' %}</a>
+      </div>
+    </div>
+  </article>
+
+  <article class="card card--flush" id="news">
+    <div class="card__head card__head--pad">
+      <h2 class="card__title">City news &amp; notices</h2>
+      {% if notices|length > 3 %}
+        <button type="button" class="link" data-dialog-open="all-notices">View all {% icon 'arrow-right' 'sm' %}</button>
+      {% endif %}
+    </div>
+    {% if notices %}
+      <ul class="news">
+        {% for notice in notices|slice:":3" %}
+          <li>
+            <button type="button" class="news__item" data-dialog-open="notice-{{ notice.pk }}">
+              <span class="tile tile--lg">{% icon notice.icon %}</span>
+              <span class="news__text">
+                <span class="kicker">{{ notice.topic }}</span>
+                <strong>{{ notice.title }}</strong>
+                <span>{{ notice.summary }}</span>
+                <time datetime="{{ notice.published_on|date:'Y-m-d' }}">{{ notice.published_on|date:"d M Y" }}</time>
+              </span>
+              {% icon 'chevron-right' 'sm' %}
+            </button>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="empty">
+        <p>No notices published yet.</p>
+        <a class="link" href="{% url 'admin:grievances_notice_add' %}">Publish a notice {% icon 'arrow-right' 'sm' %}</a>
+      </div>
+    {% endif %}
+  </article>
+
+  <aside class="promo" aria-labelledby="promo-title">
+    <p class="promo__kicker">Our city, our shared pride</p>
+    <h2 class="promo__title" id="promo-title">Cleaner streets. Better everyday lives.</h2>
+    <p class="promo__text">Small actions in your neighbourhood make a big difference to our city.</p>
+    <a class="btn btn--orange btn--block" href="{% url 'grievances:help_desk' %}">Explore civic services {% icon 'arrow-right' 'sm' %}</a>
+    <small class="promo__small">Participate. Report. Make a difference.</small>
+  </aside>
+</section>
+
+<div class="banner">
+  <p class="banner__text">{% icon 'building' %}<span>See a civic issue? <strong>Your voice can make a difference.</strong></span></p>
+  <a class="link" href="{% url 'grievances:complaint_create' %}">Report waste, road or sewage issues {% icon 'arrow-right' 'sm' %}</a>
+</div>
+
+{% for notice in notices %}
+  <dialog class="dialog" id="notice-{{ notice.pk }}" aria-labelledby="notice-{{ notice.pk }}-title">
+    <div class="dialog__head">
+      <div>
+        <h2 id="notice-{{ notice.pk }}-title">{{ notice.title }}</h2>
+        <p>{{ notice.topic }} · {{ notice.published_on|date:"d M Y" }}</p>
+      </div>
+      <button type="button" class="icon-btn" data-dialog-close aria-label="Close">{% icon 'x' %}</button>
+    </div>
+    <div class="dialog__body">{{ notice.body|default:notice.summary|linebreaks }}</div>
+    <div class="dialog__foot">
+      <button type="button" class="btn btn--ghost" data-dialog-close>Close</button>
+      <a class="btn btn--primary" href="{% url 'grievances:complaint_create' %}">Report a related issue</a>
+    </div>
+  </dialog>
+{% endfor %}
+
+{% if notices|length > 3 %}
+  <dialog class="dialog" id="all-notices" aria-labelledby="all-notices-title">
+    <div class="dialog__head">
+      <h2 id="all-notices-title">All city news &amp; notices</h2>
+      <button type="button" class="icon-btn" data-dialog-close aria-label="Close">{% icon 'x' %}</button>
+    </div>
+    <ul class="news news--dialog">
+      {% for notice in notices %}
+        <li>
+          <button type="button" class="news__item" data-dialog-open="notice-{{ notice.pk }}">
+            <span class="tile tile--lg">{% icon notice.icon %}</span>
+            <span class="news__text">
+              <span class="kicker">{{ notice.topic }}</span>
+              <strong>{{ notice.title }}</strong>
+              <span>{{ notice.summary }}</span>
+            </span>
+            {% icon 'chevron-right' 'sm' %}
+          </button>
+        </li>
+      {% endfor %}
+    </ul>
+  </dialog>
+{% endif %}
+
+{{ stats.chart|json_script:"dashboard-data" }}
+{{ stats.ward_points|json_script:"ward-points" }}
+{% endblock %}
+
+{% block scripts %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="{% static_v 'js/dashboard.js' %}"></script>
+{% endblock %}

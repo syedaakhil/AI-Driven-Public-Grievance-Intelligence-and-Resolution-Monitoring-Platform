@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 420" preserveAspectRatio="xMidYMin slice">
+  <!-- City Corporation: illustrated civic hall with a clock tower (original artwork) -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6383AC"/>
+      <stop offset=".6" stop-color="#36567F"/>
+      <stop offset="1" stop-color="#1B2F4F"/>
+    </linearGradient>
+    <linearGradient id="stone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#B3C6DF"/>
+      <stop offset="1" stop-color="#7090B8"/>
+    </linearGradient>
+    <linearGradient id="stone-dark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#92ABCB"/>
+      <stop offset="1" stop-color="#52729C"/>
+    </linearGradient>
+    <pattern id="windows" width="15" height="24" patternUnits="userSpaceOnUse">
+      <path d="M4 24V10.5a3.5 3.5 0 0 1 7 0V24" fill="#3D5C87"/>
+    </pattern>
+  </defs>
+
+  <rect width="300" height="420" fill="url(#sky)"/>
+  <g fill="#fff" opacity=".1">
+    <ellipse cx="70" cy="70" rx="56" ry="9"/>
+    <ellipse cx="225" cy="46" rx="62" ry="10"/>
+    <ellipse cx="240" cy="118" rx="38" ry="7"/>
+  </g>
+
+  <!-- skyline behind -->
+  <g fill="#48688F" opacity=".75">
+    <rect x="0" y="206" width="30" height="96"/>
+    <rect x="24" y="184" width="22" height="118"/>
+    <rect x="254" y="178" width="26" height="124"/>
+    <rect x="276" y="204" width="24" height="98"/>
+  </g>
+
+  <!-- clock tower -->
+  <rect x="131" y="70" width="38" height="130" fill="url(#stone)"/>
+  <path d="M126 70h48l-6-15h-36z" fill="#CAD7EA"/>
+  <path d="M135 55 150 20l15 35z" fill="#BCCBE2"/>
+  <rect x="148" y="9" width="4" height="13" fill="#CAD7EA"/>
+  <circle cx="150" cy="98" r="12" fill="#E9EFF7"/>
+  <circle cx="150" cy="98" r="12" fill="none" stroke="#3D5C87" stroke-width="2"/>
+  <path d="M150 90v8l5 3" fill="none" stroke="#3D5C87" stroke-width="2" stroke-linecap="round"/>
+  <rect x="140" y="122" width="20" height="62" fill="url(#windows)"/>
+
+  <!-- main hall -->
+  <rect x="38" y="176" width="224" height="126" fill="url(#stone-dark)"/>
+  <rect x="38" y="170" width="224" height="8" fill="#BCCBE2"/>
+  <rect x="46" y="190" width="86" height="46" fill="url(#windows)"/>
+  <rect x="168" y="190" width="86" height="46" fill="url(#windows)"/>
+  <rect x="46" y="248" width="86" height="46" fill="url(#windows)"/>
+  <rect x="168" y="248" width="86" height="46" fill="url(#windows)"/>
+  <rect x="131" y="184" width="38" height="118" fill="url(#stone)"/>
+  <path d="M139 302v-30a11 11 0 0 1 22 0v30z" fill="#2B476F"/>
+
+  <!-- corner turrets -->
+  <rect x="32" y="154" width="18" height="148" fill="url(#stone)"/>
+  <path d="M30 154h22l-11-15z" fill="#CAD7EA"/>
+  <rect x="250" y="154" width="18" height="148" fill="url(#stone)"/>
+  <path d="M248 154h22l-11-15z" fill="#CAD7EA"/>
+
+  <!-- palms -->
+  <g fill="#1E395E">
+    <rect x="14" y="232" width="3" height="80"/>
+    <path d="M15 234c-13-4-21 2-25 8 8-4 15-4 25-6zM16 234c13-6 21-2 27 4-9-3-17-3-27-2zM15 232c-4-12 2-20 6-24-2 8-2 14-4 24z"/>
+    <rect x="283" y="238" width="3" height="80"/>
+    <path d="M284 240c-13-4-21 2-25 8 8-4 15-4 25-6zM285 240c13-6 21-2 27 4-9-3-17-3-27-2zM284 238c-4-12 2-20 6-24-2 8-2 14-4 24z"/>
+  </g>
+
+  <rect x="0" y="300" width="300" height="120" fill="#1B2F4F"/>
+</svg>

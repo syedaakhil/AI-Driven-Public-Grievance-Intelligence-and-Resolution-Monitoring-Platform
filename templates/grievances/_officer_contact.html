@@ -1,0 +1,1 @@
+{% load ui %}{% if officer.email %}<a class="btn btn--primary btn--sm" href="mailto:{{ officer.email }}">{% icon 'mail' 'sm' %}Contact</a>{% elif officer.phone %}<a class="btn btn--primary btn--sm" href="tel:{{ officer.phone }}">{% icon 'phone' 'sm' %}Call</a>{% else %}<span class="muted small">No contact details</span>{% endif %}

@@ -1,0 +1,1 @@
+{% load ui %}{% if value is None %}<b class="change">—</b>{% elif value >= 0 %}<b class="change change--up">↗ {{ value }}%</b>{% else %}<b class="change change--down">↘ {{ value|absolute }}%</b>{% endif %}

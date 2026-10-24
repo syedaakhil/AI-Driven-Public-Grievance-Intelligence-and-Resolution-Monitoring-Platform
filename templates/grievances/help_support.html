@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% load ui %}
+
+{% block title %}Help &amp; support · City Corporation{% endblock %}
+
+{% block content %}
+<div class="head">
+  <h1 class="head__title">Help &amp; support</h1>
+  <p class="head__lead">Questions about using the City Corporation portal? Send an enquiry, follow the guide, or adjust accessibility and language settings.</p>
+</div>
+
+<div class="split section">
+  <section class="card" aria-labelledby="enquiry-title">
+    <h2 class="card__title" id="enquiry-title">Contact support</h2>
+    <form method="post" novalidate class="mt-16">
+      {% csrf_token %}
+      <div class="form-grid">
+        {% include "partials/field.html" with field=form.name %}
+        {% include "partials/field.html" with field=form.email %}
+        {% include "partials/field.html" with field=form.topic wide=True %}
+        <div class="field field--wide{% if form.message.errors %} has-error{% endif %}">
+          <label for="{{ form.message.id_for_label }}">Message <span class="req">*</span></label>
+          {{ form.message }}
+          <p class="field__hint field__hint--split"><span>Please don't include sensitive personal details.</span><span data-counter-for="{{ form.message.id_for_label }}">0 / 800</span></p>
+          {% for error in form.message.errors %}<p class="field__error">{{ error }}</p>{% endfor %}
+        </div>
+      </div>
+      <div class="actions">
+        <button type="submit" class="btn btn--primary">Send enquiry</button>
+      </div>
+    </form>
+  </section>
+
+  <aside class="stack">
+    <section class="card" id="accessibility" aria-labelledby="a11y-title">
+      <h2 class="card__title" id="a11y-title">Accessibility &amp; language</h2>
+      <div class="settings">
+        <div class="setting">
+          <div><strong id="text-size-label">Text size</strong><span>Make all text larger</span></div>
+          <div class="seg" role="group" aria-labelledby="text-size-label">
+            <button type="button" class="seg__btn" data-pref-text="normal" aria-pressed="true">A</button>
+            <button type="button" class="seg__btn seg__btn--md" data-pref-text="large" aria-pressed="false">A+</button>
+            <button type="button" class="seg__btn seg__btn--lg" data-pref-text="xlarge" aria-pressed="false">A++</button>
+          </div>
+        </div>
+        <div class="setting">
+          <div><strong id="contrast-label">High contrast</strong><span>Darker text and stronger borders</span></div>
+          <label class="switch"><input type="checkbox" data-pref-toggle="contrast" aria-labelledby="contrast-label"><span></span></label>
+        </div>
+        <div class="setting">
+          <div><strong id="motion-label">Reduce motion</strong><span>Turn off animations</span></div>
+          <label class="switch"><input type="checkbox" data-pref-toggle="reduceMotion" aria-labelledby="motion-label"><span></span></label>
+        </div>
+        <div class="setting">
+          <div><strong><label for="language-select">Language</label></strong><span>Translates the menu labels</span></div>
+          <select class="select select--sm" id="language-select" data-pref-lang>
+            <option value="en">English</option>
+            <option value="ta">தமிழ் (Tamil)</option>
+            <option value="hi">हिन्दी (Hindi)</option>
+          </select>
+        </div>
+      </div>
+      <p class="muted small mt-12">Settings are saved in this browser. Press <kbd>Tab</kbd> to move between controls and <kbd>Esc</kbd> to close menus.</p>
+    </section>
+
+    <section class="card" aria-labelledby="recent-title">
+      <h2 class="card__title" id="recent-title">Recent enquiries</h2>
+      {% if recent %}
+        <ul class="mini-list">
+          {% for enquiry in recent %}
+            <li><span><strong>{{ enquiry.reference }}</strong><small>{{ enquiry.get_topic_display }}</small></span><span class="muted small nowrap">{{ enquiry.created_at|date:"d M Y" }}</span></li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="muted small mt-6">No enquiries yet.</p>
+      {% endif %}
+    </section>
+  </aside>
+</div>
+
+<section class="card section" aria-labelledby="guide-title">
+  <h2 class="card__title" id="guide-title">Step-by-step guide</h2>
+  <div class="guide">
+    <ol class="steps">
+      <li><strong>Read the Home dashboard</strong>Switch between monthly and weekly trends, and change the range to the last 3 months.</li>
+      <li><strong>Check a ward</strong>Click a ward on the map to see its complaints in the Dataset.</li>
+      <li><strong>Publish notices</strong>Add city news under <a href="{% url 'admin:grievances_notice_changelist' %}">Manage officers &amp; notices</a>.</li>
+    </ol>
+    <ol class="steps" start="4" style="counter-reset: step 3">
+      <li><strong>File a complaint</strong>Use <a href="{% url 'grievances:complaint_create' %}">Filed complaint</a> and note the channel it came through.</li>
+      <li><strong>Update its status</strong>Open it from the <a href="{% url 'grievances:complaint_list' %}">Dataset</a>, assign an officer and record progress.</li>
+      <li><strong>Follow the officers</strong>See each officer's open and resolved complaints in <a href="{% url 'grievances:officers' %}">Officers in charge</a>.</li>
+    </ol>
+  </div>
+</section>
+
+<section aria-labelledby="faq-title">
+  <h2 class="section__title" id="faq-title">Frequently asked questions</h2>
+  <div class="faqs">
+    <details class="faq">
+      <summary>Who can sign in to this dashboard?</summary>
+      <div class="faq__body"><p>Corporation admins sign in with a username and password. Citizens sign in with their mobile number and an OTP, and use the complaint registration page.</p></div>
+    </details>
+    <details class="faq">
+      <summary>Where is complaint data stored?</summary>
+      <div class="faq__body"><p>In this portal's own database (SQLite). Officers, notices and complaints can also be managed at <a href="{% url 'admin:index' %}">/admin/</a>.</p></div>
+    </details>
+    <details class="faq" id="privacy">
+      <summary>Privacy note — what happens to the data entered?</summary>
+      <div class="faq__body">
+        <p>Complaints, enquiries and photos stay in this portal's database and media folder. Nothing is sent to a government system or to analytics services.</p>
+        <p>OTP codes are sent only through the SMS provider configured in <code>.env</code>. Fonts, charts and the optional street map load from public CDNs and never receive form data.</p>
+      </div>
+    </details>
+    <details class="faq">
+      <summary>Where do the dashboard numbers come from?</summary>
+      <div class="faq__body"><p>They are counted from the complaints in the database. With no complaints yet, the dashboard shows zeros.</p></div>
+    </details>
+    <details class="faq">
+      <summary>The charts or street map are not showing.</summary>
+      <div class="faq__body"><p>They need an internet connection to load their libraries. Everything else works offline, and the illustrated ward map is always available.</p></div>
+    </details>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static_v 'js/help.js' %}"></script>
+{% endblock %}

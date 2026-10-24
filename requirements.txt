@@ -1,0 +1,16 @@
+# Every version is pinned (from "pip freeze"). Upgrade on purpose, run the tests, then update here.
+
+# --- Application ---
+Django==6.1.2
+asgiref==3.13.0
+sqlparse==0.6.0
+tzdata==2026.5
+
+# --- Production ---
+gunicorn==26.2.0          # app server (Linux/macOS only; on Windows use runserver for development)
+whitenoise==6.12.0        # serves /static/ from gunicorn, compressed and cache-busted
+dj-database-url==3.1.2    # reads DATABASE_URL
+psycopg==3.3.6            # PostgreSQL driver
+psycopg-binary==3.3.6
+typing_extensions==4.16.0
+redis==8.1.0              # shared cache (OTP and login rate limits) when REDIS_URL is set
