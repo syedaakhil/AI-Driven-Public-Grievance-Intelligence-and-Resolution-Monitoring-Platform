@@ -190,13 +190,15 @@ class BrevoTests(TestCase):
     def test_brevo_errors_become_email_errors(self):
         cases = [(urllib.error.HTTPError(brevo.BREVO_URL, 401, 'Unauthorized', {}, io.BytesIO(b'bad key')), 'API key'),
                  (urllib.error.HTTPError(brevo.BREVO_URL, 400, 'Bad', {}, io.BytesIO(b'sender')), 'SENDER_EMAIL'),
+                 (urllib.error.HTTPError(brevo.BREVO_URL, 403, 'Forbidden', {}, io.BytesIO(b'permission_denied')),
+                  'transactional email permission'),
                  (urllib.error.HTTPError(brevo.BREVO_URL, 500, 'Oops', {}, io.BytesIO(b'')), 'HTTP 500'),
                  (urllib.error.URLError('no network'), 'Could not reach Brevo')]
         for problem, message in cases:
             with self.subTest(message=message), mock.patch('urllib.request.urlopen', side_effect=problem), \
                     self.assertLogs('assistant.brevo', 'ERROR'), self.assertRaisesMessage(brevo.EmailError, message):
                 brevo.send_email('S', 'h', 't', EmailLog.Kind.ON_DEMAND)
-        self.assertEqual(EmailLog.objects.filter(status='failed').count(), 4)
+        self.assertEqual(EmailLog.objects.filter(status='failed').count(), len(cases))
 
 
 # ---------- Daily 9 AM report ----------

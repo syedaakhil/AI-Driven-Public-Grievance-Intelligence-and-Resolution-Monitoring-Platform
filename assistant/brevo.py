@@ -70,6 +70,9 @@ def _post(payload):
             raise EmailError('Brevo refused the API key (HTTP 401). Check BREVO_API_KEY in .env.') from exc
         if exc.code == 400:
             raise EmailError('Brevo rejected the email (HTTP 400). Is SENDER_EMAIL verified in Brevo?') from exc
+        if exc.code == 403:
+            raise EmailError('Brevo says this API key may not send emails (HTTP 403). Create a key with '
+                             'transactional email permission in Brevo and put it in BREVO_API_KEY.') from exc
         raise EmailError(f'Brevo could not send the email (HTTP {exc.code}). Try again later.') from exc
     except (urllib.error.URLError, TimeoutError, OSError) as exc:
         logger.error('Could not reach Brevo: %s', exc)
