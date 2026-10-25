@@ -24,8 +24,10 @@ def _login_url(tab='', next_url=''):
 
 def login_view(request):
     next_url = request.GET.get('next', '')
-    # Arriving from a protected dashboard page (?next=) opens the admin tab.
-    tab = request.GET.get('as') or ('admin' if next_url else 'citizen')
+    # Arriving from a protected dashboard page (?next=) opens the admin tab. The site's main link
+    # (?next=/) opens the citizen tab: that is how the public arrives.
+    from_dashboard = next_url and next_url != reverse('grievances:home')
+    tab = request.GET.get('as') or ('admin' if from_dashboard else 'citizen')
     waiting = otp.pending(request)
     return render(request, 'accounts/login.html', {
         'tab': 'admin' if tab == 'admin' else 'citizen',

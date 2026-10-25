@@ -39,6 +39,17 @@ class AdminLoginTests(TestCase):
         response = self.client.get(reverse('grievances:home'))
         self.assertRedirects(response, reverse('accounts:login') + '?next=/')
 
+    def test_main_link_opens_the_citizen_tab(self):
+        response = self.client.get(reverse('grievances:home'), follow=True)
+        self.assertEqual(response.context['tab'], 'citizen')
+        self.assertContains(response, 'href="/login/?as=admin&amp;next=/"')   # admins still come back to /
+
+    def test_other_dashboard_pages_open_the_admin_tab(self):
+        response = self.client.get(reverse('grievances:complaint_list'), follow=True)
+        self.assertEqual(response.context['tab'], 'admin')
+        self.assertEqual(self.client.get(reverse('accounts:login'), {'as': 'admin', 'next': '/'}).context['tab'],
+                         'admin')
+
     def test_wrong_password_shows_error(self):
         response = self.client.post(reverse('accounts:admin_login'),
                                     {'username': 'admin', 'password': 'wrong'}, follow=True)
