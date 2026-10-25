@@ -157,6 +157,7 @@ It must say **"System check identified no issues"**. The project adds its own ch
 |---|---|---|
 | `accounts.E001` | The secret key is the development key | Set `DJANGO_SECRET_KEY` |
 | `accounts.W001` | The SMS backend is still `console` | Set a real `SMS_BACKEND` and its keys |
+| `accounts.W003` | `CITIZEN_OTP_ON_SCREEN` shows OTPs on the login page (demo only) | Set a real `SMS_BACKEND` and remove `CITIZEN_OTP_ON_SCREEN` |
 | `accounts.W002` | No Redis, so OTP and login rate limits aren't shared between workers | Set `REDIS_URL` |
 
 Django's own warnings (`security.W…`) disappear once `DJANGO_DEBUG=0` and the variables above are set.

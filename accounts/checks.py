@@ -6,7 +6,14 @@ from django.core import checks
 @checks.register(checks.Tags.security, deploy=True)
 def citizen_sign_in_settings(app_configs, **kwargs):
     errors = []
-    if settings.SMS_BACKEND == 'console':
+    if settings.SMS_BACKEND == 'console' and settings.CITIZEN_OTP_ON_SCREEN:
+        errors.append(checks.Warning(
+            'CITIZEN_OTP_ON_SCREEN shows each OTP on the login page, so anyone can sign in as any mobile '
+            'number and see its complaints. Use it only for a demo.',
+            hint='Set SMS_BACKEND to fast2sms, msg91 or twilio with its keys, and remove CITIZEN_OTP_ON_SCREEN.',
+            id='accounts.W003',
+        ))
+    elif settings.SMS_BACKEND == 'console':
         errors.append(checks.Warning(
             'SMS_BACKEND is "console", so OTPs are only printed in the server log and citizens cannot sign in.',
             hint='Set SMS_BACKEND to fast2sms, msg91 or twilio and add its keys to .env.',

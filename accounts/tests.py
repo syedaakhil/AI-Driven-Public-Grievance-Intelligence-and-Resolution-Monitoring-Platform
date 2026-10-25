@@ -111,6 +111,23 @@ class LiveSiteLoginTests(TestCase):
         response = self.client.get(reverse('accounts:login'))
         self.assertEqual(response.context['dev_code'], '')
 
+    @override_settings(SMS_BACKEND='console', CITIZEN_OTP_ON_SCREEN=True)
+    def test_otp_on_screen_shows_the_code_and_signs_the_citizen_in(self):
+        with redirect_stdout(io.StringIO()):
+            self.client.post(reverse('accounts:send_otp'), {'phone': '9876543210'})
+        code = self.client.session[otp.DEV_CODE_KEY]
+        page = self.client.get(reverse('accounts:login'))
+        self.assertContains(page, f'<strong>{code}</strong>')
+        response = self.client.post(reverse('accounts:verify_otp'), {'otp': code})
+        self.assertRedirects(response, reverse('grievances:complaint_registration'))
+        self.assertEqual(self.client.session['citizen_phone'], '+919876543210')
+
+    @override_settings(SMS_BACKEND='fast2sms', FAST2SMS_API_KEY='dummy', CITIZEN_OTP_ON_SCREEN=True)
+    def test_otp_on_screen_does_nothing_with_a_real_sms_provider(self):
+        with mock.patch.object(sms, '_post', return_value={'return': True}):
+            self.client.post(reverse('accounts:send_otp'), {'phone': '9876543210'})
+        self.assertNotIn(otp.DEV_CODE_KEY, self.client.session)
+
 
 class SettingsTests(SimpleTestCase):
     def test_secret_key_is_required_outside_debug(self):
@@ -136,6 +153,18 @@ class SettingsTests(SimpleTestCase):
                        CACHES={'default': project_settings.cache_settings('redis://localhost:6379/0')})
     def test_deploy_check_passes_with_live_settings(self):
         self.assertEqual(checks.citizen_sign_in_settings(None), [])
+
+    @override_settings(SMS_BACKEND='console', CITIZEN_OTP_ON_SCREEN=True, SECRET_KEY='a-real-key',
+                       CACHES={'default': project_settings.cache_settings('redis://localhost:6379/0')})
+    def test_deploy_check_warns_that_otp_on_screen_is_demo_only(self):
+        self.assertEqual([m.id for m in checks.citizen_sign_in_settings(None)], ['accounts.W003'])
+
+    def test_otp_on_screen_is_off_unless_turned_on(self):
+        with mock.patch.dict(os.environ):
+            os.environ.pop('CITIZEN_OTP_ON_SCREEN', None)
+            self.assertFalse(project_settings.env_flag('CITIZEN_OTP_ON_SCREEN', False))
+        with mock.patch.dict(os.environ, {'CITIZEN_OTP_ON_SCREEN': '1'}):
+            self.assertTrue(project_settings.env_flag('CITIZEN_OTP_ON_SCREEN', False))
 
     @override_settings(SMS_BACKEND='msg91', SECRET_KEY='a-real-key',
                        CACHES={'default': project_settings.cache_settings('')})

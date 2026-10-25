@@ -236,6 +236,10 @@ LOGIN_URL = 'accounts:login'
 # Citizen SMS (OTPs and complaint status updates): "console" (testing), "fast2sms", "msg91" or
 # "twilio". See accounts/sms.py.
 SMS_BACKEND = os.environ.get('SMS_BACKEND', 'console').strip().lower()
+# Demo switch for a live site without an SMS provider: with the console backend, show the citizen
+# OTP on the login page (debug mode always does). Anyone can then sign in as any mobile number,
+# so turn it off once a real SMS provider is set up.
+CITIZEN_OTP_ON_SCREEN = env_flag('CITIZEN_OTP_ON_SCREEN', False)
 FAST2SMS_API_KEY = os.environ.get('FAST2SMS_API_KEY', '')
 MSG91_AUTH_KEY = os.environ.get('MSG91_AUTH_KEY', '')
 MSG91_OTP_TEMPLATE_ID = os.environ.get('MSG91_OTP_TEMPLATE_ID', '')
