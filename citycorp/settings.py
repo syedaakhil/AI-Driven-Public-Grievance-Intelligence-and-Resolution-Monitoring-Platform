@@ -74,6 +74,18 @@ def database_settings(url):
     return config
 
 
+def media_root(environ=os.environ):
+    """
+    Where uploads are saved: DJANGO_MEDIA_ROOT if set, /tmp/media on Vercel (whose app folder is
+    read-only, and whose /tmp is wiped from time to time), otherwise media/ next to manage.py.
+    """
+    if environ.get('DJANGO_MEDIA_ROOT', '').strip():
+        return Path(environ['DJANGO_MEDIA_ROOT'].strip())
+    if environ.get('VERCEL'):
+        return Path('/tmp/media')
+    return BASE_DIR / 'media'
+
+
 def cache_settings(url):
     """
     Redis at REDIS_URL, or per-process memory when empty. OTP and admin-login rate limits live in
@@ -223,10 +235,10 @@ STORAGES = {
                     else 'whitenoise.storage.CompressedManifestStaticFilesStorage'},
 }
 
-# Complaint photos and earlier-complaint copies. They hold citizens' personal details, so they are
-# never served from MEDIA_URL; staff open them through grievances:complaint_file.
+# Complaint photos, earlier-complaint copies and employee photos. They hold personal details, so they
+# are never served from MEDIA_URL; staff open them through grievances:complaint_file / officer_photo.
 MEDIA_URL = 'media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = media_root()
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

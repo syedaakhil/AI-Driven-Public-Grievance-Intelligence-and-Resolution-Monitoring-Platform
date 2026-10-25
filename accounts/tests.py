@@ -180,6 +180,13 @@ class SettingsTests(SimpleTestCase):
     def test_deploy_check_flags_a_per_process_cache(self):
         self.assertEqual([m.id for m in checks.citizen_sign_in_settings(None)], ['accounts.W002'])
 
+    def test_uploads_go_to_tmp_on_vercel(self):
+        base = project_settings.BASE_DIR
+        self.assertEqual(project_settings.media_root({}), base / 'media')
+        self.assertEqual(project_settings.media_root({'VERCEL': '1'}).as_posix(), '/tmp/media')
+        self.assertEqual(project_settings.media_root({'VERCEL': '1', 'DJANGO_MEDIA_ROOT': '/data/up'}).as_posix(),
+                         '/data/up')
+
     def test_database_defaults_to_sqlite(self):
         db = project_settings.database_settings('')
         self.assertEqual(db['ENGINE'], 'django.db.backends.sqlite3')
