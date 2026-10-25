@@ -74,6 +74,9 @@
       {% else %}
         <form method="post" action="{% url 'accounts:send_otp' %}" class="stack stack--tight">
           {% csrf_token %}
+          {% if otp_on_screen %}
+            <div class="alert alert--info">{% icon 'info' %}<span>{% translate "Demo mode: no SMS is sent. Your OTP will be shown on the next screen." %}</span></div>
+          {% endif %}
           <div class="field">
             <label for="phone">{% translate "Mobile number" %}</label>
             <div class="phone">

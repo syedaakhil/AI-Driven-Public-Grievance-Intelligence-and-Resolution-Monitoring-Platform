@@ -78,10 +78,14 @@ def send(request, phone):
         'sent_at': now,
         'tries': 0,
     }
-    # Without a real SMS provider, keep the code so the login page can show it while testing,
-    # or on a demo site with CITIZEN_OTP_ON_SCREEN turned on.
-    if sms.uses_console() and (settings.DEBUG or settings.CITIZEN_OTP_ON_SCREEN):
+    if shows_code_on_screen():
         request.session[DEV_CODE_KEY] = code
+
+
+def shows_code_on_screen():
+    """Without a real SMS provider, the login page shows the OTP while testing (debug mode) or on a
+    demo site with CITIZEN_OTP_ON_SCREEN turned on."""
+    return sms.uses_console() and (settings.DEBUG or settings.CITIZEN_OTP_ON_SCREEN)
 
 
 def verify(request, code):

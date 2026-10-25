@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: City Corporation\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-24 15:24+0530\n"
+"POT-Creation-Date: 2026-10-25 15:32+0530\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: City Corporation team\n"
 "Language-Team: Hindi\n"
@@ -856,6 +856,9 @@ msgstr "OTP फिर से भेजें"
 
 msgid "Change number"
 msgstr "नंबर बदलें"
+
+msgid "Demo mode: no SMS is sent. Your OTP will be shown on the next screen."
+msgstr "डेमो मोड: कोई SMS नहीं भेजा जाता। आपका OTP अगली स्क्रीन पर दिखाया जाएगा।"
 
 msgid "Mobile number"
 msgstr "मोबाइल नंबर"

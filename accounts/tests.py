@@ -112,10 +112,19 @@ class LiveSiteLoginTests(TestCase):
         self.assertEqual(response.context['dev_code'], '')
 
     @override_settings(SMS_BACKEND='console', CITIZEN_OTP_ON_SCREEN=True)
+    def test_otp_on_screen_says_so_before_the_number_is_entered(self):
+        self.assertContains(self.client.get(reverse('accounts:login')), 'Demo mode: no SMS is sent.')
+
+    @override_settings(SMS_BACKEND='console')
+    def test_no_demo_note_when_the_switch_is_off(self):
+        self.assertNotContains(self.client.get(reverse('accounts:login')), 'Demo mode')
+
+    @override_settings(SMS_BACKEND='console', CITIZEN_OTP_ON_SCREEN=True)
     def test_otp_on_screen_shows_the_code_and_signs_the_citizen_in(self):
         with redirect_stdout(io.StringIO()):
             self.client.post(reverse('accounts:send_otp'), {'phone': '9876543210'})
         code = self.client.session[otp.DEV_CODE_KEY]
+        self.assertTrue(otp.shows_code_on_screen())
         page = self.client.get(reverse('accounts:login'))
         self.assertContains(page, f'<strong>{code}</strong>')
         response = self.client.post(reverse('accounts:verify_otp'), {'otp': code})

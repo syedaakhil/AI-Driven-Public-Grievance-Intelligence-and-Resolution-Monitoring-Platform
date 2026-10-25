@@ -34,6 +34,7 @@ def login_view(request):
         'waiting_phone': otp.mask(waiting['phone']) if waiting else '',
         'waiting_digits': waiting['phone'][3:] if waiting else '',
         'dev_code': request.session.get(otp.DEV_CODE_KEY, '') if waiting else '',
+        'otp_on_screen': otp.shows_code_on_screen(),
     })
 
 
