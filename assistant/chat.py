@@ -1,5 +1,6 @@
 """Turning one chat message into the assistant's answer (in the user's language; emails stay English)."""
 import logging
+import os
 
 from django.utils import translation
 from django.utils.translation import gettext as _, ngettext
@@ -7,8 +8,9 @@ from django.utils.translation import gettext as _, ngettext
 from . import brevo
 from .emails import render_table_email, result_rows
 from .intents import detect_intent
+from grievances.models import Complaint
+
 from .models import EmailLog
-from .ratelimit import allow
 from .search import EMAIL_ADDRESS_RE, Query
 from .sources import search_everything
 
@@ -17,14 +19,14 @@ logger = logging.getLogger(__name__)
 SESSION_KEY = 'assistant_last_query'
 SHOWN_IN_CHAT = 10
 MAX_EMAILED = 200
-EMAILS_PER_HOUR = 10
 
 
 def help_text():
     return _('Hi! I can search complaints and email them to the corporation inbox.\n'
              '• Search by name, ID or words: “Lakshmi”, “CC-2026-00042”, “pothole Anna Nagar”\n'
              '• Filter: “open complaints”, “resolved today”, “latest complaints”\n'
-             '• Email: “mail me this”, “email me the complaints of Ravi”')
+             '• Email: “mail me this”, “email me the complaints of Ravi”\n'
+             '• Files: “mail me CC-2026-00042” also attaches that complaint’s photo and documents')
 
 
 def suggestions():
@@ -68,10 +70,6 @@ def _email(request, query):
             query, used_previous = Query.from_dict(saved), True
         else:
             query = Query(recent=True)   # "send the data to my email" with nothing searched yet
-    if not allow(f'chat-email:{request.user.pk}', EMAILS_PER_HOUR, 3600):
-        return {'reply': _('You have asked for %(count)s emails in the last hour. Please try again later.')
-                % {'count': EMAILS_PER_HOUR}, 'results': [], 'total': 0, 'email': {'status': 'limited'}}
-
     described = query.describe()   # in the user's language, for the chat reply
     # The email itself is always in English, whatever language the site is shown in.
     with translation.override('en'):
@@ -86,15 +84,47 @@ def _email(request, query):
     if not results:
         return {'reply': _('No records match %(search)s, so no email was sent.') % {'search': described},
                 'results': [], 'total': 0, 'email': {'status': 'nothing'}}
+    files, missing = complaint_files(query.reference) if query.reference else ([], [])
     try:
-        brevo.send_email(subject, html, text, EmailLog.Kind.ON_DEMAND, record_count=len(results))
+        brevo.send_email(subject, html, text, EmailLog.Kind.ON_DEMAND, record_count=len(results),
+                         attachments=files)
     except brevo.EmailError as exc:
         return {'reply': _('❌ The email was not sent: %(reason)s') % {'reason': exc}, 'results': [], 'total': total,
                 'email': {'status': 'failed'}}
     typed = {address.casefold() for address in EMAIL_ADDRESS_RE.findall(query.text)} - {brevo.ONLY_RECIPIENT}
     reply = _('✅ Sent %(records)s (%(search)s) to %(address)s.') % {
         'records': _records(len(results)), 'search': described, 'address': brevo.ONLY_RECIPIENT}
+    if files:
+        reply += ' ' + ngettext('📎 %(count)s file attached.', '📎 %(count)s files attached.', len(files)) % {
+            'count': len(files)}
+    if missing:
+        reply += ' ' + _('These uploaded files are no longer stored, so they could not be attached: %(files)s.') % {
+            'files': ', '.join(missing)}
     if typed:
         reply += ' ' + _('(Emails only go to %(address)s; other addresses are ignored.)') % {
             'address': brevo.ONLY_RECIPIENT}
     return {'reply': reply, 'results': [], 'total': total, 'email': {'status': 'sent', 'to': brevo.ONLY_RECIPIENT}}
+
+
+def complaint_files(reference):
+    """
+    The uploaded photo and earlier complaint copy of one complaint, as ([(file name, bytes)], [missing
+    labels]). A file can be missing when the server's disk doesn't keep uploads (such as Vercel).
+    """
+    complaint = Complaint.objects.filter(reference__iexact=reference).first()
+    files, missing = [], []
+    if complaint is None:
+        return files, missing
+    for label, slug, upload in ((_('photo'), 'photo', complaint.attachment),
+                                (_('earlier complaint copy'), 'previous-copy', complaint.previous_copy)):
+        if not upload:
+            continue
+        try:
+            with upload.open('rb') as handle:
+                data = handle.read()
+        except OSError:
+            logger.warning('File of complaint %s is missing from storage: %s', complaint.reference, slug)
+            missing.append(label)
+            continue
+        files.append((f'{complaint.reference}-{slug}{os.path.splitext(upload.name)[1].lower()}', data))
+    return files, missing

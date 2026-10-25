@@ -1,5 +1,9 @@
+import base64
 import io
 import json
+import os
+import shutil
+import tempfile
 import urllib.error
 from datetime import date, datetime, timedelta, timezone as dt_timezone
 from unittest import mock
@@ -7,6 +11,7 @@ from zoneinfo import ZoneInfo
 
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
+from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.core.management.base import CommandError
@@ -370,13 +375,45 @@ class ChatApiTests(TestCase):
         urlopen.assert_not_called()
         self.assertEqual(data['email']['status'], 'nothing')
 
-    def test_email_requests_are_limited_per_hour(self):
+    def test_the_same_email_can_be_asked_for_again_and_again(self):
         with mock.patch('urllib.request.urlopen', return_value=BrevoReply()) as urlopen:
-            for _ in range(10):
-                self.say('mail me lakshmi complaints')
-            data = self.say('mail me lakshmi complaints').json()
-        self.assertEqual(urlopen.call_count, 10)
-        self.assertEqual(data['email']['status'], 'limited')
+            replies = [self.say('mail me lakshmi complaints').json() for _ in range(12)]
+        self.assertEqual(urlopen.call_count, 12)
+        self.assertTrue(all(reply['email']['status'] == 'sent' for reply in replies))
+
+    def test_mailing_a_complaint_number_attaches_its_files(self):
+        media = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, media, ignore_errors=True)
+        with override_settings(MEDIA_ROOT=media):
+            self.complaint.attachment.save('pothole.png', ContentFile(b'\x89PNG photo bytes'))
+            self.complaint.previous_copy.save('earlier.pdf', ContentFile(b'%PDF-1.4 copy'))
+            with mock.patch('urllib.request.urlopen', return_value=BrevoReply()) as urlopen:
+                data = self.say(f'mail me {self.complaint.reference}').json()
+        self.assertEqual(data['email']['status'], 'sent')
+        self.assertIn('2 files attached', data['reply'])
+        _, payload = sent_payload(urlopen)
+        self.assertEqual(payload['to'], [{'email': 'govermentowncorporation@gmail.com'}])
+        attached = {item['name']: base64.b64decode(item['content']) for item in payload['attachment']}
+        self.assertEqual(attached, {f'{self.complaint.reference}-photo.png': b'\x89PNG photo bytes',
+                                    f'{self.complaint.reference}-previous-copy.pdf': b'%PDF-1.4 copy'})
+
+    def test_a_file_missing_from_storage_is_reported_not_fatal(self):
+        media = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, media, ignore_errors=True)
+        with override_settings(MEDIA_ROOT=media):
+            self.complaint.attachment.save('pothole.png', ContentFile(b'photo'))
+            os.remove(self.complaint.attachment.path)   # as on Vercel, where uploads don't last
+            with mock.patch('urllib.request.urlopen', return_value=BrevoReply()) as urlopen:
+                data = self.say(f'email {self.complaint.reference}').json()
+        self.assertEqual(data['email']['status'], 'sent')
+        self.assertIn('no longer stored', data['reply'])
+        _, payload = sent_payload(urlopen)
+        self.assertNotIn('attachment', payload)
+
+    def test_searches_without_a_complaint_number_attach_nothing(self):
+        with mock.patch('urllib.request.urlopen', return_value=BrevoReply()) as urlopen:
+            self.say('mail me lakshmi complaints')
+        self.assertNotIn('attachment', sent_payload(urlopen)[1])
 
     def test_help(self):
         self.assertIn('I can search complaints', self.say('hi').json()['reply'])

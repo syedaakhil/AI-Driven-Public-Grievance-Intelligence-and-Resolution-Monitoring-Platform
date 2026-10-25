@@ -5,6 +5,7 @@ Every email goes to ONE address only: ONLY_RECIPIENT below. It is fixed in the c
 send_email() has no "to" parameter, a chat message can't change it, and .env can't redirect it
 (ADMIN_EMAIL must equal it, or nothing is sent). Every attempt is stored in EmailLog.
 """
+import base64
 import json
 import logging
 import urllib.error
@@ -33,18 +34,22 @@ def recipient():
     return ONLY_RECIPIENT
 
 
-def build_payload(subject, html, text):
+def build_payload(subject, html, text, attachments=()):
     if not settings.BREVO_API_KEY:
         raise EmailError('Email is not set up yet: add BREVO_API_KEY to .env.')
     if not settings.SENDER_EMAIL:
         raise EmailError('Email is not set up yet: add SENDER_EMAIL (a sender verified in Brevo) to .env.')
-    return {
+    payload = {
         'sender': {'name': settings.SENDER_NAME, 'email': settings.SENDER_EMAIL},
         'to': [{'email': recipient()}],
         'subject': subject,
         'htmlContent': html,
         'textContent': text,
     }
+    if attachments:
+        payload['attachment'] = [{'name': name, 'content': base64.b64encode(data).decode('ascii')}
+                                 for name, data in attachments]
+    return payload
 
 
 def check_only_recipient(payload):
@@ -83,11 +88,14 @@ def _post(payload):
         return {}
 
 
-def send_email(subject, html, text, kind, record_count=0):
-    """Send to the one allowed address. Returns the EmailLog; raises EmailError when not sent."""
+def send_email(subject, html, text, kind, record_count=0, attachments=()):
+    """
+    Send to the one allowed address, with optional (file name, bytes) attachments. Returns the
+    EmailLog; raises EmailError when not sent.
+    """
     log = EmailLog(kind=kind, recipient=ONLY_RECIPIENT, subject=subject[:200], record_count=record_count)
     try:
-        payload = build_payload(subject, html, text)
+        payload = build_payload(subject, html, text, attachments)
         check_only_recipient(payload)
         reply = _post(payload)
     except EmailError as exc:

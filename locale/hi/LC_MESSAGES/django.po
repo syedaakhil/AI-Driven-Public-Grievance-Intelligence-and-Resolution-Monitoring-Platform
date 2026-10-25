@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: City Corporation\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-25 15:32+0530\n"
+"POT-Creation-Date: 2026-10-25 15:44+0530\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: City Corporation team\n"
 "Language-Team: Hindi\n"
@@ -65,16 +65,23 @@ msgstr "OTP %(phone)s पर भेजा गया।"
 msgid "You have been signed out."
 msgstr "आप साइन आउट हो गए हैं।"
 
+#| msgid ""
+#| "Hi! I can search complaints and email them to the corporation inbox.\n"
+#| "• Search by name, ID or words: “Lakshmi”, “CC-2026-00042”, “pothole Anna Nagar”\n"
+#| "• Filter: “open complaints”, “resolved today”, “latest complaints”\n"
+#| "• Email: “mail me this”, “email me the complaints of Ravi”"
 msgid ""
 "Hi! I can search complaints and email them to the corporation inbox.\n"
 "• Search by name, ID or words: “Lakshmi”, “CC-2026-00042”, “pothole Anna Nagar”\n"
 "• Filter: “open complaints”, “resolved today”, “latest complaints”\n"
-"• Email: “mail me this”, “email me the complaints of Ravi”"
+"• Email: “mail me this”, “email me the complaints of Ravi”\n"
+"• Files: “mail me CC-2026-00042” also attaches that complaint’s photo and documents"
 msgstr ""
 "नमस्ते! मैं शिकायतें खोज सकता हूँ और उन्हें निगम के इनबॉक्स में ईमेल कर सकता हूँ।\n"
 "• नाम, ID या शब्दों से खोजें: “Lakshmi”, “CC-2026-00042”, “pothole Anna Nagar”\n"
 "• फ़िल्टर: “open complaints”, “resolved today”, “latest complaints”\n"
-"• ईमेल: “mail me this”, “मुझे ईमेल भेजो”, “email me the complaints of Ravi”"
+"• ईमेल: “mail me this”, “मुझे ईमेल भेजो”, “email me the complaints of Ravi”\n"
+"• फ़ाइलें: “mail me CC-2026-00042” उस शिकायत की फ़ोटो और दस्तावेज़ भी साथ भेजता है"
 
 msgid "Latest complaints"
 msgstr "नवीनतम शिकायतें"
@@ -107,10 +114,6 @@ msgid "Found %(records)s for %(search)s."
 msgstr "%(search)s के लिए %(records)s मिले।"
 
 #, python-format
-msgid "You have asked for %(count)s emails in the last hour. Please try again later."
-msgstr "आपने पिछले एक घंटे में %(count)s ईमेल माँगे हैं। कृपया बाद में फिर से प्रयास करें।"
-
-#, python-format
 msgid "No records match %(search)s, so no email was sent."
 msgstr "%(search)s से कोई रिकॉर्ड मेल नहीं खाता, इसलिए कोई ईमेल नहीं भेजा गया।"
 
@@ -123,8 +126,26 @@ msgid "✅ Sent %(records)s (%(search)s) to %(address)s."
 msgstr "✅ %(records)s (%(search)s) %(address)s पर भेजे गए।"
 
 #, python-format
+msgid "📎 %(count)s file attached."
+msgid_plural "📎 %(count)s files attached."
+msgstr[0] "📎 %(count)s फ़ाइल संलग्न की गई।"
+msgstr[1] "📎 %(count)s फ़ाइलें संलग्न की गईं।"
+
+#, python-format
+msgid "These uploaded files are no longer stored, so they could not be attached: %(files)s."
+msgstr "ये अपलोड की गई फ़ाइलें अब संग्रहीत नहीं हैं, इसलिए संलग्न नहीं की जा सकीं: %(files)s।"
+
+#, python-format
 msgid "(Emails only go to %(address)s; other addresses are ignored.)"
 msgstr "(ईमेल केवल %(address)s पर जाते हैं; दूसरे पते अनदेखे किए जाते हैं।)"
+
+#| msgid "Photo"
+msgid "photo"
+msgstr "फ़ोटो"
+
+#| msgid "Earlier complaint copy"
+msgid "earlier complaint copy"
+msgstr "पिछली शिकायत की प्रति"
 
 #, python-format
 msgid "status %(statuses)s"

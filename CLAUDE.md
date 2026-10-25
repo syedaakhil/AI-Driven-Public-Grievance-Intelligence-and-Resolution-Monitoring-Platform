@@ -89,6 +89,7 @@ Open pages through `runserver` on port 8000. VS Code Live Server (port 5500) can
     - It sends only to `brevo.ONLY_RECIPIENT` (`govermentowncorporation@gmail.com`).
     - `ADMIN_EMAIL` must equal that address, and `check_only_recipient()` guards the payload.
     - Every attempt is written to `EmailLog`. Never add a way to choose recipients.
+    - `send_email(..., attachments=[(name, bytes)])` attaches files. In the chat, an email request that names a complaint number ("mail me CC-2026-00042") attaches that complaint's photo and earlier copy (`chat.complaint_files`); a file missing from storage (uploads don't last on Vercel) is reported, not fatal. Chat emails have no hourly limit (only the 30-messages-a-minute chat limit).
   - **Daily report:** `reports.py` plus `manage.py send_daily_report [--force] [--dry-run]`.
     - It's due from 09:00 Asia/Kolkata.
     - `ReportRun` (one row per date) stops duplicates; a failed run is retried by the next run.
