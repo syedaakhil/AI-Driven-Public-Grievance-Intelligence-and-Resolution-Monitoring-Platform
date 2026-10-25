@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load ui i18n %}
+
+{% block title %}{% blocktranslate with name=employee.name %}Edit {{ name }} · City Corporation{% endblocktranslate %}{% endblock %}
+
+{% block content %}
+<div class="head">
+  <a class="link" href="{{ employee.get_absolute_url }}">{% icon 'arrow-left' 'sm' %}{% translate "Back to employee" %}</a>
+</div>
+
+<section class="card section" aria-labelledby="edit-title">
+  <h1 class="card__title" id="edit-title">{% blocktranslate with name=employee.name employee_id=employee.employee_id %}Edit {{ name }} ({{ employee_id }}){% endblocktranslate %}</h1>
+  <p class="muted small">{% translate "The employee ID never changes." %}</p>
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    <div class="form-grid">
+      {% include "partials/field.html" with field=form.name %}
+      {% include "partials/field.html" with field=form.department %}
+      {% include "partials/field.html" with field=form.designation %}
+      {% include "partials/field.html" with field=form.ward %}
+      {% include "partials/field.html" with field=form.phone %}
+      {% include "partials/field.html" with field=form.email %}
+      {% include "partials/field.html" with field=form.status %}
+      {% include "partials/field.html" with field=form.photo %}
+    </div>
+    <div class="actions">
+      <button type="submit" class="btn btn--primary">{% icon 'check' 'sm' %}{% translate "Save changes" %}</button>
+      <a class="btn btn--ghost" href="{{ employee.get_absolute_url }}">{% translate "Cancel" %}</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

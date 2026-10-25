@@ -1,6 +1,13 @@
 from django.contrib import admin
 
-from .models import Category, Complaint, ComplaintUpdate, Notice, Officer, SupportEnquiry, Ward
+from .models import (Category, Complaint, ComplaintUpdate, Department, EmployeeReport, Notice, Officer,
+                     SupportEnquiry, Ward, WorkAssignment)
+
+
+@admin.register(Department)
+class DepartmentAdmin(admin.ModelAdmin):
+    list_display = ['name']
+    search_fields = ['name']
 
 
 @admin.register(Category)
@@ -16,9 +23,29 @@ class WardAdmin(admin.ModelAdmin):
 
 @admin.register(Officer)
 class OfficerAdmin(admin.ModelAdmin):
-    list_display = ['name', 'designation', 'category', 'ward', 'email', 'is_active']
-    list_filter = ['category', 'ward', 'is_active']
-    search_fields = ['name', 'designation', 'email']
+    list_display = ['employee_id', 'name', 'designation', 'department', 'ward', 'status', 'date_joined']
+    list_filter = ['status', 'department', 'ward']
+    search_fields = ['employee_id', 'name', 'designation', 'email']
+    readonly_fields = ['employee_id']
+
+    def has_delete_permission(self, request, obj=None):
+        return False   # employees are deactivated (status "inactive"), never deleted, to keep history
+
+
+@admin.register(EmployeeReport)
+class EmployeeReportAdmin(admin.ModelAdmin):
+    list_display = ['employee', 'reason', 'status', 'reported_by', 'created_at']
+    list_filter = ['status', 'reason']
+    autocomplete_fields = ['employee']
+
+
+@admin.register(WorkAssignment)
+class WorkAssignmentAdmin(admin.ModelAdmin):
+    list_display = ['title', 'employee', 'complaint', 'priority', 'due_date', 'status', 'created_at']
+    list_filter = ['status', 'priority']
+    search_fields = ['title', 'employee__name', 'employee__employee_id', 'complaint__reference']
+    autocomplete_fields = ['employee', 'complaint']
+    readonly_fields = ['completed_at']
 
 
 class ComplaintUpdateInline(admin.TabularInline):

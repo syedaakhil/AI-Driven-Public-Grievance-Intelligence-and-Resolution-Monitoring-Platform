@@ -1,0 +1,58 @@
+{% load ui i18n %}{# Assign work / report forms for one employee. Inputs are written out so ids stay unique per employee. #}
+{% with eid=employee.employee_id %}
+<div class="taskforms">
+  {% if employee.status != 'inactive' %}
+  <details class="taskform"{% if open %} open{% endif %}>
+    <summary class="btn btn--primary btn--sm">{% icon 'list' 'sm' %}{% translate "Assign work" %}</summary>
+    <form method="post" action="{% url 'grievances:officer_assign' eid %}" class="taskform__body">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <div class="field">
+        <label for="ref-{{ eid }}">{% translate "Complaint ID (optional)" %}</label>
+        <input class="input" id="ref-{{ eid }}" name="complaint_ref" maxlength="20" list="open-complaints" autocomplete="off" placeholder="{% translate 'e.g. CC-2026-00042' %}">
+      </div>
+      <div class="field">
+        <label for="title-{{ eid }}">{% translate "Task" %}</label>
+        <input class="input" id="title-{{ eid }}" name="title" maxlength="120" placeholder="{% translate 'e.g. Inspect the drain on Gandhi Street' %}" aria-describedby="title-hint-{{ eid }}">
+        <p class="field__hint" id="title-hint-{{ eid }}">{% translate "Leave empty when you entered a complaint ID." %}</p>
+      </div>
+      <div class="taskform__row">
+        <div class="field">
+          <label for="priority-{{ eid }}">{% translate "Priority" %}</label>
+          <select class="select" id="priority-{{ eid }}" name="priority">
+            {% for value, label in assign_form.fields.priority.choices %}<option value="{{ value }}"{% if value == 'medium' %} selected{% endif %}>{{ label }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label for="due-{{ eid }}">{% translate "Due date" %}</label>
+          <input class="input" type="date" id="due-{{ eid }}" name="due_date">
+        </div>
+      </div>
+      <div class="field">
+        <label for="desc-{{ eid }}">{% translate "Instructions" %} <span class="opt">{% translate "(optional)" %}</span></label>
+        <textarea class="textarea" id="desc-{{ eid }}" name="description" rows="2" maxlength="1000"></textarea>
+      </div>
+      <button type="submit" class="btn btn--primary btn--sm">{% translate "Assign" %}</button>
+    </form>
+  </details>
+  {% endif %}
+  <details class="taskform">
+    <summary class="btn btn--ghost btn--sm">{% icon 'alert' 'sm' %}{% translate "Report a complaint" %}{% if employee.report_count %} <span class="count">{{ employee.report_count }}</span>{% endif %}</summary>
+    <form method="post" action="{% url 'grievances:officer_report' eid %}" class="taskform__body">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <div class="field">
+        <label for="reason-{{ eid }}">{% translate "Reason" %}</label>
+        <select class="select" id="reason-{{ eid }}" name="reason" required>
+          {% for value, label in report_form.fields.reason.choices %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label for="details-{{ eid }}">{% translate "Details" %}</label>
+        <textarea class="textarea" id="details-{{ eid }}" name="details" rows="3" minlength="10" maxlength="1000" required placeholder="{% translate 'What happened, and when?' %}"></textarea>
+      </div>
+      <button type="submit" class="btn btn--danger btn--sm">{% translate "Submit report" %}</button>
+    </form>
+  </details>
+</div>
+{% endwith %}

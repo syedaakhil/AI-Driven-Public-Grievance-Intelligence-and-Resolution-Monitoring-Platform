@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: City Corporation\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-25 15:48+0530\n"
+"POT-Creation-Date: 2026-10-25 16:48+0530\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: City Corporation team\n"
 "Language-Team: Hindi\n"
@@ -185,8 +185,8 @@ msgstr "होम"
 msgid "Filed complaint"
 msgstr "दर्ज शिकायत"
 
-msgid "Officers in charge"
-msgstr "प्रभारी अधिकारी"
+msgid "Employees"
+msgstr "कर्मचारी"
 
 msgid "Dataset"
 msgstr "डेटासेट"
@@ -196,6 +196,16 @@ msgstr "अवलोकन"
 
 msgid "Filed complaints"
 msgstr "दर्ज शिकायतें"
+
+#| msgid "Complaint details"
+msgid "Employee details"
+msgstr "कर्मचारी का विवरण"
+
+msgid "Edit employee"
+msgstr "कर्मचारी संपादित करें"
+
+msgid "Employee ID card"
+msgstr "कर्मचारी पहचान पत्र"
 
 msgid "Complaints dataset"
 msgstr "शिकायत डेटासेट"
@@ -301,8 +311,9 @@ msgstr "वार्ड"
 msgid "Status"
 msgstr "स्थिति"
 
-msgid "Officer in charge"
-msgstr "प्रभारी अधिकारी"
+#| msgid "Officer in charge"
+msgid "Employee in charge"
+msgstr "प्रभारी कर्मचारी"
 
 msgid "Note"
 msgstr "टिप्पणी"
@@ -364,23 +375,32 @@ msgstr "ID, नागरिक का नाम, तालुक या क्�
 msgid "Review"
 msgstr "समीक्षा"
 
-msgid "Resolution rate"
-msgstr "समाधान दर"
+#| msgid "Assigned or in progress"
+msgid "Assigned or available"
+msgstr "सौंपा गया या उपलब्ध"
 
-msgid "Assigned complaints"
-msgstr "सौंपी गई शिकायतें"
+msgid "Assigned"
+msgstr "सौंपी गई"
 
-msgid "Most open complaints"
-msgstr "सबसे अधिक खुली शिकायतें"
+msgid "Available"
+msgstr "उपलब्ध"
 
 msgid "Name (A–Z)"
 msgstr "नाम (A–Z)"
 
-msgid "Search officers"
-msgstr "अधिकारी खोजें"
+#| msgid "Most open complaints"
+msgid "Most open tasks"
+msgstr "सबसे अधिक खुले कार्य"
 
-msgid "Name, designation or area"
-msgstr "नाम, पद या क्षेत्र"
+msgid "Most open complaints"
+msgstr "सबसे अधिक खुली शिकायतें"
+
+#| msgid "Search help topics"
+msgid "Search employees"
+msgstr "कर्मचारी खोजें"
+
+msgid "Name, employee ID or ward"
+msgstr "नाम, कर्मचारी ID या वार्ड"
 
 msgid "All departments"
 msgstr "सभी विभाग"
@@ -388,11 +408,111 @@ msgstr "सभी विभाग"
 msgid "Department"
 msgstr "विभाग"
 
-msgid "Your name"
-msgstr "आपका नाम"
+msgid "Active and on leave"
+msgstr "सक्रिय और छुट्टी पर"
+
+#| msgid "Assigned"
+msgid "Assignment"
+msgstr "कार्य स्थिति"
+
+#| msgid "Full Name"
+msgid "Full name"
+msgstr "पूरा नाम"
+
+msgid "Designation"
+msgstr "पद"
+
+msgid "Mobile number"
+msgstr "मोबाइल नंबर"
 
 msgid "Email"
 msgstr "ईमेल"
+
+msgid "Photo"
+msgstr "फ़ोटो"
+
+msgid "e.g. Priya Raman"
+msgstr "जैसे प्रिया रमन"
+
+msgid "e.g. Assistant Engineer"
+msgstr "जैसे सहायक अभियंता"
+
+msgid "10-digit mobile number"
+msgstr "10 अंकों का मोबाइल नंबर"
+
+#| msgid "Choose a photo"
+msgid "Choose a department"
+msgstr "विभाग चुनें"
+
+#| msgid "Check a ward"
+msgid "Choose a ward"
+msgstr "वार्ड चुनें"
+
+#| msgid "Your name must have at least 2 characters."
+msgid "The name must have at least 2 characters."
+msgstr "नाम में कम से कम 2 अक्षर होने चाहिए।"
+
+#| msgid "Use letters, spaces, full stops, apostrophes or hyphens in your name."
+msgid "Use letters, spaces, full stops, apostrophes or hyphens in the name."
+msgstr "नाम में केवल अक्षर, रिक्त स्थान, पूर्ण विराम, एपॉस्ट्रॉफ़ी या हाइफ़न का उपयोग करें।"
+
+msgid "Enter the designation, for example Assistant Engineer."
+msgstr "पद दर्ज करें, जैसे सहायक अभियंता।"
+
+msgid "Reason"
+msgstr "कारण"
+
+#| msgid "Your details"
+msgid "Details"
+msgstr "विवरण"
+
+msgid "What happened, and when?"
+msgstr "क्या हुआ, और कब?"
+
+#| msgid "Choose a file"
+msgid "Choose a reason"
+msgstr "कारण चुनें"
+
+#| msgid "Please describe the problem in a little more detail (at least 20 characters)."
+msgid "Please describe what happened (at least 10 characters)."
+msgstr "कृपया बताएँ कि क्या हुआ (कम से कम 10 अक्षर)।"
+
+#| msgid "Complaint ID"
+msgid "Complaint ID (optional)"
+msgstr "शिकायत ID (वैकल्पिक)"
+
+msgid "e.g. CC-2026-00042"
+msgstr "जैसे CC-2026-00042"
+
+msgid "Task"
+msgstr "कार्य"
+
+msgid "Instructions"
+msgstr "निर्देश"
+
+#| msgid "Save update"
+msgid "Due date"
+msgstr "नियत तिथि"
+
+msgid "e.g. Inspect the drain on Gandhi Street"
+msgstr "जैसे गांधी स्ट्रीट की नाली का निरीक्षण करें"
+
+#, python-format
+msgid "No complaint with ID %(reference)s was found."
+msgstr "ID %(reference)s वाली कोई शिकायत नहीं मिली।"
+
+#| msgid "Complaint %(reference)s was deleted."
+msgid "Complaint %(reference)s is already resolved."
+msgstr "शिकायत %(reference)s पहले ही हल हो चुकी है।"
+
+msgid "Choose today or a later date."
+msgstr "आज या बाद की तिथि चुनें।"
+
+msgid "Describe the task, or enter an open complaint ID."
+msgstr "कार्य का वर्णन करें, या कोई खुली शिकायत ID दर्ज करें।"
+
+msgid "Your name"
+msgstr "आपका नाम"
 
 msgid "Topic"
 msgstr "विषय"
@@ -420,11 +540,18 @@ msgstr "संदेश कम से कम 15 अक्षरों का ह
 msgid "Ward %(number)s – %(name)s"
 msgstr "वार्ड %(number)s – %(name)s"
 
+#| msgid "Activity"
+msgid "Active"
+msgstr "सक्रिय"
+
+msgid "On leave"
+msgstr "छुट्टी पर"
+
+msgid "Inactive"
+msgstr "निष्क्रिय"
+
 msgid "Submitted"
 msgstr "दर्ज"
-
-msgid "Assigned"
-msgstr "सौंपी गई"
 
 msgid "In progress"
 msgstr "प्रगति पर"
@@ -476,6 +603,31 @@ msgstr "सुलभता या भाषा"
 
 msgid "Something else"
 msgstr "कुछ और"
+
+msgid "Absent from duty"
+msgstr "ड्यूटी से अनुपस्थित"
+
+msgid "Delayed work"
+msgstr "काम में देरी"
+
+msgid "Rude or improper behaviour"
+msgstr "असभ्य या अनुचित व्यवहार"
+
+msgid "Bribery or corruption"
+msgstr "रिश्वत या भ्रष्टाचार"
+
+msgid "Poor quality of work"
+msgstr "काम की खराब गुणवत्ता"
+
+msgid "Open"
+msgstr "खुली"
+
+#| msgid "Close"
+msgid "Closed"
+msgstr "बंद"
+
+msgid "Done"
+msgstr "पूरा"
 
 msgid "Water supply"
 msgstr "जल आपूर्ति"
@@ -597,6 +749,9 @@ msgstr "दर्ज करने की तिथि"
 msgid "Resolved on"
 msgstr "समाधान की तिथि"
 
+msgid "Nothing changed."
+msgstr "कुछ भी नहीं बदला।"
+
 #, python-format
 msgid "Complaint %(reference)s updated. The citizen was sent an SMS about the new status."
 msgstr "शिकायत %(reference)s अपडेट की गई। नागरिक को नई स्थिति के बारे में SMS भेजा गया।"
@@ -609,9 +764,6 @@ msgstr "शिकायत %(reference)s अपडेट की गई, ले�
 msgid "Complaint %(reference)s updated."
 msgstr "शिकायत %(reference)s अपडेट की गई।"
 
-msgid "Nothing changed."
-msgstr "कुछ भी नहीं बदला।"
-
 msgid "Tick “I understand this cannot be undone” to delete the complaint."
 msgstr "शिकायत हटाने के लिए “मैं समझता/समझती हूँ कि इसे वापस नहीं लिया जा सकता” पर टिक करें।"
 
@@ -619,19 +771,51 @@ msgstr "शिकायत हटाने के लिए “मैं सम�
 msgid "Complaint %(reference)s was deleted."
 msgstr "शिकायत %(reference)s हटा दी गई।"
 
+#, python-format
+msgid "%(name)s was added with employee ID %(employee_id)s."
+msgstr "%(name)s को कर्मचारी ID %(employee_id)s के साथ जोड़ा गया।"
+
+msgid "Please fix the highlighted fields."
+msgstr "कृपया चिह्नित फ़ील्ड ठीक करें।"
+
+#, python-format
+msgid "%(name)s (%(employee_id)s) was updated."
+msgstr "%(name)s (%(employee_id)s) अपडेट किया गया।"
+
+#, python-format
+msgid "%(name)s (%(employee_id)s) was deactivated. Their complaints and tasks are kept."
+msgstr "%(name)s (%(employee_id)s) को निष्क्रिय किया गया। उनकी शिकायतें और कार्य सुरक्षित रखे गए हैं।"
+
+#, python-format
+msgid "Your report about %(name)s (%(employee_id)s) was recorded."
+msgstr "%(name)s (%(employee_id)s) के बारे में आपकी रिपोर्ट दर्ज कर ली गई।"
+
+#| msgid "❌ The email was not sent: %(reason)s"
+msgid "The report was not saved: %(errors)s"
+msgstr "रिपोर्ट सहेजी नहीं गई: %(errors)s"
+
+#, python-format
+msgid "%(name)s is inactive, so work cannot be assigned."
+msgstr "%(name)s निष्क्रिय हैं, इसलिए कार्य नहीं सौंपा जा सकता।"
+
+#| msgid "❌ The email was not sent: %(reason)s"
+msgid "The work was not assigned: %(errors)s"
+msgstr "कार्य नहीं सौंपा गया: %(errors)s"
+
+#, python-format
+msgid "“%(title)s” was assigned to %(name)s."
+msgstr "“%(title)s” %(name)s को सौंपा गया।"
+
+#, python-format
+msgid "“%(title)s” is now %(status)s."
+msgstr "“%(title)s” अब %(status)s है।"
+
 msgid "Complaint IDs look like CC-2026-00042."
 msgstr "शिकायत ID इस तरह दिखती है: CC-2026-00042।"
 
 #, python-format
-msgid "No complaint with ID %(reference)s was found."
-msgstr "ID %(reference)s वाली कोई शिकायत नहीं मिली।"
-
-#, python-format
 msgid "Thank you. Your enquiry %(reference)s has been recorded."
 msgstr "धन्यवाद। आपकी पूछताछ %(reference)s दर्ज कर ली गई है।"
-
-msgid "Please fix the highlighted fields."
-msgstr "कृपया चिह्नित फ़ील्ड ठीक करें।"
 
 msgid "Register a complaint · City Corporation"
 msgstr "शिकायत दर्ज करें · नगर निगम"
@@ -874,12 +1058,6 @@ msgstr "नंबर बदलें"
 msgid "Demo mode: no SMS is sent. Your OTP will be shown on the next screen."
 msgstr "डेमो मोड: कोई SMS नहीं भेजा जाता। आपका OTP अगली स्क्रीन पर दिखाया जाएगा।"
 
-msgid "Mobile number"
-msgstr "मोबाइल नंबर"
-
-msgid "10-digit mobile number"
-msgstr "10 अंकों का मोबाइल नंबर"
-
 msgid "Send OTP"
 msgstr "OTP भेजें"
 
@@ -937,6 +1115,42 @@ msgstr "इस नंबर से साइन इन:"
 msgid "Sign out"
 msgstr "साइन आउट"
 
+#| msgid "Assigned"
+msgid "Assign work"
+msgstr "कार्य सौंपें"
+
+msgid "Leave empty when you entered a complaint ID."
+msgstr "शिकायत ID दर्ज करने पर इसे खाली छोड़ दें।"
+
+#| msgid "Assigned"
+msgid "Assign"
+msgstr "सौंपें"
+
+#| msgid "Register a complaint"
+msgid "Report a complaint"
+msgstr "शिकायत दर्ज करें"
+
+#| msgid "Submitted on"
+msgid "Submit report"
+msgstr "रिपोर्ट जमा करें"
+
+#| msgid "%(counter)s open complaint"
+#| msgid_plural "%(counter)s open complaints"
+msgid "Assigned · %(counter)s open task"
+msgid_plural "Assigned · %(counter)s open tasks"
+msgstr[0] "सौंपा गया · %(counter)s खुला कार्य"
+msgstr[1] "सौंपा गया · %(counter)s खुले कार्य"
+
+#| msgid "%(count)s record"
+#| msgid_plural "%(count)s records"
+msgid "%(counter)s overdue"
+msgid_plural "%(counter)s overdue"
+msgstr[0] "%(counter)s समय-सीमा पार"
+msgstr[1] "%(counter)s समय-सीमा पार"
+
+msgid "Call"
+msgstr "कॉल करें"
+
 msgid "City Corporation"
 msgstr "नगर निगम"
 
@@ -993,8 +1207,9 @@ msgstr "अभी तक कोई गतिविधि दर्ज नही�
 msgid "Update complaint"
 msgstr "शिकायत अपडेट करें"
 
-msgid "Filed by a citizen. Choose the category and ward to route it to the officer in charge."
-msgstr "नागरिक द्वारा दर्ज। इसे प्रभारी अधिकारी तक भेजने के लिए श्रेणी और वार्ड चुनें।"
+#| msgid "Filed by a citizen. Choose the category and ward to route it to the officer in charge."
+msgid "Filed by a citizen. Choose the category and ward to route it to an employee of that department."
+msgstr "नागरिक द्वारा दर्ज। इसे उस विभाग के कर्मचारी तक भेजने के लिए श्रेणी और वार्ड चुनें।"
 
 msgid "Save update"
 msgstr "अपडेट सहेजें"
@@ -1056,9 +1271,6 @@ msgstr "दर्ज"
 
 msgid "Attachments"
 msgstr "संलग्नक"
-
-msgid "Photo"
-msgstr "फ़ोटो"
 
 msgid "Earlier copy"
 msgstr "पिछली प्रति"
@@ -1218,9 +1430,6 @@ msgstr "विभाग इसे बंद करता है, और शि�
 
 msgid "Complaint ID"
 msgstr "शिकायत ID"
-
-msgid "e.g. CC-2026-00042"
-msgstr "जैसे CC-2026-00042"
 
 msgid "Check status"
 msgstr "स्थिति देखें"
@@ -1383,12 +1592,13 @@ msgstr "इसकी स्थिति अपडेट करें"
 msgid "Open it from the <a href=\"%(dataset_url)s\">Dataset</a>, assign an officer and record progress."
 msgstr "इसे <a href=\"%(dataset_url)s\">डेटासेट</a> से खोलें, अधिकारी सौंपें और प्रगति दर्ज करें।"
 
-msgid "Follow the officers"
-msgstr "अधिकारियों पर नज़र रखें"
+#| msgid "Follow the officers"
+msgid "Follow the employees"
+msgstr "कर्मचारियों पर नज़र रखें"
 
 #, python-format
-msgid "See each officer's open and resolved complaints in <a href=\"%(officers_url)s\">Officers in charge</a>."
-msgstr "<a href=\"%(officers_url)s\">प्रभारी अधिकारी</a> में हर अधिकारी की खुली और हल की गई शिकायतें देखें।"
+msgid "Add employees, assign work and see who is available in <a href=\"%(officers_url)s\">Employees</a>."
+msgstr "<a href=\"%(officers_url)s\">कर्मचारी</a> में कर्मचारी जोड़ें, कार्य सौंपें और देखें कि कौन उपलब्ध है।"
 
 msgid "Who can sign in to this dashboard?"
 msgstr "इस डैशबोर्ड में कौन साइन इन कर सकता है?"
@@ -1552,9 +1762,6 @@ msgstr "सांकेतिक वार्ड सीमाएँ · पैम
 msgid "Ward / zone"
 msgstr "वार्ड / क्षेत्र"
 
-msgid "Open"
-msgstr "खुली"
-
 msgid "Explore ward-wise data"
 msgstr "वार्ड-वार डेटा देखें"
 
@@ -1600,8 +1807,135 @@ msgstr "संबंधित समस्या दर्ज करें"
 msgid "All city news &amp; notices"
 msgstr "सभी नगर समाचार और सूचनाएँ"
 
-msgid "Officers in charge · City Corporation"
-msgstr "प्रभारी अधिकारी · नगर निगम"
+#| msgid "My complaints · City Corporation"
+msgid "%(name)s · Employees · City Corporation"
+msgstr "%(name)s · कर्मचारी · नगर निगम"
+
+#| msgid "Back to my complaints"
+msgid "Back to employees"
+msgstr "कर्मचारियों पर वापस जाएँ"
+
+#| msgid "View as"
+msgid "View ID card"
+msgstr "पहचान पत्र देखें"
+
+msgid "Edit"
+msgstr "संपादित करें"
+
+msgid "Employee ID"
+msgstr "कर्मचारी ID"
+
+#| msgid "Date range"
+msgid "Date joined"
+msgstr "कार्यभार ग्रहण की तिथि"
+
+msgid "Give work or report a problem"
+msgstr "कार्य सौंपें या समस्या की रिपोर्ट करें"
+
+#, python-format
+msgid "Open task (%(counter)s)"
+msgid_plural "Open tasks (%(counter)s)"
+msgstr[0] "खुला कार्य (%(counter)s)"
+msgstr[1] "खुले कार्य (%(counter)s)"
+
+#| msgid "Filed %(date)s"
+msgid "Due %(date)s"
+msgstr "नियत तिथि %(date)s"
+
+#| msgid "Overview"
+msgid "Overdue"
+msgstr "समय-सीमा पार"
+
+#| msgid "Works in progress"
+msgid "Mark in progress"
+msgstr "प्रगति पर चिह्नित करें"
+
+msgid "Mark done"
+msgstr "पूरा चिह्नित करें"
+
+msgid "No open tasks. This employee is available."
+msgstr "कोई खुला कार्य नहीं। यह कर्मचारी उपलब्ध है।"
+
+#, python-format
+msgid "Completed task (%(counter)s)"
+msgid_plural "Completed tasks (%(counter)s)"
+msgstr[0] "पूरा हुआ कार्य (%(counter)s)"
+msgstr[1] "पूरे हुए कार्य (%(counter)s)"
+
+#| msgid "Filed %(date)s"
+msgid "Done on %(date)s"
+msgstr "%(date)s को पूरा हुआ"
+
+#| msgid "No complaints yet."
+msgid "No completed tasks yet."
+msgstr "अभी तक कोई कार्य पूरा नहीं हुआ।"
+
+#| msgid "Filed complaints"
+msgid "Linked complaints"
+msgstr "जुड़ी हुई शिकायतें"
+
+#| msgid "No complaints in this period yet"
+msgid "No complaints are linked to this employee."
+msgstr "इस कर्मचारी से कोई शिकायत जुड़ी नहीं है।"
+
+#| msgid "filed %(date)s"
+msgid "Report filed (%(counter)s)"
+msgid_plural "Reports filed (%(counter)s)"
+msgstr[0] "दर्ज रिपोर्ट (%(counter)s)"
+msgstr[1] "दर्ज रिपोर्टें (%(counter)s)"
+
+#, python-format
+msgid "%(date)s · by %(who)s"
+msgstr "%(date)s · %(who)s द्वारा"
+
+#| msgid "No complaints have been filed by citizens yet."
+msgid "No reports have been filed against this employee."
+msgstr "इस कर्मचारी के विरुद्ध कोई रिपोर्ट दर्ज नहीं हुई है।"
+
+msgid "Deactivate employee"
+msgstr "कर्मचारी को निष्क्रिय करें"
+
+msgid "The employee is hidden from the list and gets no new work. Their complaints, tasks and reports are kept."
+msgstr "कर्मचारी सूची से छिप जाएगा और उसे नया कार्य नहीं मिलेगा। उसकी शिकायतें, कार्य और रिपोर्टें सुरक्षित रहेंगी।"
+
+msgid "Deactivate"
+msgstr "निष्क्रिय करें"
+
+#| msgid "Citizen help desk · City Corporation"
+msgid "Edit %(name)s · City Corporation"
+msgstr "%(name)s संपादित करें · नगर निगम"
+
+msgid "Back to employee"
+msgstr "कर्मचारी पर वापस जाएँ"
+
+#, python-format
+msgid "Edit %(name)s (%(employee_id)s)"
+msgstr "%(name)s (%(employee_id)s) संपादित करें"
+
+msgid "The employee ID never changes."
+msgstr "कर्मचारी ID कभी नहीं बदलती।"
+
+#| msgid "Date range"
+msgid "Save changes"
+msgstr "बदलाव सहेजें"
+
+msgid "Cancel"
+msgstr "रद्द करें"
+
+#| msgid "My complaints · City Corporation"
+msgid "ID card %(employee_id)s · City Corporation"
+msgstr "पहचान पत्र %(employee_id)s · नगर निगम"
+
+msgid "Print ID card"
+msgstr "पहचान पत्र प्रिंट करें"
+
+#, python-format
+msgid "Photo of %(name)s"
+msgstr "%(name)s की फ़ोटो"
+
+#| msgid "My complaints · City Corporation"
+msgid "Employees · City Corporation"
+msgstr "कर्मचारी · नगर निगम"
 
 msgid "View as"
 msgstr "इस रूप में देखें"
@@ -1612,38 +1946,53 @@ msgstr "कार्ड"
 msgid "Table"
 msgstr "तालिका"
 
-msgid "Add officer"
-msgstr "अधिकारी जोड़ें"
+msgid "Appoint employees, give them work, and see who is busy and who is available."
+msgstr "कर्मचारी नियुक्त करें, उन्हें कार्य दें, और देखें कि कौन व्यस्त है और कौन उपलब्ध।"
 
-msgid "Officers listed"
-msgstr "सूचीबद्ध अधिकारी"
+msgid "Add employee"
+msgstr "कर्मचारी जोड़ें"
 
-msgid "Complaints assigned"
-msgstr "सौंपी गई शिकायतें"
+msgid "An employee ID such as CC-EMP-123456 is created automatically."
+msgstr "CC-EMP-123456 जैसी कर्मचारी ID अपने-आप बनती है।"
 
-msgid "Average resolution rate"
-msgstr "औसत समाधान दर"
+#| msgid "JPG, JPEG, PNG or WEBP · up to 5 MB"
+msgid "JPG, PNG or WEBP, up to 5 MB. Shown on the ID card."
+msgstr "JPG, PNG या WEBP, 5 MB तक। पहचान पत्र पर दिखाई जाती है।"
 
-msgid "No officers have been added yet."
-msgstr "अभी तक कोई अधिकारी नहीं जोड़ा गया है।"
+msgid "Save employee"
+msgstr "कर्मचारी सहेजें"
 
-msgid "Add the first officer"
-msgstr "पहला अधिकारी जोड़ें"
+#| msgid "Works in progress"
+msgid "Working employees"
+msgstr "कार्यरत कर्मचारी"
 
-msgid "No officers match your search."
-msgstr "आपकी खोज से कोई अधिकारी मेल नहीं खाता।"
+msgid "Overdue tasks"
+msgstr "समय-सीमा पार कार्य"
 
-msgid "Resolution"
-msgstr "समाधान"
+msgid "No employees yet. Add the first one with the form above."
+msgstr "अभी कोई कर्मचारी नहीं। ऊपर दिए फ़ॉर्म से पहला कर्मचारी जोड़ें।"
 
-msgid "Contact"
-msgstr "संपर्क"
+#| msgid "No officers match your search."
+msgid "No employees match your search."
+msgstr "आपकी खोज से कोई कर्मचारी मेल नहीं खाता।"
 
-msgid "Resolution progress"
-msgstr "समाधान प्रगति"
+msgid "Employee"
+msgstr "कर्मचारी"
 
-msgid "View complaints"
-msgstr "शिकायतें देखें"
+msgid "Work"
+msgstr "कार्य"
+
+#| msgid "Reported"
+msgid "Reports"
+msgstr "रिपोर्टें"
+
+#| msgid "Action"
+msgid "Actions"
+msgstr "कार्रवाई"
+
+#| msgid "Open dataset"
+msgid "Open tasks"
+msgstr "खुले कार्य"
 
 msgid "Progress of your complaint with the City Corporation."
 msgstr "नगर निगम में आपकी शिकायत की प्रगति।"

@@ -31,7 +31,7 @@
         <dt>{% translate "Received through" %}</dt><dd>{{ complaint.get_channel_display }}</dd>
         <dt>{% translate "Filed on" %}</dt><dd>{{ complaint.created_at|date:"d M Y, h:i A" }}</dd>
         <dt>{% translate "Target time" %}</dt><dd>{{ complaint.category.target_time|tr|default:"—" }}</dd>
-        <dt>{% translate "Officer in charge" %}</dt><dd>{% if complaint.officer %}{{ complaint.officer.name }}, {{ complaint.officer.designation }}{% else %}{% translate "Not assigned yet" %}{% endif %}</dd>
+        <dt>{% translate "Employee in charge" %}</dt><dd>{% if complaint.officer %}<a href="{{ complaint.officer.get_absolute_url }}">{{ complaint.officer.name }}</a>, {{ complaint.officer.designation }} · <span class="mono">{{ complaint.officer.employee_id }}</span>{% else %}{% translate "Not assigned yet" %}{% endif %}</dd>
         <dt>{% translate "Citizen" %}</dt><dd>{{ complaint.citizen_name }} · {{ complaint.citizen_contact }}</dd>
         {% if complaint.citizen_address %}<dt>{% translate "Citizen address" %}</dt><dd>{{ complaint.citizen_address|linebreaksbr }}</dd>{% endif %}
         {% if complaint.impact %}<dt>{% translate "Effect on citizen" %}</dt><dd>{{ complaint.impact|linebreaksbr }}</dd>{% endif %}
@@ -75,7 +75,7 @@
       <form method="post" class="stack stack--tight mt-16">
         {% csrf_token %}
         {% if complaint.needs_review %}
-          <p class="muted small">{% translate "Filed by a citizen. Choose the category and ward to route it to the officer in charge." %}</p>
+          <p class="muted small">{% translate "Filed by a citizen. Choose the category and ward to route it to an employee of that department." %}</p>
         {% endif %}
         {% include "partials/field.html" with field=form.category %}
         {% include "partials/field.html" with field=form.ward %}

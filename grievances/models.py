@@ -1,6 +1,8 @@
+import secrets
+
 from django.conf import settings
 from django.core.validators import FileExtensionValidator
-from django.db import models, transaction
+from django.db import IntegrityError, models, transaction
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from django.urls import reverse
@@ -8,12 +10,24 @@ from django.utils import timezone
 from django.utils.translation import gettext, gettext_lazy as _
 
 
+class Department(models.Model):
+    """A corporation department; it handles one or more service categories and employs staff."""
+
+    name = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return gettext(self.name)   # Hindi version from reference_i18n.py when there is one
+
+
 class Category(models.Model):
     """A civic service that complaints are filed under, and the department that handles it."""
 
     slug = models.SlugField(unique=True)
     name = models.CharField(max_length=60)
-    department = models.CharField(max_length=100)
+    department = models.ForeignKey(Department, on_delete=models.PROTECT, related_name='categories')
     target_time = models.CharField(max_length=40, help_text='Target resolution time, e.g. "48 hours".')
     description = models.CharField(max_length=200, blank=True)
     icon = models.CharField(max_length=20, default='file')
@@ -42,20 +56,72 @@ class Ward(models.Model):
         return gettext('Ward %(number)s – %(name)s') % {'number': f'{self.number:02d}', 'name': gettext(self.name)}
 
 
+EMPLOYEE_ID_PREFIX = 'CC-EMP-'
+EMPLOYEE_ID_ATTEMPTS = 20
+
+
+def new_employee_id():
+    return f'{EMPLOYEE_ID_PREFIX}{secrets.randbelow(10 ** 6):06d}'
+
+
 class Officer(models.Model):
+    """
+    A corporation employee ("Employee" in the dashboard; the table and Complaint.officer keep the
+    old name). Never deleted: deactivating sets status to inactive, so complaints keep their history.
+    """
+
+    class Status(models.TextChoices):
+        ACTIVE = 'active', _('Active')
+        ON_LEAVE = 'on_leave', _('On leave')
+        INACTIVE = 'inactive', _('Inactive')
+
+    employee_id = models.CharField(max_length=13, unique=True, editable=False)
     name = models.CharField(max_length=80)
     designation = models.CharField(max_length=80)
-    category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name='officers')
+    department = models.ForeignKey(Department, on_delete=models.PROTECT, related_name='employees')
     ward = models.ForeignKey(Ward, on_delete=models.PROTECT, related_name='officers')
     email = models.EmailField(blank=True)
     phone = models.CharField(max_length=20, blank=True)
-    is_active = models.BooleanField(default=True)
+    photo = models.FileField(upload_to='employees/%Y/', blank=True,
+                             validators=[FileExtensionValidator(['jpg', 'jpeg', 'png', 'webp'])])
+    date_joined = models.DateField(default=timezone.localdate)
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.ACTIVE, db_index=True)
 
     class Meta:
         ordering = ['name']
+        verbose_name = 'employee'
 
     def __str__(self):
         return f'{self.name} ({self.designation})'
+
+    def save(self, *args, **kwargs):
+        if self.employee_id:
+            return super().save(*args, **kwargs)
+        # Random IDs can collide: skip ones already taken, and retry if another save wins the race.
+        for _attempt in range(EMPLOYEE_ID_ATTEMPTS):
+            self.employee_id = new_employee_id()
+            if type(self).objects.filter(employee_id=self.employee_id).exists():
+                continue
+            try:
+                with transaction.atomic():
+                    return super().save(*args, **kwargs)
+            except IntegrityError:
+                if not type(self).objects.filter(employee_id=self.employee_id).exists():
+                    raise
+        self.employee_id = ''
+        raise RuntimeError('Could not find a free employee ID.')
+
+    def get_absolute_url(self):
+        return reverse('grievances:officer_detail', args=[self.employee_id])
+
+    @property
+    def initial(self):
+        return self.name[:1].upper()
+
+    @property
+    def has_photo(self):
+        """False when no photo was uploaded, or when the server didn't keep the file (as on Vercel)."""
+        return bool(self.photo) and self.photo.storage.exists(self.photo.name)
 
 
 class Complaint(models.Model):
@@ -242,3 +308,86 @@ class SupportEnquiry(models.Model):
         if not self.reference:
             self.reference = f'SUP-{self.pk:05d}'
             type(self).objects.filter(pk=self.pk).update(reference=self.reference)
+
+
+class EmployeeReport(models.Model):
+    """A complaint about an employee, filed by a corporation admin."""
+
+    class Reason(models.TextChoices):
+        ABSENT = 'absent', _('Absent from duty')
+        DELAY = 'delay', _('Delayed work')
+        MISCONDUCT = 'misconduct', _('Rude or improper behaviour')
+        CORRUPTION = 'corruption', _('Bribery or corruption')
+        QUALITY = 'quality', _('Poor quality of work')
+        OTHER = 'other', _('Something else')
+
+    class Status(models.TextChoices):
+        OPEN = 'open', _('Open')
+        REVIEWED = 'reviewed', _('Reviewed')
+        CLOSED = 'closed', _('Closed')
+
+    employee = models.ForeignKey(Officer, on_delete=models.PROTECT, related_name='reports')
+    reason = models.CharField(max_length=20, choices=Reason.choices)
+    details = models.TextField()
+    reported_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,
+                                    blank=True, related_name='employee_reports')
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.OPEN, db_index=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.employee.employee_id}: {self.get_reason_display()}'
+
+
+class WorkAssignment(models.Model):
+    """A task given to an employee: an existing complaint, or free-form work."""
+
+    class Status(models.TextChoices):
+        ASSIGNED = 'assigned', _('Assigned')
+        IN_PROGRESS = 'in_progress', _('In progress')
+        DONE = 'done', _('Done')
+
+    OPEN_STATUSES = (Status.ASSIGNED, Status.IN_PROGRESS)
+
+    employee = models.ForeignKey(Officer, on_delete=models.PROTECT, related_name='assignments')
+    complaint = models.ForeignKey(Complaint, on_delete=models.SET_NULL, null=True, blank=True,
+                                  related_name='assignments')
+    title = models.CharField(max_length=120)
+    description = models.TextField(blank=True)
+    priority = models.CharField(max_length=10, choices=Complaint.Priority.choices,
+                                default=Complaint.Priority.MEDIUM)
+    due_date = models.DateField(null=True, blank=True)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.ASSIGNED, db_index=True)
+    assigned_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,
+                                    blank=True, related_name='work_assigned')
+    created_at = models.DateTimeField(default=timezone.now)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.employee.employee_id}: {self.title}'
+
+    def save(self, *args, **kwargs):
+        if self.status == self.Status.DONE and not self.completed_at:
+            self.completed_at = timezone.now()
+        elif self.status != self.Status.DONE:
+            self.completed_at = None
+        super().save(*args, **kwargs)
+
+    @property
+    def is_open(self):
+        return self.status in self.OPEN_STATUSES
+
+    @property
+    def is_overdue(self):
+        return self.is_open and self.due_date is not None and self.due_date < timezone.localdate()
+
+    @classmethod
+    def overdue_filter(cls, prefix=''):
+        """The same rule as `is_overdue`, as a queryset filter (prefix e.g. 'assignments__')."""
+        return (models.Q(**{f'{prefix}status__in': cls.OPEN_STATUSES})
+                & models.Q(**{f'{prefix}due_date__lt': timezone.localdate()}))

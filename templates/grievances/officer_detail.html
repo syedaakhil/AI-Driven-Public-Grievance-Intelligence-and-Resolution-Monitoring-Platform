@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load ui i18n %}
+
+{% block title %}{% blocktranslate with name=employee.name %}{{ name }} · Employees · City Corporation{% endblocktranslate %}{% endblock %}
+
+{% block content %}
+<div class="head">
+  <a class="link" href="{% url 'grievances:officers' %}">{% icon 'arrow-left' 'sm' %}{% translate "Back to employees" %}</a>
+</div>
+
+<section class="card section">
+  <div class="card__head">
+    <div class="person">
+      {% include "grievances/_employee_avatar.html" with size='xl' %}
+      <span>
+        <h1 class="head__title">{{ employee.name }}</h1>
+        <small>{{ employee.designation }} · <span class="mono">{{ employee.employee_id }}</span></small>
+      </span>
+    </div>
+    <div class="head__tools">
+      <a class="btn btn--ghost btn--sm" href="{% url 'grievances:officer_id_card' employee.employee_id %}">{% icon 'user' 'sm' %}{% translate "View ID card" %}</a>
+      <a class="btn btn--ghost btn--sm" href="{% url 'grievances:officer_edit' employee.employee_id %}">{% icon 'settings' 'sm' %}{% translate "Edit" %}</a>
+      {% include "grievances/_employee_contact.html" %}
+    </div>
+  </div>
+  <div>{% include "grievances/_employee_badge.html" %}</div>
+  <dl class="facts">
+    <dt>{% translate "Employee ID" %}</dt><dd class="mono">{{ employee.employee_id }}</dd>
+    <dt>{% translate "Department" %}</dt><dd>{{ employee.department|tr }}</dd>
+    <dt>{% translate "Ward" %}</dt><dd>{{ employee.ward }} · {{ employee.ward.area|tr }}</dd>
+    <dt>{% translate "Status" %}</dt><dd>{{ employee.get_status_display }}</dd>
+    <dt>{% translate "Date joined" %}</dt><dd>{{ employee.date_joined|date:"d M Y" }}</dd>
+    <dt>{% translate "Mobile number" %}</dt><dd>{{ employee.phone|default:"—" }}</dd>
+    <dt>{% translate "Email" %}</dt><dd>{{ employee.email|default:"—" }}</dd>
+  </dl>
+</section>
+
+<datalist id="open-complaints">
+  {% for complaint in open_complaints %}<option value="{{ complaint.reference }}">{{ complaint.title|truncatechars:60 }}</option>{% endfor %}
+</datalist>
+
+<section class="card section" aria-labelledby="give-work-title">
+  <h2 class="card__title" id="give-work-title">{% translate "Give work or report a problem" %}</h2>
+  {% include "grievances/_employee_actions.html" with open=True %}
+</section>
+
+<div class="split split--even">
+  <section class="card section" aria-labelledby="open-tasks-title">
+    <h2 class="card__title" id="open-tasks-title">{% blocktranslate count counter=open_assignments|length %}Open task ({{ counter }}){% plural %}Open tasks ({{ counter }}){% endblocktranslate %}</h2>
+    {% if open_assignments %}
+      <ul class="tasks">
+        {% for task in open_assignments %}
+          <li class="task{% if task.is_overdue %} task--overdue{% endif %}">
+            <div class="task__top">
+              <strong>{{ task.title }}</strong>
+              <span class="badge badge--{{ task.priority }}">{{ task.get_priority_display }}</span>
+            </div>
+            <p class="task__meta">
+              <span class="badge badge--{% if task.status == 'in_progress' %}in_progress{% else %}assigned{% endif %}">{{ task.get_status_display }}</span>
+              {% if task.due_date %}<span>{% blocktranslate with date=task.due_date|date:"d M Y" %}Due {{ date }}{% endblocktranslate %}</span>{% endif %}
+              {% if task.is_overdue %}<span class="badge badge--high">{% translate "Overdue" %}</span>{% endif %}
+              {% if task.complaint %}<a href="{{ task.complaint.get_absolute_url }}">{{ task.complaint.reference }}</a>{% endif %}
+            </p>
+            {% if task.description %}<p class="task__text">{{ task.description }}</p>{% endif %}
+            <form method="post" action="{% url 'grievances:assignment_status' task.pk %}" class="task__actions">
+              {% csrf_token %}
+              {% if task.status == 'assigned' %}<button type="submit" name="status" value="in_progress" class="btn btn--ghost btn--sm">{% translate "Mark in progress" %}</button>{% endif %}
+              <button type="submit" name="status" value="done" class="btn btn--primary btn--sm">{% icon 'check' 'sm' %}{% translate "Mark done" %}</button>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted small">{% translate "No open tasks. This employee is available." %}</p>
+    {% endif %}
+  </section>
+
+  <section class="card section" aria-labelledby="done-tasks-title">
+    <h2 class="card__title" id="done-tasks-title">{% blocktranslate count counter=done_assignments|length %}Completed task ({{ counter }}){% plural %}Completed tasks ({{ counter }}){% endblocktranslate %}</h2>
+    {% if done_assignments %}
+      <ul class="mini-list">
+        {% for task in done_assignments %}
+          <li><span><strong>{{ task.title }}</strong><small>{% blocktranslate with date=task.completed_at|date:"d M Y" %}Done on {{ date }}{% endblocktranslate %}{% if task.complaint %} · {{ task.complaint.reference }}{% endif %}</small></span></li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted small">{% translate "No completed tasks yet." %}</p>
+    {% endif %}
+  </section>
+</div>
+
+<div class="split split--even">
+  <section class="card section" aria-labelledby="complaints-title">
+    <h2 class="card__title" id="complaints-title">{% translate "Linked complaints" %}</h2>
+    {% if complaints %}
+      <ul class="mini-list">
+        {% for complaint in complaints %}
+          <li><a href="{{ complaint.get_absolute_url }}"><span><strong>{{ complaint.reference }} · {{ complaint.title }}</strong><small>{% if complaint.category %}{{ complaint.category.name|tr }} · {% endif %}{{ complaint.created_at|date:"d M Y" }}</small></span><span class="badge badge--{{ complaint.status }}">{{ complaint.get_status_display }}</span></a></li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted small">{% translate "No complaints are linked to this employee." %}</p>
+    {% endif %}
+  </section>
+
+  <section class="card section" aria-labelledby="reports-title">
+    <h2 class="card__title" id="reports-title">{% blocktranslate count counter=reports|length %}Report filed ({{ counter }}){% plural %}Reports filed ({{ counter }}){% endblocktranslate %}</h2>
+    {% if reports %}
+      <ul class="mini-list">
+        {% for report in reports %}
+          <li><span><strong>{{ report.get_reason_display }}</strong><small>{{ report.details }}</small><small>{% blocktranslate with date=report.created_at|date:"d M Y" who=report.reported_by.get_username|default:"—" %}{{ date }} · by {{ who }}{% endblocktranslate %}</small></span><span class="badge badge--plain">{{ report.get_status_display }}</span></li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted small">{% translate "No reports have been filed against this employee." %}</p>
+    {% endif %}
+  </section>
+</div>
+
+{% if employee.status != 'inactive' %}
+<section class="card card--danger section" aria-labelledby="deactivate-title">
+  <h2 class="card__title" id="deactivate-title">{% translate "Deactivate employee" %}</h2>
+  <p class="muted small">{% translate "The employee is hidden from the list and gets no new work. Their complaints, tasks and reports are kept." %}</p>
+  <form method="post" action="{% url 'grievances:officer_deactivate' employee.employee_id %}" class="actions actions--tight">
+    {% csrf_token %}
+    <button type="submit" class="btn btn--danger btn--sm">{% translate "Deactivate" %}</button>
+  </form>
+</section>
+{% endif %}
+{% endblock %}

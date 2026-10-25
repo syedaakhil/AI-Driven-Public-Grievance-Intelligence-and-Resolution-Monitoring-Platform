@@ -119,4 +119,9 @@
     field.addEventListener('input', update);
     update();
   });
+
+  // Print buttons (the employee ID card page)
+  document.querySelectorAll('[data-print]').forEach(function (button) {
+    button.addEventListener('click', function () { window.print(); });
+  });
 })();

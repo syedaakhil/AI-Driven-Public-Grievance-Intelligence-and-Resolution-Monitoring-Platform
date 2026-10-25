@@ -1,0 +1,1 @@
+{% if employee.has_photo %}<img class="person__avatar{% if size %} person__avatar--{{ size }}{% endif %} person__photo" src="{% url 'grievances:officer_photo' employee.employee_id %}" alt="">{% else %}<span class="person__avatar{% if size %} person__avatar--{{ size }}{% endif %}" aria-hidden="true">{{ employee.initial }}</span>{% endif %}

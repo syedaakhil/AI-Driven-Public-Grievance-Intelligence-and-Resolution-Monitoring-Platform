@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 MAIN_MENU = [
     ('home', 'grievances:home', _('Home'), 'home', ''),
     ('file', 'grievances:complaint_create', _('Filed complaint'), 'file', ''),
-    ('officers', 'grievances:officers', _('Officers in charge'), 'building', ''),
+    ('officers', 'grievances:officers', _('Employees'), 'building', ''),
     ('dataset', 'grievances:complaint_list', _('Dataset'), 'table', ''),
 ]
 
@@ -16,7 +16,10 @@ MAIN_MENU = [
 PAGES = {
     'home': ('home', _('Overview')),
     'complaint_create': ('file', _('Filed complaints')),
-    'officers': ('officers', _('Officers in charge')),
+    'officers': ('officers', _('Employees')),
+    'officer_detail': ('officers', _('Employee details')),
+    'officer_edit': ('officers', _('Edit employee')),
+    'officer_id_card': ('officers', _('Employee ID card')),
     'complaint_list': ('dataset', _('Complaints dataset')),
     'complaint_detail': ('dataset', _('Complaint details')),
     'help_desk': ('help_desk', _('Citizen help desk')),

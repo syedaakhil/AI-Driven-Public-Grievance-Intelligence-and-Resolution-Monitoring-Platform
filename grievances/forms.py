@@ -3,10 +3,14 @@ import re
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db.models import Case, IntegerField, Q, Value, When
+from django.utils import timezone
 from django.utils.text import Truncator
 from django.utils.translation import gettext, gettext_lazy as _
 
-from .models import Category, Complaint, Officer, SupportEnquiry, Ward
+from accounts.otp import normalize_phone
+
+from .models import (Category, Complaint, Department, EmployeeReport, Officer, SupportEnquiry, Ward,
+                     WorkAssignment)
 
 NAME_RE = re.compile(r"^[A-Za-z஀-௿ऀ-ॿ .'-]+$")
 PHOTO_TYPES = {'image/jpeg', 'image/png', 'image/webp'}
@@ -178,10 +182,10 @@ class StatusUpdateForm(forms.Form):
     ward = forms.ModelChoiceField(Ward.objects.all(), required=False, empty_label=_('Not assigned'), label=_('Ward'))
     status = forms.ChoiceField(choices=Complaint.Status.choices, label=_('Status'))
     officer = forms.ModelChoiceField(
-        queryset=Officer.objects.filter(is_active=True).select_related('category', 'ward'),
+        queryset=Officer.objects.exclude(status=Officer.Status.INACTIVE).select_related('ward'),
         required=False,
         empty_label=_('Not assigned'),
-        label=_('Officer in charge'),
+        label=_('Employee in charge'),
     )
     note = forms.CharField(
         required=False, max_length=1000, label=_('Note'),
@@ -194,6 +198,7 @@ class StatusUpdateForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['officer'].label_from_instance = lambda employee: f'{employee.name} · {employee.employee_id}'
         style_fields(self)
 
 
@@ -275,24 +280,201 @@ class FiledComplaintFilterForm(forms.Form):
 
 
 class OfficerFilterForm(forms.Form):
+    """Search and filters on the Employees page."""
+
+    ASSIGNMENT_CHOICES = [('', _('Assigned or available')), ('assigned', _('Assigned')),
+                          ('available', _('Available'))]
     SORTS = [
-        ('rate', _('Resolution rate')),
-        ('assigned', _('Assigned complaints')),
-        ('open', _('Most open complaints')),
         ('name', _('Name (A–Z)')),
+        ('tasks', _('Most open tasks')),
+        ('complaints', _('Most open complaints')),
+        ('newest', _('Newest first')),
     ]
 
-    q = forms.CharField(required=False, label=_('Search officers'), widget=forms.TextInput(
-        attrs={'placeholder': _('Name, designation or area'), 'type': 'search'}))
-    category = forms.ModelChoiceField(Category.objects.all(), required=False, empty_label=_('All departments'),
-                                      label=_('Department'))
-    ward = forms.ModelChoiceField(Ward.objects.all(), required=False, empty_label=_('All wards'))
+    q = forms.CharField(required=False, label=_('Search employees'), widget=forms.TextInput(
+        attrs={'placeholder': _('Name, employee ID or ward'), 'type': 'search'}))
+    department = forms.ModelChoiceField(Department.objects.all(), required=False, empty_label=_('All departments'),
+                                        label=_('Department'))
+    ward = forms.ModelChoiceField(Ward.objects.all(), required=False, empty_label=_('All wards'), label=_('Ward'))
+    status = forms.ChoiceField(choices=[('', _('Active and on leave'))] + Officer.Status.choices, required=False,
+                               label=_('Status'))
+    assignment = forms.ChoiceField(choices=ASSIGNMENT_CHOICES, required=False, label=_('Assignment'))
     sort = forms.ChoiceField(choices=SORTS, required=False, label=_('Sort by'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['category'].label_from_instance = lambda category: gettext(category.department)
         style_fields(self)
+
+    def filter(self, queryset):
+        """Expects the open_tasks annotation from views.employee_queryset()."""
+        data = self.cleaned_data if self.is_valid() else {}
+        q = data.get('q', '').strip()
+        if q:
+            ward_number = q.lower().removeprefix('ward').strip()
+            ward_match = Q(ward__name__icontains=q) | Q(ward__area__icontains=q)
+            if ward_number.isdigit():
+                ward_match |= Q(ward__number=int(ward_number))
+            queryset = queryset.filter(Q(name__icontains=q) | Q(employee_id__icontains=q) | ward_match)
+        for name in ('department', 'ward'):
+            if data.get(name):
+                queryset = queryset.filter(**{name: data[name]})
+        if data.get('status'):
+            queryset = queryset.filter(status=data['status'])
+        else:
+            queryset = queryset.exclude(status=Officer.Status.INACTIVE)
+        if data.get('assignment') == 'assigned':
+            queryset = queryset.filter(open_tasks__gt=0)
+        elif data.get('assignment') == 'available':
+            queryset = queryset.filter(open_tasks=0)
+        sort = data.get('sort') or 'name'
+        if sort == 'tasks':
+            return queryset.order_by('-open_tasks', 'name')
+        if sort == 'complaints':
+            return queryset.order_by('-open_complaints', 'name')
+        if sort == 'newest':
+            return queryset.order_by('-date_joined', '-id')
+        return queryset.order_by('name')
+
+
+class EmployeeForm(forms.ModelForm):
+    """Add (and edit) an employee. The employee ID is made automatically and never changes."""
+
+    class Meta:
+        model = Officer
+        fields = ['name', 'department', 'designation', 'ward', 'phone', 'email', 'photo']
+        labels = {'name': _('Full name'), 'department': _('Department'), 'designation': _('Designation'),
+                  'ward': _('Ward'), 'phone': _('Mobile number'), 'email': _('Email'), 'photo': _('Photo')}
+        widgets = {
+            'name': forms.TextInput(attrs={'autocomplete': 'off', 'placeholder': _('e.g. Priya Raman')}),
+            'designation': forms.TextInput(attrs={'placeholder': _('e.g. Assistant Engineer')}),
+            'phone': forms.TextInput(attrs={'inputmode': 'tel', 'placeholder': _('10-digit mobile number')}),
+            'email': forms.EmailInput(attrs={'placeholder': 'name@example.com'}),
+            'photo': forms.ClearableFileInput(attrs={'accept': 'image/jpeg,image/png,image/webp'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['department'].empty_label = _('Choose a department')
+        self.fields['ward'].empty_label = _('Choose a ward')
+        style_fields(self)
+
+    def clean_name(self):
+        name = ' '.join(self.cleaned_data['name'].split())
+        if len(name) < 2:
+            raise ValidationError(gettext('The name must have at least 2 characters.'))
+        if not NAME_RE.match(name):
+            raise ValidationError(gettext('Use letters, spaces, full stops, apostrophes or hyphens in the name.'))
+        return name
+
+    def clean_designation(self):
+        designation = ' '.join(self.cleaned_data['designation'].split())
+        if len(designation) < 2:
+            raise ValidationError(gettext('Enter the designation, for example Assistant Engineer.'))
+        return designation
+
+    def clean_phone(self):
+        phone = self.cleaned_data['phone'].strip()
+        if not phone:
+            return ''
+        normalized = normalize_phone(phone)
+        if not normalized:
+            raise ValidationError(gettext('Enter a valid 10-digit mobile number starting with 6, 7, 8 or 9.'))
+        return normalized
+
+    def clean_photo(self):
+        return _check_upload(self.cleaned_data.get('photo'), PHOTO_TYPES, gettext('JPG, JPEG, PNG or WEBP'))
+
+
+class EmployeeEditForm(EmployeeForm):
+    class Meta(EmployeeForm.Meta):
+        fields = EmployeeForm.Meta.fields + ['status']
+        labels = {**EmployeeForm.Meta.labels, 'status': _('Status')}
+
+
+class EmployeeReportForm(forms.ModelForm):
+    """A complaint about an employee."""
+
+    class Meta:
+        model = EmployeeReport
+        fields = ['reason', 'details']
+        labels = {'reason': _('Reason'), 'details': _('Details')}
+        widgets = {'details': forms.Textarea(attrs={'rows': 3, 'maxlength': 1000,
+                                                    'placeholder': _('What happened, and when?')})}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['reason'].choices = [('', gettext('Choose a reason'))] + list(EmployeeReport.Reason.choices)
+        style_fields(self)
+
+    def clean_details(self):
+        details = self.cleaned_data['details'].strip()
+        if len(details) < 10:
+            raise ValidationError(gettext('Please describe what happened (at least 10 characters).'))
+        return details
+
+
+class WorkAssignmentForm(forms.ModelForm):
+    """
+    Give an employee work: an open complaint (typed or picked by its ID) or a free-form task.
+    For a complaint the title can be left empty; it is taken from the complaint.
+    """
+
+    complaint_ref = forms.CharField(
+        required=False, max_length=20, label=_('Complaint ID (optional)'),
+        widget=forms.TextInput(attrs={'list': 'open-complaints', 'autocomplete': 'off',
+                                      'placeholder': _('e.g. CC-2026-00042')}))
+
+    class Meta:
+        model = WorkAssignment
+        fields = ['title', 'description', 'priority', 'due_date']
+        labels = {'title': _('Task'), 'description': _('Instructions'), 'priority': _('Priority'),
+                  'due_date': _('Due date')}
+        widgets = {
+            'title': forms.TextInput(attrs={'placeholder': _('e.g. Inspect the drain on Gandhi Street')}),
+            'description': forms.Textarea(attrs={'rows': 2, 'maxlength': 1000}),
+            'due_date': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['title'].required = False
+        self.complaint = None
+        style_fields(self)
+
+    def clean_complaint_ref(self):
+        reference = self.cleaned_data['complaint_ref'].strip().upper()
+        if not reference:
+            return ''
+        self.complaint = Complaint.objects.filter(reference=reference).first()
+        if self.complaint is None:
+            raise ValidationError(gettext('No complaint with ID %(reference)s was found.') % {'reference': reference})
+        if not self.complaint.is_open:
+            raise ValidationError(gettext('Complaint %(reference)s is already resolved.') % {'reference': reference})
+        return reference
+
+    def clean_due_date(self):
+        due = self.cleaned_data.get('due_date')
+        if due and due < timezone.localdate():
+            raise ValidationError(gettext('Choose today or a later date.'))
+        return due
+
+    def clean(self):
+        data = super().clean()
+        data['title'] = ' '.join((data.get('title') or '').split())
+        if not data['title']:
+            if self.complaint is not None:
+                data['title'] = Truncator(f'{self.complaint.reference}: {self.complaint.title}').chars(120)
+            elif not self.errors.get('complaint_ref'):
+                self.add_error('title', gettext('Describe the task, or enter an open complaint ID.'))
+        return data
+
+    def save(self, commit=True):
+        assignment = super().save(commit=False)
+        assignment.title = self.cleaned_data['title']
+        assignment.complaint = self.complaint
+        if commit:
+            assignment.save()
+        return assignment
 
 
 class SupportEnquiryForm(forms.ModelForm):

@@ -11,15 +11,20 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.staticfiles import finders
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import Client, TestCase, override_settings
+from django.db import connection
+from django.db.migrations.executor import MigrationExecutor
+from django.test.utils import CaptureQueriesContext
+from django.test import Client, TestCase, TransactionTestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 
 from accounts.decorators import CITIZEN_SESSION_KEY
 
-from . import services
+from . import models as grievance_models, services
 from .forms import CitizenComplaintForm
 
-from .models import Category, Complaint, ComplaintUpdate, Notice, Officer, SupportEnquiry, Ward
+from .models import (Category, Complaint, ComplaintUpdate, Department, EmployeeReport, Notice, Officer,
+                     SupportEnquiry, Ward, WorkAssignment)
 
 
 def sign_in_admin(client):
@@ -65,7 +70,7 @@ class PageTests(DashboardTestCase):
 
     def test_empty_states(self):
         self.assertContains(self.client.get(reverse('grievances:complaint_list')), 'No complaints yet.')
-        self.assertContains(self.client.get(reverse('grievances:officers')), 'No officers have been added yet.')
+        self.assertContains(self.client.get(reverse('grievances:officers')), 'No employees yet.')
         self.assertContains(self.client.get(reverse('grievances:home')), 'No notices published yet.')
 
 
@@ -324,7 +329,7 @@ class CitizenRegistrationTests(TestCase):
         complaint = Complaint.objects.get()
         self.assertTrue(complaint.filed_by_citizen)
         roads, ward = Category.objects.get(slug='roads'), Ward.objects.get(number=1)
-        officer = Officer.objects.create(name='Kavitha R', designation='Assistant Engineer', category=roads, ward=ward)
+        officer = Officer.objects.create(name='Kavitha R', designation='Assistant Engineer', department=roads.department, ward=ward)
         self.client.post(reverse('accounts:logout'))
         sign_in_admin(self.client)
 
@@ -627,7 +632,7 @@ class StatusSmsTests(DashboardTestCase):
 
     def test_automatic_assignment_counts_as_a_status_change(self):
         complaint = self.citizen_complaint(category=None, ward=None, status='submitted')
-        Officer.objects.create(name='Kavitha R', designation='Assistant Engineer', category=self.water, ward=self.ward)
+        Officer.objects.create(name='Kavitha R', designation='Assistant Engineer', department=self.water.department, ward=self.ward)
         _, sent = self.update(complaint, status='submitted', category=self.water.pk, ward=self.ward.pk)
         self.assertIn(f'Your complaint {complaint.reference} is now Assigned. - City Corporation', sent)
 
@@ -714,26 +719,44 @@ class DashboardFilterTests(DashboardTestCase):
         self.assertEqual(self.listed('complaint_create', q='ravi'), [second])
         self.assertEqual(self.listed('complaint_create', sort='oldest'), [first, second])
 
-    def test_officers_page_filters_and_sorts(self):
+    def test_employees_page_searches_filters_and_sorts(self):
         ward2 = Ward.objects.get(number=2)
-        busy = Officer.objects.create(name='Zara P', designation='Assistant Engineer', category=self.water, ward=self.ward)
-        idle = Officer.objects.create(name='Arun V', designation='Junior Engineer', category=self.roads, ward=ward2)
-        self.make_complaint(officer=busy, status='resolved')
+        busy = Officer.objects.create(name='Zara P', designation='Assistant Engineer', department=self.water.department,
+                                      ward=self.ward)
+        idle = Officer.objects.create(name='Arun V', designation='Junior Engineer', department=self.roads.department,
+                                      ward=ward2)
+        away = Officer.objects.create(name='Meena S', designation='Clerk', department=self.roads.department,
+                                      ward=ward2, status=Officer.Status.ON_LEAVE)
+        gone = Officer.objects.create(name='Old N', designation='Clerk', department=self.roads.department,
+                                      ward=ward2, status=Officer.Status.INACTIVE)
+        WorkAssignment.objects.create(employee=busy, title='Fix the leak')
+        WorkAssignment.objects.create(employee=busy, title='Old job', status=WorkAssignment.Status.DONE)
         self.make_complaint(officer=busy)
-        officers = lambda **params: [o.name for o in self.client.get(reverse('grievances:officers'), params).context['officers']]
-        self.assertEqual(officers(), ['Zara P', 'Arun V'])               # resolution rate, unassigned last
-        self.assertEqual(officers(sort='name'), ['Arun V', 'Zara P'])
-        self.assertEqual(officers(sort='assigned'), ['Zara P', 'Arun V'])
-        self.assertEqual(officers(sort='open'), ['Zara P', 'Arun V'])
-        self.assertEqual(officers(category=self.roads.pk), ['Arun V'])
-        self.assertEqual(officers(ward=self.ward.pk), ['Zara P'])
-        self.assertEqual(officers(q='junior'), ['Arun V'])
-        self.assertEqual(officers(sort='bogus'), ['Zara P', 'Arun V'])   # invalid sort falls back
+
+        def names(**params):
+            return [e.name for e in self.client.get(reverse('grievances:officers'), params).context['employees']]
+
+        self.assertEqual(names(), ['Arun V', 'Meena S', 'Zara P'])           # inactive hidden by default
+        self.assertEqual(names(status='inactive'), ['Old N'])
+        self.assertEqual(names(status='on_leave'), ['Meena S'])
+        self.assertEqual(names(department=self.roads.department.pk), ['Arun V', 'Meena S'])
+        self.assertEqual(names(ward=self.ward.pk), ['Zara P'])
+        self.assertEqual(names(assignment='assigned'), ['Zara P'])
+        self.assertEqual(names(assignment='available'), ['Arun V', 'Meena S'])
+        self.assertEqual(names(q=busy.employee_id), ['Zara P'])               # by employee ID
+        self.assertEqual(names(q='ward 2'), ['Arun V', 'Meena S'])            # by ward number
+        self.assertEqual(names(q=ward2.area), ['Arun V', 'Meena S'])          # by ward area
+        self.assertEqual(names(sort='tasks')[0], 'Zara P')
+        self.assertEqual(names(sort='complaints')[0], 'Zara P')
+        self.assertEqual(names(sort='bogus'), ['Arun V', 'Meena S', 'Zara P'])  # invalid sort falls back
         page = self.client.get(reverse('grievances:officers'), {'view': 'table'})
         self.assertEqual(page.context['view'], 'table')
-        self.assertEqual(page.context['average_rate'], 50)
-        self.assertEqual(next(o for o in page.context['officers'] if o == busy).rate, 50)
-        self.assertEqual(next(o for o in page.context['officers'] if o == idle).rate, 0)
+        self.assertEqual(page.context['totals'], {'count': 3, 'assigned': 1, 'available': 2, 'overdue': 0})
+        listed = {e.name: e for e in page.context['employees']}
+        self.assertEqual((listed['Zara P'].open_tasks, listed['Zara P'].open_complaints), (1, 1))
+        self.assertNotIn(gone.name, listed)
+        self.assertEqual(idle.status, Officer.Status.ACTIVE)
+        self.assertEqual(away.status, Officer.Status.ON_LEAVE)
 
     def test_invalid_status_update_shows_the_form_again(self):
         complaint = self.make_complaint()
@@ -771,13 +794,13 @@ class DashboardFilterTests(DashboardTestCase):
 
 
 class OfficerAutoAssignmentTests(DashboardTestCase):
-    """complaint_detail routes a complaint to the active officer for its category and ward."""
+    """complaint_detail routes a complaint to an active employee of its category's department and ward."""
 
     def setUp(self):
         super().setUp()
         self.ward2 = Ward.objects.get(number=2)
-        self.water_ward1 = Officer.objects.create(name='Anitha M', designation='AE', category=self.water, ward=self.ward)
-        self.roads_ward1 = Officer.objects.create(name='Kavitha R', designation='AE', category=self.roads, ward=self.ward)
+        self.water_ward1 = Officer.objects.create(name='Anitha M', designation='AE', department=self.water.department, ward=self.ward)
+        self.roads_ward1 = Officer.objects.create(name='Kavitha R', designation='AE', department=self.roads.department, ward=self.ward)
 
     def review(self, complaint, category, ward, status='submitted', officer=''):
         self.client.post(complaint.get_absolute_url(), {
@@ -792,17 +815,19 @@ class OfficerAutoAssignmentTests(DashboardTestCase):
     def test_matching_officer_is_assigned_and_status_moves_to_assigned(self):
         complaint = self.review(self.unreviewed(), self.water, self.ward)
         self.assertEqual((complaint.officer, complaint.status), (self.water_ward1, 'assigned'))
-        self.assertIn('Assigned to Anitha M.', complaint.updates.last().note)
+        self.assertIn(f'Assigned to Anitha M ({self.water_ward1.employee_id}).', complaint.updates.last().note)
 
     def test_no_officer_for_that_ward_leaves_it_unassigned(self):
         complaint = self.review(self.unreviewed(), self.water, self.ward2)
         self.assertEqual((complaint.officer, complaint.status), (None, 'submitted'))
 
-    def test_inactive_officer_is_skipped(self):
-        self.water_ward1.is_active = False
-        self.water_ward1.save()
-        complaint = self.review(self.unreviewed(), self.water, self.ward)
-        self.assertIsNone(complaint.officer)
+    def test_inactive_or_on_leave_employee_is_skipped(self):
+        for status in (Officer.Status.INACTIVE, Officer.Status.ON_LEAVE):
+            with self.subTest(status=status):
+                self.water_ward1.status = status
+                self.water_ward1.save()
+                complaint = self.review(self.unreviewed(), self.water, self.ward)
+                self.assertIsNone(complaint.officer)
 
     def test_later_status_is_kept(self):
         complaint = self.review(self.unreviewed(), self.water, self.ward, status='in_progress')
@@ -822,14 +847,14 @@ class OfficerAutoAssignmentTests(DashboardTestCase):
         # The admin corrects the category; the officer field still shows the old officer.
         complaint = self.review(complaint, self.roads, self.ward, status='assigned', officer=self.water_ward1)
         self.assertEqual(complaint.officer, self.roads_ward1)
-        self.assertIn('Assigned to Kavitha R.', complaint.updates.last().note)
+        self.assertIn(f'Assigned to Kavitha R ({self.roads_ward1.employee_id}).', complaint.updates.last().note)
 
     def test_correcting_the_ward_with_no_officer_there_unassigns(self):
         complaint = self.review(self.unreviewed(), self.water, self.ward)
         complaint = self.review(complaint, self.water, self.ward2, status='assigned', officer=self.water_ward1)
         self.assertIsNone(complaint.officer)
         self.assertEqual(complaint.status, 'submitted')
-        self.assertIn('Officer removed.', complaint.updates.last().note)
+        self.assertIn('Employee removed.', complaint.updates.last().note)
 
 
 class CsvExportInjectionTests(DashboardTestCase):
@@ -1052,3 +1077,382 @@ class ComplaintFileTests(TestCase):
                 self.assertContains(response, self.photo_url)
                 self.assertContains(response, self.copy_url)
                 self.assertNotContains(response, settings.MEDIA_URL + 'complaints/')
+
+
+# ---------- Employees page (the old "Officers in charge") ----------
+
+class EmployeeTestCase(DashboardTestCase):
+    def make_employee(self, **overrides):
+        data = {'name': 'Priya Raman', 'designation': 'Assistant Engineer', 'department': self.water.department,
+                'ward': self.ward}
+        data.update(overrides)
+        return Officer.objects.create(**data)
+
+    def add_data(self, **overrides):
+        data = {'name': 'Priya Raman', 'department': self.water.department.pk, 'designation': 'Assistant Engineer',
+                'ward': self.ward.pk, 'phone': '98765 43210', 'email': 'priya@example.com'}
+        data.update(overrides)
+        return data
+
+
+class EmployeeIdTests(EmployeeTestCase):
+    def test_id_is_made_on_create_in_the_right_format(self):
+        employee = self.make_employee()
+        self.assertRegex(employee.employee_id, r'^CC-EMP-\d{6}$')
+
+    def test_ids_are_unique(self):
+        ids = {self.make_employee(name=f'Person {letter}').employee_id for letter in 'ABCDEFGHIJ'}
+        self.assertEqual(len(ids), 10)
+
+    def test_a_taken_id_is_skipped(self):
+        first = self.make_employee()
+        with mock.patch.object(grievance_models, 'new_employee_id',
+                               side_effect=[first.employee_id, 'CC-EMP-000777']):
+            second = self.make_employee(name='Second Person')
+        self.assertEqual(second.employee_id, 'CC-EMP-000777')
+
+    def test_gives_up_when_every_id_is_taken(self):
+        first = self.make_employee()
+        with mock.patch.object(grievance_models, 'new_employee_id', return_value=first.employee_id):
+            with self.assertRaisesMessage(RuntimeError, 'free employee ID'):
+                self.make_employee(name='Second Person')
+        self.assertEqual(Officer.objects.count(), 1)
+
+    def test_id_never_changes(self):
+        employee = self.make_employee()
+        original = employee.employee_id
+        employee.name = 'Priya R'
+        employee.save()
+        self.client.post(reverse('grievances:officer_edit', args=[original]),
+                         self.add_data(name='Priya K', status='on_leave', employee_id='CC-EMP-999999'))
+        employee.refresh_from_db()
+        self.assertEqual((employee.employee_id, employee.name, employee.status), (original, 'Priya K', 'on_leave'))
+
+
+class AddEmployeeTests(EmployeeTestCase):
+    def test_add_employee_shows_the_new_id(self):
+        response = self.client.post(reverse('grievances:officers'), self.add_data(), follow=True)
+        employee = Officer.objects.get()
+        self.assertEqual((employee.name, employee.phone, employee.status), ('Priya Raman', '+919876543210', 'active'))
+        self.assertEqual(employee.date_joined, timezone.localdate())
+        self.assertContains(response, f'Priya Raman was added with employee ID {employee.employee_id}.')
+
+    def test_form_is_validated(self):
+        cases = {
+            'department': (self.add_data(department=''), 'department'),
+            'bad phone': (self.add_data(phone='12345'), 'phone'),
+            'bad name': (self.add_data(name='R2-D2'), 'name'),
+            'bad email': (self.add_data(email='not-an-email'), 'email'),
+        }
+        for label, (data, field) in cases.items():
+            with self.subTest(label):
+                response = self.client.post(reverse('grievances:officers'), data)
+                self.assertEqual(response.status_code, 200)
+                self.assertIn(field, response.context['add_form'].errors)
+        self.assertFalse(Officer.objects.exists())
+
+    def test_photo_is_checked_saved_and_private(self):
+        media = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, media, ignore_errors=True)
+        with override_settings(MEDIA_ROOT=media):
+            bad = SimpleUploadedFile('notes.pdf', b'%PDF-1.4', content_type='application/pdf')
+            response = self.client.post(reverse('grievances:officers'), self.add_data(photo=bad))
+            self.assertIn('photo', response.context['add_form'].errors)
+            photo = SimpleUploadedFile('priya.png', PNG_BYTES, content_type='image/png')
+            self.client.post(reverse('grievances:officers'), self.add_data(photo=photo))
+            employee = Officer.objects.get()
+            self.assertTrue(employee.has_photo)
+            url = reverse('grievances:officer_photo', args=[employee.employee_id])
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(b''.join(response.streaming_content), PNG_BYTES)
+            self.assertEqual(response['Cache-Control'], 'private, no-store')
+            self.assertEqual(Client().get(url).status_code, 302)   # not for the public
+            os.remove(employee.photo.path)                         # e.g. Vercel didn't keep it
+            self.assertFalse(employee.has_photo)
+            self.assertEqual(self.client.get(url).status_code, 404)
+
+    def test_only_staff_can_use_the_page(self):
+        self.client.logout()
+        url = reverse('grievances:officers')
+        self.assertRedirects(self.client.get(url), f"{reverse('accounts:login')}?next={url}",
+                             fetch_redirect_response=False)
+        self.client.post(url, self.add_data())
+        session = self.client.session
+        session[CITIZEN_SESSION_KEY] = '+919876543210'
+        session.save()
+        self.assertEqual(self.client.post(url, self.add_data()).status_code, 302)
+        self.assertFalse(Officer.objects.exists())
+
+    def test_add_form_is_csrf_protected(self):
+        client = Client(enforce_csrf_checks=True)
+        client.force_login(get_user_model().objects.get(username='admin'))
+        self.assertEqual(client.post(reverse('grievances:officers'), self.add_data()).status_code, 403)
+        self.assertFalse(Officer.objects.exists())
+
+    def test_old_admin_link_is_gone(self):
+        self.assertNotContains(self.client.get(reverse('grievances:officers')), reverse('admin:grievances_officer_add'))
+
+
+class DeactivateEmployeeTests(EmployeeTestCase):
+    def test_deactivate_is_a_soft_delete(self):
+        employee = self.make_employee()
+        complaint = self.make_complaint(officer=employee)
+        response = self.client.post(reverse('grievances:officer_deactivate', args=[employee.employee_id]), follow=True)
+        self.assertContains(response, 'was deactivated')
+        employee.refresh_from_db()
+        complaint.refresh_from_db()
+        self.assertEqual(employee.status, Officer.Status.INACTIVE)
+        self.assertEqual(complaint.officer, employee)
+        self.assertNotIn(employee, self.client.get(reverse('grievances:officers')).context['employees'])
+
+    def test_deactivate_needs_post(self):
+        employee = self.make_employee()
+        self.assertEqual(self.client.get(reverse('grievances:officer_deactivate', args=[employee.employee_id])).status_code,
+                         405)
+
+    def test_employees_cannot_be_deleted_in_admin(self):
+        employee = self.make_employee()
+        response = self.client.get(reverse('admin:grievances_officer_delete', args=[employee.pk]))
+        self.assertEqual(response.status_code, 403)
+
+    def test_inactive_employee_gets_no_work(self):
+        employee = self.make_employee(status=Officer.Status.INACTIVE)
+        response = self.client.post(reverse('grievances:officer_assign', args=[employee.employee_id]),
+                                    {'title': 'Inspect drain', 'priority': 'medium'}, follow=True)
+        self.assertContains(response, 'is inactive')
+        self.assertFalse(WorkAssignment.objects.exists())
+
+
+class AssignWorkTests(EmployeeTestCase):
+    def assign(self, employee, **data):
+        data.setdefault('priority', 'medium')
+        return self.client.post(reverse('grievances:officer_assign', args=[employee.employee_id]), data, follow=True)
+
+    def test_free_form_task(self):
+        employee = self.make_employee()
+        due = timezone.localdate() + timezone.timedelta(days=3)
+        response = self.assign(employee, title='Inspect the drain on Gandhi Street', due_date=due.isoformat(),
+                               priority='high')
+        task = WorkAssignment.objects.get()
+        self.assertEqual((task.employee, task.title, task.priority, task.due_date, task.status, task.complaint),
+                         (employee, 'Inspect the drain on Gandhi Street', 'high', due, 'assigned', None))
+        self.assertEqual(task.assigned_by.username, 'admin')
+        self.assertContains(response, 'was assigned to Priya Raman')
+
+    def test_task_for_an_open_complaint(self):
+        employee = self.make_employee()
+        complaint = self.make_complaint(status=Complaint.Status.SUBMITTED, officer=None)
+        self.assign(employee, complaint_ref=complaint.reference.lower())
+        task = WorkAssignment.objects.get()
+        complaint.refresh_from_db()
+        self.assertEqual(task.complaint, complaint)
+        self.assertEqual(task.title, f'{complaint.reference}: {complaint.title}')
+        self.assertEqual((complaint.officer, complaint.status), (employee, Complaint.Status.ASSIGNED))
+        update = complaint.updates.get()
+        self.assertEqual(update.status, Complaint.Status.ASSIGNED)
+        self.assertEqual(update.note, f'Assigned to Priya Raman ({employee.employee_id}).')
+
+    def test_citizen_is_texted_when_their_complaint_is_assigned(self):
+        employee = self.make_employee()
+        complaint = self.make_complaint(filed_by_citizen=True, status=Complaint.Status.SUBMITTED)
+        with redirect_stdout(io.StringIO()) as out:
+            response = self.assign(employee, complaint_ref=complaint.reference)
+        self.assertIn(f'Your complaint {complaint.reference} is now Assigned.', out.getvalue())
+        self.assertContains(response, 'The citizen was sent an SMS')
+
+    def test_a_complaint_already_in_progress_keeps_its_status(self):
+        employee = self.make_employee()
+        complaint = self.make_complaint(status=Complaint.Status.IN_PROGRESS)
+        self.assign(employee, complaint_ref=complaint.reference, title='Finish the repair')
+        complaint.refresh_from_db()
+        self.assertEqual((complaint.officer, complaint.status), (employee, Complaint.Status.IN_PROGRESS))
+        self.assertEqual(WorkAssignment.objects.get().title, 'Finish the repair')
+
+    def test_invalid_assignments_are_refused(self):
+        employee = self.make_employee()
+        resolved = self.make_complaint(status=Complaint.Status.RESOLVED)
+        cases = {
+            'nothing': ({}, 'Describe the task, or enter an open complaint ID.'),
+            'unknown complaint': ({'complaint_ref': 'CC-2026-99999'}, 'No complaint with ID CC-2026-99999 was found.'),
+            'resolved complaint': ({'complaint_ref': resolved.reference}, 'is already resolved'),
+            'past due date': ({'title': 'Late', 'due_date': '2020-01-01'}, 'Choose today or a later date.'),
+        }
+        for label, (data, message) in cases.items():
+            with self.subTest(label):
+                self.assertContains(self.assign(employee, **data), message)
+        self.assertFalse(WorkAssignment.objects.exists())
+
+    def test_task_status_moves_to_done(self):
+        employee = self.make_employee()
+        task = WorkAssignment.objects.create(employee=employee, title='Inspect drain')
+        url = reverse('grievances:assignment_status', args=[task.pk])
+        self.client.post(url, {'status': 'in_progress'})
+        task.refresh_from_db()
+        self.assertEqual((task.status, task.completed_at), ('in_progress', None))
+        self.client.post(url, {'status': 'done'})
+        task.refresh_from_db()
+        self.assertEqual(task.status, 'done')
+        self.assertIsNotNone(task.completed_at)
+        self.client.post(url, {'status': 'archived'})   # unknown values are ignored
+        task.refresh_from_db()
+        self.assertEqual(task.status, 'done')
+
+
+class ReportEmployeeTests(EmployeeTestCase):
+    def test_report_is_recorded_and_counted(self):
+        employee = self.make_employee()
+        url = reverse('grievances:officer_report', args=[employee.employee_id])
+        response = self.client.post(url, {'reason': 'absent', 'details': 'Not at the ward office on Monday.',
+                                          'next': reverse('grievances:officers')}, follow=True)
+        self.assertRedirects(response, reverse('grievances:officers'))
+        report = EmployeeReport.objects.get()
+        self.assertEqual((report.employee, report.reason, report.status, report.reported_by.username),
+                         (employee, 'absent', 'open', 'admin'))
+        listed = response.context['employees'][0]
+        self.assertEqual(listed.report_count, 1)
+        detail = self.client.get(employee.get_absolute_url())
+        self.assertContains(detail, 'Absent from duty')
+        self.assertContains(detail, 'Not at the ward office on Monday.')
+
+    def test_report_needs_a_reason_and_details(self):
+        employee = self.make_employee()
+        url = reverse('grievances:officer_report', args=[employee.employee_id])
+        response = self.client.post(url, {'reason': 'absent', 'details': 'short'}, follow=True)
+        self.assertContains(response, 'Please describe what happened')
+        self.client.post(url, {'reason': 'nonsense', 'details': 'Long enough details here.'})
+        self.assertFalse(EmployeeReport.objects.exists())
+
+    def test_next_must_stay_on_the_employees_page(self):
+        employee = self.make_employee()
+        response = self.client.post(reverse('grievances:officer_report', args=[employee.employee_id]),
+                                    {'reason': 'absent', 'details': 'Not at the office today.',
+                                     'next': 'https://evil.example.com/'})
+        self.assertRedirects(response, employee.get_absolute_url())
+
+
+class AssignmentBadgeTests(EmployeeTestCase):
+    def card(self, employee):
+        response = self.client.get(reverse('grievances:officers'))
+        return response, next(e for e in response.context['employees'] if e == employee)
+
+    def test_available_then_assigned_then_overdue(self):
+        employee = self.make_employee()
+        response, _listed = self.card(employee)
+        self.assertContains(response, '<span class="badge badge--resolved">Available</span>', html=True)
+
+        WorkAssignment.objects.create(employee=employee, title='One')
+        WorkAssignment.objects.create(employee=employee, title='Two')
+        WorkAssignment.objects.create(employee=employee, title='Old', status=WorkAssignment.Status.DONE)
+        response, listed = self.card(employee)
+        self.assertEqual(listed.open_tasks, 2)
+        self.assertContains(response, 'Assigned · 2 open tasks')
+
+        late = WorkAssignment.objects.create(employee=employee, title='Late',
+                                             due_date=timezone.localdate() - timezone.timedelta(days=1))
+        response, listed = self.card(employee)
+        self.assertEqual((listed.open_tasks, listed.overdue_tasks), (3, 1))
+        self.assertContains(response, '1 overdue')
+        self.assertTrue(late.is_overdue)
+        detail = self.client.get(employee.get_absolute_url())
+        self.assertContains(detail, 'task--overdue')
+
+        late.status = WorkAssignment.Status.DONE
+        late.save()
+        self.assertFalse(late.is_overdue)
+
+    def test_table_view_shows_the_badge_too(self):
+        employee = self.make_employee()
+        WorkAssignment.objects.create(employee=employee, title='One')
+        response = self.client.get(reverse('grievances:officers'), {'view': 'table'})
+        self.assertContains(response, 'Assigned · 1 open task')
+
+    def test_list_avoids_one_query_per_employee(self):
+        def queries_for_the_page():
+            with CaptureQueriesContext(connection) as captured:
+                for view in ('cards', 'table'):
+                    self.client.get(reverse('grievances:officers'), {'view': view})
+            return len(captured)
+
+        def add(letter):
+            employee = self.make_employee(name=f'Person {letter}')
+            WorkAssignment.objects.create(employee=employee, title='Task')
+            EmployeeReport.objects.create(employee=employee, reason='absent', details='Away all day.')
+            self.make_complaint(officer=employee)
+
+        add('A')
+        one = queries_for_the_page()
+        for letter in 'BCDE':
+            add(letter)
+        self.assertEqual(queries_for_the_page(), one)
+
+
+class EmployeeDetailAndIdCardTests(EmployeeTestCase):
+    def test_detail_lists_tasks_reports_and_complaints(self):
+        employee = self.make_employee()
+        complaint = self.make_complaint(officer=employee, title='Water leak on Pantheon Road')
+        WorkAssignment.objects.create(employee=employee, title='Open job')
+        WorkAssignment.objects.create(employee=employee, title='Finished job', status=WorkAssignment.Status.DONE)
+        response = self.client.get(employee.get_absolute_url())
+        self.assertEqual([t.title for t in response.context['open_assignments']], ['Open job'])
+        self.assertEqual([t.title for t in response.context['done_assignments']], ['Finished job'])
+        self.assertContains(response, complaint.reference)
+        self.assertContains(response, employee.employee_id)
+
+    def test_unknown_employee_is_404(self):
+        self.assertEqual(self.client.get(reverse('grievances:officer_detail', args=['CC-EMP-000000'])).status_code, 404)
+
+    def test_id_card_shows_the_details_and_prints_alone(self):
+        employee = self.make_employee()
+        response = self.client.get(reverse('grievances:officer_id_card', args=[employee.employee_id]))
+        for text in (employee.employee_id, 'Priya Raman', 'Assistant Engineer', 'Water Supply Department',
+                     'City', 'Corporation', employee.date_joined.strftime('%d %b %Y'), 'data-print'):
+            self.assertContains(response, text)
+        self.assertContains(response, 'idcard__photo--initial')   # no photo: the initial
+        css = open(finders.find('css/main.css'), encoding='utf-8').read()
+        self.assertIn('body:has(.idcard) * { visibility: hidden; }', css)
+
+    def test_complaint_page_names_the_employee_and_id(self):
+        employee = self.make_employee()
+        complaint = self.make_complaint(officer=employee)
+        response = self.client.get(complaint.get_absolute_url())
+        self.assertContains(response, employee.employee_id)
+        self.assertContains(response, employee.get_absolute_url())
+
+
+class EmployeeMigrationTests(TransactionTestCase):
+    """0006-0008 keep every complaint's officer and give existing officers an ID and a department."""
+
+    before = [('grievances', '0005_complaintupdate_is_public')]
+    after = [('grievances', '0008_employee_dashboard')]
+
+    def tearDown(self):
+        MigrationExecutor(connection).migrate(MigrationExecutor(connection).loader.graph.leaf_nodes())
+
+    def test_existing_links_survive(self):
+        executor = MigrationExecutor(connection)
+        executor.migrate(self.before)
+        old = executor.loader.project_state(self.before).apps
+        water = old.get_model('grievances', 'Category').objects.get(slug='water')
+        ward = old.get_model('grievances', 'Ward').objects.get(number=1)
+        OldOfficer = old.get_model('grievances', 'Officer')
+        active = OldOfficer.objects.create(name='Anitha M', designation='AE', category=water, ward=ward)
+        retired = OldOfficer.objects.create(name='Ravi K', designation='AE', category=water, ward=ward, is_active=False)
+        complaint = old.get_model('grievances', 'Complaint').objects.create(
+            title='Leak', description='Water leak.', citizen_name='Priya', citizen_contact='+919876543210',
+            officer=active, reference='CC-2026-00001')
+
+        executor = MigrationExecutor(connection)
+        executor.migrate(self.after)
+        new = executor.loader.project_state(self.after).apps
+        Officer_ = new.get_model('grievances', 'Officer')
+        self.assertEqual(new.get_model('grievances', 'Complaint').objects.get(pk=complaint.pk).officer_id, active.pk)
+        anitha, ravi = Officer_.objects.get(pk=active.pk), Officer_.objects.get(pk=retired.pk)
+        self.assertRegex(anitha.employee_id, r'^CC-EMP-\d{6}$')
+        self.assertNotEqual(anitha.employee_id, ravi.employee_id)
+        self.assertEqual((anitha.status, ravi.status), ('active', 'inactive'))
+        self.assertEqual(anitha.department.name, 'Water Supply Department')
+        Department_ = new.get_model('grievances', 'Department')
+        self.assertEqual(Department_.objects.count(), 4)
+        self.assertEqual(new.get_model('grievances', 'Category').objects.get(slug='water').department, anitha.department)
+

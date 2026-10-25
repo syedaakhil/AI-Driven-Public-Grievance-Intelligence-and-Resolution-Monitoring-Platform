@@ -1,0 +1,1 @@
+{% load ui i18n %}{% if employee.email %}<a class="btn btn--ghost btn--sm" href="mailto:{{ employee.email }}">{% icon 'mail' 'sm' %}{% translate "Email" %}</a>{% endif %}{% if employee.phone %}<a class="btn btn--ghost btn--sm" href="tel:{{ employee.phone }}">{% icon 'phone' 'sm' %}{% translate "Call" %}</a>{% endif %}

@@ -94,7 +94,7 @@ class HindiPageTests(TestCase):
             'grievances:home': 'आपका निगम एक नज़र में',
             'grievances:complaint_list': 'शिकायत डेटासेट',
             'grievances:complaint_create': 'दर्ज शिकायतें',
-            'grievances:officers': 'प्रभारी अधिकारी',
+            'grievances:officers': 'कर्मचारी',
             'grievances:help_desk': 'नागरिक सहायता केंद्र',
             'grievances:help_support': 'सहायता और समर्थन',
         }

@@ -7,8 +7,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.views import redirect_to_login
 from django.core.paginator import Paginator
-from django.db.models import Count, F, FloatField, Q
-from django.db.models.functions import Cast
+from django.db import transaction
+from django.db.models import Count, Q
 from django.http import FileResponse, Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -20,9 +20,10 @@ from accounts.decorators import CITIZEN_SESSION_KEY, citizen_required, staff_req
 from accounts.otp import mask as mask_phone
 
 from . import notify, services
-from .forms import (CitizenComplaintForm, ComplaintFilterForm, FiledComplaintFilterForm, OfficerFilterForm,
-                    StatusUpdateForm, SupportEnquiryForm)
-from .models import Category, Complaint, ComplaintUpdate, Notice, Officer, SupportEnquiry
+from .forms import (CitizenComplaintForm, ComplaintFilterForm, EmployeeEditForm, EmployeeForm, EmployeeReportForm,
+                    FiledComplaintFilterForm, OfficerFilterForm, StatusUpdateForm, SupportEnquiryForm,
+                    WorkAssignmentForm)
+from .models import Category, Complaint, ComplaintUpdate, Notice, Officer, SupportEnquiry, WorkAssignment
 
 logger = logging.getLogger(__name__)
 
@@ -107,7 +108,7 @@ def complaint_export(request):
         writer.writerow([_csv_safe(value) for value in (
             complaint.reference, complaint.title,
             _(complaint.category.name) if complaint.category else _('Not assigned'),
-            _(complaint.category.department) if complaint.category else '',
+            str(complaint.category.department) if complaint.category else '',
             complaint.ward or _('Not assigned'), complaint.location, complaint.get_channel_display(),
             complaint.get_priority_display(), complaint.get_status_display(),
             complaint.officer.name if complaint.officer else '',
@@ -139,7 +140,7 @@ def _timeline(complaint):
 @staff_required
 def complaint_detail(request, reference):
     complaint = get_object_or_404(
-        Complaint.objects.select_related('category', 'ward', 'officer'), reference=reference)
+        Complaint.objects.select_related('category__department', 'ward', 'officer'), reference=reference)
 
     if request.method == 'POST':
         form = StatusUpdateForm(request.POST)
@@ -151,15 +152,16 @@ def complaint_detail(request, reference):
                 changes.append(f'Category set to {category.name}.' if category else 'Category removed.')
             if ward != complaint.ward:
                 changes.append(f'Ward set to {ward}.' if ward else 'Ward removed.')
-            # Route the complaint to the officer in charge of its category and ward: when it has no officer
-            # yet, or when the category/ward was corrected and the current officer doesn't cover the new
-            # one. An officer the admin picked (or removed) in this update is left as chosen.
+            # Route the complaint to an active employee of the category's department in that ward: when
+            # it has no employee yet, or when the category/ward was corrected and the current employee
+            # doesn't cover the new one. An employee the admin picked (or removed) here is left as chosen.
             officer_untouched = officer == complaint.officer
-            current_fits = officer is not None and (officer.category_id, officer.ward_id) == (
-                getattr(category, 'pk', None), getattr(ward, 'pk', None))
+            current_fits = officer is not None and category is not None and (
+                officer.department_id, officer.ward_id) == (category.department_id, getattr(ward, 'pk', None))
             if category and ward and officer_untouched and not current_fits:
                 had_officer = officer is not None
-                officer = Officer.objects.filter(is_active=True, category=category, ward=ward).first()
+                officer = Officer.objects.filter(status=Officer.Status.ACTIVE, department_id=category.department_id,
+                                                 ward=ward).order_by('name').first()
                 if officer and status == Complaint.Status.SUBMITTED:
                     status = Complaint.Status.ASSIGNED
                 elif officer is None and had_officer and status == Complaint.Status.ASSIGNED:
@@ -168,7 +170,8 @@ def complaint_detail(request, reference):
             if status_changed:
                 changes.append(f'Status changed to {Complaint.Status(status).label}.')
             if officer != complaint.officer:
-                changes.append(f'Assigned to {officer.name}.' if officer else 'Officer removed.')
+                changes.append(f'Assigned to {officer.name} ({officer.employee_id}).' if officer
+                               else 'Employee removed.')
             if changes or note:
                 complaint.category, complaint.ward = category, ward
                 complaint.status, complaint.officer = status, officer
@@ -178,16 +181,7 @@ def complaint_detail(request, reference):
                     note=' '.join(changes + ([note] if note else [])),
                     is_public=bool(share_note and note),
                 )
-                # Sent after saving: a failed SMS is logged and reported, never undoes the update.
-                if status_changed and notify.status_sms_recipient(complaint):
-                    if notify.notify_status_change(complaint):
-                        messages.success(request, _('Complaint %(reference)s updated. The citizen was sent an SMS about '
-                                                    'the new status.') % {'reference': complaint.reference})
-                    else:
-                        messages.warning(request, _('Complaint %(reference)s updated, but the SMS to the citizen could '
-                                                    'not be sent. See the server log.') % {'reference': complaint.reference})
-                else:
-                    messages.success(request, _('Complaint %(reference)s updated.') % {'reference': complaint.reference})
+                _report_status_change(request, complaint, status_changed)
             else:
                 messages.info(request, _('Nothing changed.'))
             return redirect(complaint)
@@ -203,6 +197,22 @@ def complaint_detail(request, reference):
         'timeline': _timeline(complaint),
         'activity': complaint.updates.select_related('author').order_by('-created_at', '-id'),
     })
+
+
+def _report_status_change(request, complaint, status_changed):
+    """
+    Text the citizen about a new status and tell the admin how it went. Called after saving: a failed
+    SMS is logged and reported, and never undoes the update.
+    """
+    if status_changed and notify.status_sms_recipient(complaint):
+        if notify.notify_status_change(complaint):
+            messages.success(request, _('Complaint %(reference)s updated. The citizen was sent an SMS about '
+                                        'the new status.') % {'reference': complaint.reference})
+        else:
+            messages.warning(request, _('Complaint %(reference)s updated, but the SMS to the citizen could '
+                                        'not be sent. See the server log.') % {'reference': complaint.reference})
+    else:
+        messages.success(request, _('Complaint %(reference)s updated.') % {'reference': complaint.reference})
 
 
 @staff_required
@@ -251,59 +261,197 @@ def complaint_file(request, reference, kind):
     return response
 
 
-# ---------- Officers ----------
+# ---------- Employees (the "Officers in charge" page) ----------
+
+def employee_queryset():
+    """Employees with the counts the cards, table and badges show, in one query (no N+1)."""
+    open_tasks = Q(assignments__status__in=WorkAssignment.OPEN_STATUSES)
+    return Officer.objects.select_related('department', 'ward').annotate(
+        open_tasks=Count('assignments', filter=open_tasks, distinct=True),
+        overdue_tasks=Count('assignments', filter=WorkAssignment.overdue_filter('assignments__'), distinct=True),
+        open_complaints=Count('complaints', filter=Q(complaints__status__in=Complaint.OPEN_STATUSES), distinct=True),
+        resolved_complaints=Count('complaints', filter=Q(complaints__status=Complaint.Status.RESOLVED),
+                                  distinct=True),
+        report_count=Count('reports', distinct=True),
+    )
+
+
+def _employee(employee_id):
+    return get_object_or_404(employee_queryset(), employee_id=employee_id)
+
+
+def _open_complaints():
+    """For the complaint-ID suggestions in the "Assign work" forms."""
+    return Complaint.objects.filter(status__in=Complaint.OPEN_STATUSES).only('reference', 'title').order_by(
+        '-created_at')[:200]
+
+
+def _back(request, employee):
+    """Where to return after a form on a card: the page it came from, or the employee's page."""
+    target = request.POST.get('next', '')
+    return target if target.startswith(reverse('grievances:officers')) else employee.get_absolute_url()
+
 
 @staff_required
 def officers(request):
+    if request.method == 'POST':
+        add_form = EmployeeForm(request.POST, request.FILES)
+        if add_form.is_valid():
+            employee = add_form.save()
+            messages.success(request, _('%(name)s was added with employee ID %(employee_id)s.') % {
+                'name': employee.name, 'employee_id': employee.employee_id})
+            return redirect('grievances:officers')
+        messages.error(request, _('Please fix the highlighted fields.'))
+    else:
+        add_form = EmployeeForm()
+
     form = OfficerFilterForm(request.GET)
-    people = Officer.objects.filter(is_active=True).select_related('category', 'ward').annotate(
-        assigned=Count('complaints'),
-        resolved=Count('complaints', filter=Q(complaints__status=Complaint.Status.RESOLVED)),
-    ).annotate(open=F('assigned') - F('resolved'))
-
-    if form.is_valid():
-        data = form.cleaned_data
-        if data['q']:
-            q = data['q']
-            people = people.filter(Q(name__icontains=q) | Q(designation__icontains=q) |
-                                   Q(ward__area__icontains=q) | Q(ward__name__icontains=q))
-        if data['category']:
-            people = people.filter(category=data['category'])
-        if data['ward']:
-            people = people.filter(ward=data['ward'])
-        sort = data['sort'] or 'rate'
-    else:
-        sort = 'rate'
-
-    if sort == 'name':
-        people = people.order_by('name')
-    elif sort == 'assigned':
-        people = people.order_by('-assigned', 'name')
-    elif sort == 'open':
-        people = people.order_by('-open', 'name')
-    else:
-        people = people.annotate(
-            rate=Cast('resolved', FloatField()) / Cast('assigned', FloatField())
-        ).order_by(F('rate').desc(nulls_last=True), 'name')
-
-    people = list(people)
-    for officer in people:
-        officer.rate = round(officer.resolved / officer.assigned * 100) if officer.assigned else 0
-
-    totals = Officer.objects.filter(is_active=True).aggregate(
-        count=Count('id', distinct=True),
-        assigned=Count('complaints'),
-        resolved=Count('complaints', filter=Q(complaints__status=Complaint.Status.RESOLVED)),
-    )
+    employees = list(form.filter(employee_queryset()))
+    working = employee_queryset().exclude(status=Officer.Status.INACTIVE).values_list(
+        'open_tasks', 'overdue_tasks')
+    totals = {
+        'count': len(working),
+        'assigned': sum(1 for tasks, _overdue in working if tasks),
+        'available': sum(1 for tasks, _overdue in working if not tasks),
+        'overdue': sum(overdue for _tasks, overdue in working),
+    }
     return render(request, 'grievances/officers.html', {
         'form': form,
-        'officers': people,
+        'add_form': add_form,
+        'employees': employees,
         'view': 'table' if request.GET.get('view') == 'table' else 'cards',
         'totals': totals,
-        'open_total': totals['assigned'] - totals['resolved'],
-        'average_rate': round(totals['resolved'] / totals['assigned'] * 100) if totals['assigned'] else None,
-        'any_officers': Officer.objects.filter(is_active=True).exists(),
+        'any_employees': Officer.objects.exists(),
+        'open_complaints': _open_complaints(),
+        'report_form': EmployeeReportForm(),
+        'assign_form': WorkAssignmentForm(),
     })
+
+
+@staff_required
+def officer_detail(request, employee_id):
+    employee = _employee(employee_id)
+    assignments = employee.assignments.select_related('complaint', 'assigned_by')
+    return render(request, 'grievances/officer_detail.html', {
+        'employee': employee,
+        'open_assignments': [task for task in assignments if task.is_open],
+        'done_assignments': [task for task in assignments if not task.is_open],
+        'reports': employee.reports.select_related('reported_by'),
+        'complaints': employee.complaints.select_related('category', 'ward').order_by('-created_at'),
+        'open_complaints': _open_complaints(),
+        'report_form': EmployeeReportForm(),
+        'assign_form': WorkAssignmentForm(),
+        'task_statuses': WorkAssignment.Status,
+    })
+
+
+@staff_required
+def officer_edit(request, employee_id):
+    employee = get_object_or_404(Officer, employee_id=employee_id)
+    form = EmployeeEditForm(request.POST or None, request.FILES or None, instance=employee)
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            messages.success(request, _('%(name)s (%(employee_id)s) was updated.') % {
+                'name': employee.name, 'employee_id': employee.employee_id})
+            return redirect(employee)
+        messages.error(request, _('Please fix the highlighted fields.'))
+    return render(request, 'grievances/officer_form.html', {'employee': employee, 'form': form})
+
+
+@staff_required
+@require_POST
+def officer_deactivate(request, employee_id):
+    """Soft delete: the employee stays in the database, so their complaints and tasks keep their history."""
+    employee = get_object_or_404(Officer, employee_id=employee_id)
+    employee.status = Officer.Status.INACTIVE
+    employee.save(update_fields=['status'])
+    messages.success(request, _('%(name)s (%(employee_id)s) was deactivated. Their complaints and tasks are kept.')
+                     % {'name': employee.name, 'employee_id': employee.employee_id})
+    return redirect(employee)
+
+
+@staff_required
+def officer_id_card(request, employee_id):
+    return render(request, 'grievances/officer_id_card.html', {'employee': _employee(employee_id)})
+
+
+@staff_required
+def officer_photo(request, employee_id):
+    """An employee's photo, for staff only (uploads are never served from /media/)."""
+    employee = get_object_or_404(Officer, employee_id=employee_id)
+    photo = employee.photo
+    if not photo or not photo.storage.exists(photo.name):
+        raise Http404
+    response = FileResponse(photo.open('rb'), filename=os.path.basename(photo.name))
+    response['Cache-Control'] = 'private, no-store'
+    return response
+
+
+@staff_required
+@require_POST
+def officer_report(request, employee_id):
+    employee = get_object_or_404(Officer, employee_id=employee_id)
+    form = EmployeeReportForm(request.POST)
+    if form.is_valid():
+        report = form.save(commit=False)
+        report.employee, report.reported_by = employee, request.user
+        report.save()
+        messages.success(request, _('Your report about %(name)s (%(employee_id)s) was recorded.') % {
+            'name': employee.name, 'employee_id': employee.employee_id})
+    else:
+        messages.error(request, _('The report was not saved: %(errors)s') % {'errors': _form_errors(form)})
+    return redirect(_back(request, employee))
+
+
+@staff_required
+@require_POST
+def officer_assign(request, employee_id):
+    employee = get_object_or_404(Officer, employee_id=employee_id)
+    if employee.status == Officer.Status.INACTIVE:
+        messages.error(request, _('%(name)s is inactive, so work cannot be assigned.') % {'name': employee.name})
+        return redirect(_back(request, employee))
+    form = WorkAssignmentForm(request.POST)
+    if not form.is_valid():
+        messages.error(request, _('The work was not assigned: %(errors)s') % {'errors': _form_errors(form)})
+        return redirect(_back(request, employee))
+
+    complaint = form.complaint
+    status_changed = False
+    with transaction.atomic():
+        task = form.save(commit=False)
+        task.employee, task.assigned_by = employee, request.user
+        task.save()
+        if complaint is not None:
+            # The complaint now belongs to this employee; a new complaint moves to "assigned".
+            if complaint.status == Complaint.Status.SUBMITTED:
+                complaint.status, status_changed = Complaint.Status.ASSIGNED, True
+            complaint.officer = employee
+            complaint.save()
+            ComplaintUpdate.objects.create(
+                complaint=complaint, status=complaint.status, author=request.user,
+                note=f'Assigned to {employee.name} ({employee.employee_id}).')
+    if complaint is not None:
+        _report_status_change(request, complaint, status_changed)
+    messages.success(request, _('“%(title)s” was assigned to %(name)s.') % {'title': task.title, 'name': employee.name})
+    return redirect(_back(request, employee))
+
+
+@staff_required
+@require_POST
+def assignment_status(request, pk):
+    task = get_object_or_404(WorkAssignment.objects.select_related('employee'), pk=pk)
+    status = request.POST.get('status')
+    if status in WorkAssignment.Status.values and status != task.status:
+        task.status = status
+        task.save()
+        messages.success(request, _('“%(title)s” is now %(status)s.') % {
+            'title': task.title, 'status': task.get_status_display()})
+    return redirect(task.employee)
+
+
+def _form_errors(form):
+    return ' '.join(str(error) for errors in form.errors.values() for error in errors)
 
 
 # ---------- Help pages ----------

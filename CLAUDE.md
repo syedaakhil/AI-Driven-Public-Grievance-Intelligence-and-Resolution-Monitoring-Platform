@@ -59,13 +59,22 @@ Open pages through `runserver` on port 8000. VS Code Live Server (port 5500) can
   - `decorators.py`: `CITIZEN_SESSION_KEY = 'citizen_phone'` (set after a successful OTP), `citizen_required`, and `staff_required` (`is_active and is_staff`).
   - The migration `0001_corporation_admin` creates the admin user from `DJANGO_ADMIN_USERNAME`/`DJANGO_ADMIN_PASSWORD`.
 - **`grievances/`**: the domain.
-  - Models: `Category`, `Ward`, `Officer`, `Complaint` (with `Status`, `Priority` and `Channel` choices), `ComplaintUpdate`, `Notice` and `SupportEnquiry`.
+  - Models: `Department`, `Category` (FK to Department), `Ward`, `Officer` (shown as "Employee"), `Complaint` (with `Status`, `Priority` and `Channel` choices), `ComplaintUpdate`, `Notice`, `SupportEnquiry`, `EmployeeReport` and `WorkAssignment`.
   - `forms.py` holds all validation:
     - `CitizenComplaintForm`: the only form that creates complaints, used by `/complaint-registration/` and `POST /api/complaints/`. Its template writes its own inputs, and the form only validates. Staff don't enter complaints in the dashboard; they use Django `/admin/` if needed.
     - `StatusUpdateForm`.
-    - Filter forms: `ComplaintFilterForm`, `FiledComplaintFilterForm` and `OfficerFilterForm`.
+    - Filter forms: `ComplaintFilterForm`, `FiledComplaintFilterForm` and `OfficerFilterForm` (employees).
+    - Employee forms: `EmployeeForm` / `EmployeeEditForm`, `EmployeeReportForm` and `WorkAssignmentForm` (an open complaint ID in `complaint_ref`, or a free-form title).
     - `SupportEnquiryForm`.
     - Shared helpers: `NAME_RE`, the upload limits/types (`PHOTO_TYPES`, `PREVIOUS_COPY_TYPES`, 5 MB), `_check_upload` and `style_fields`. Phone numbers are validated by `accounts.otp.normalize_phone`.
+  - **Employees** (`/officers/`, nav "Employees"; the model and table are still `Officer`, so `Complaint.officer` is unchanged):
+    - `employee_id` is `CC-EMP-` plus 6 random digits, made in `Officer.save()` (it retries taken IDs) and never edited. URLs use it: `/officers/<employee_id>/`, plus `edit/`, `id-card/`, `photo/`, `report/`, `assign/` and `deactivate/` (POST). Task status changes go to `/officers/tasks/<pk>/status/`.
+    - `status` is active / on_leave / inactive. **Never delete an employee**: deactivate sets inactive, and admin delete is turned off. Complaints auto-route (in `complaint_detail`) to an **active** employee of the category's department in that ward.
+    - Assigning an open complaint sets `Complaint.officer`, moves a submitted complaint to assigned, adds a `ComplaintUpdate`, and texts the citizen through `_report_status_change()`.
+    - `views.employee_queryset()` annotates `open_tasks`, `overdue_tasks`, `open_complaints` and `report_count` in one query. Use it, not per-employee queries. The badge is `_employee_badge.html` ("Assigned · N open tasks" orange, "Available" green, overdue red).
+    - Photos use a `FileField` checked with `_check_upload` (Pillow isn't installed) and are served only by `officer_photo`. `has_photo` is False when the file is gone (as on Vercel), and the ID card then shows the initial. The ID card prints alone (`body:has(.idcard)` print CSS).
+    - Migrations 0006–0008 created departments from the old text, gave existing officers IDs, and kept every complaint's officer. `EmployeeMigrationTests` checks this.
+    - No roles or permission groups here: everything is `@staff_required`; roles come later from a plugin.
   - `services.py` aggregates the dashboard stats (`dashboard(range_months)`, month/week periods and `percent_change`).
   - In `views.py`, dashboard pages are `@staff_required`. Citizen pages (`complaint_registration`, `track_list` at `/track/`, `track_detail` at `/track/<ref>/`) are `@citizen_required`.
     - **Citizen pages must look complaints up through `_citizen_complaints(request)`**, which filters `citizen_contact` to the verified phone. Another citizen's reference gives a 404.

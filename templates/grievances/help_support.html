@@ -85,7 +85,7 @@
     <ol class="steps" start="4" style="counter-reset: step 3">
       <li><strong>{% translate "File a complaint" %}</strong>{% url 'grievances:complaint_create' as filed_url %}{% blocktranslate %}Use <a href="{{ filed_url }}">Filed complaint</a> and note the channel it came through.{% endblocktranslate %}</li>
       <li><strong>{% translate "Update its status" %}</strong>{% url 'grievances:complaint_list' as dataset_url %}{% blocktranslate %}Open it from the <a href="{{ dataset_url }}">Dataset</a>, assign an officer and record progress.{% endblocktranslate %}</li>
-      <li><strong>{% translate "Follow the officers" %}</strong>{% url 'grievances:officers' as officers_url %}{% blocktranslate %}See each officer's open and resolved complaints in <a href="{{ officers_url }}">Officers in charge</a>.{% endblocktranslate %}</li>
+      <li><strong>{% translate "Follow the employees" %}</strong>{% url 'grievances:officers' as officers_url %}{% blocktranslate %}Add employees, assign work and see who is available in <a href="{{ officers_url }}">Employees</a>.{% endblocktranslate %}</li>
     </ol>
   </div>
 </section>

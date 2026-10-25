@@ -1,25 +1,44 @@
 {% extends "base.html" %}
-{% load ui humanize i18n %}
+{% load ui i18n %}
 
-{% block title %}{% translate "Officers in charge · City Corporation" %}{% endblock %}
+{% block title %}{% translate "Employees · City Corporation" %}{% endblock %}
 
 {% block content %}
 <div class="head">
-  <h1 class="head__title">{% translate "Officers in charge" %}</h1>
+  <h1 class="head__title">{% translate "Employees" %}</h1>
   <div class="head__tools">
     <div class="seg" role="group" aria-label="{% translate 'View as' %}">
       <a class="seg__btn" href="{% query view='' %}"{% if view == 'cards' %} aria-current="true"{% endif %}>{% translate "Cards" %}</a>
       <a class="seg__btn" href="{% query view='table' %}"{% if view == 'table' %} aria-current="true"{% endif %}>{% translate "Table" %}</a>
     </div>
-    <a class="btn btn--ghost btn--sm" href="{% url 'admin:grievances_officer_add' %}">{% icon 'user' 'sm' %}{% translate "Add officer" %}</a>
   </div>
+  <p class="head__lead">{% translate "Appoint employees, give them work, and see who is busy and who is available." %}</p>
 </div>
 
+<details class="card section addpanel"{% if add_form.errors or not any_employees %} open{% endif %}>
+  <summary class="addpanel__summary"><span class="tile tile--orange">{% icon 'user' %}</span><span><strong>{% translate "Add employee" %}</strong><small>{% translate "An employee ID such as CC-EMP-123456 is created automatically." %}</small></span>{% icon 'chevron-down' 'sm' %}</summary>
+  <form method="post" enctype="multipart/form-data" class="addpanel__form" novalidate>
+    {% csrf_token %}
+    {% if add_form.non_field_errors %}<div class="alert alert--error" role="alert">{% icon 'alert' %}<span>{{ add_form.non_field_errors|join:" " }}</span></div>{% endif %}
+    <div class="form-grid">
+      {% include "partials/field.html" with field=add_form.name %}
+      {% include "partials/field.html" with field=add_form.department %}
+      {% include "partials/field.html" with field=add_form.designation %}
+      {% include "partials/field.html" with field=add_form.ward %}
+      {% include "partials/field.html" with field=add_form.phone %}
+      {% include "partials/field.html" with field=add_form.email %}
+      {% translate "JPG, PNG or WEBP, up to 5 MB. Shown on the ID card." as photo_hint %}
+      {% include "partials/field.html" with field=add_form.photo hint=photo_hint wide=True %}
+    </div>
+    <div class="actions"><button type="submit" class="btn btn--primary">{% icon 'check' 'sm' %}{% translate "Save employee" %}</button></div>
+  </form>
+</details>
+
 <section class="grid grid--4 section" aria-label="{% translate 'Summary' %}">
-  <div class="card mini"><span class="tile">{% icon 'users' %}</span><div><strong>{{ totals.count }}</strong><span>{% translate "Officers listed" %}</span></div></div>
-  <div class="card mini"><span class="tile tile--orange">{% icon 'file' %}</span><div><strong>{{ totals.assigned|intcomma }}</strong><span>{% translate "Complaints assigned" %}</span></div></div>
-  <div class="card mini"><span class="tile tile--green">{% icon 'check' %}</span><div><strong>{% if average_rate is None %}—{% else %}{{ average_rate }}%{% endif %}</strong><span>{% translate "Average resolution rate" %}</span></div></div>
-  <div class="card mini"><span class="tile">{% icon 'clock' %}</span><div><strong>{{ open_total|intcomma }}</strong><span>{% translate "Open complaints" %}</span></div></div>
+  <div class="card mini"><span class="tile">{% icon 'users' %}</span><div><strong>{{ totals.count }}</strong><span>{% translate "Working employees" %}</span></div></div>
+  <div class="card mini"><span class="tile tile--orange">{% icon 'list' %}</span><div><strong>{{ totals.assigned }}</strong><span>{% translate "Assigned" %}</span></div></div>
+  <div class="card mini"><span class="tile tile--green">{% icon 'check' %}</span><div><strong>{{ totals.available }}</strong><span>{% translate "Available" %}</span></div></div>
+  <div class="card mini"><span class="tile">{% icon 'clock' %}</span><div><strong>{{ totals.overdue }}</strong><span>{% translate "Overdue tasks" %}</span></div></div>
 </section>
 
 <section class="card section">
@@ -29,44 +48,50 @@
       <label for="{{ form.q.id_for_label }}">{{ form.q.label }}</label>
       <div class="search">{% icon 'search' 'sm' %}{{ form.q }}</div>
     </div>
-    <div class="field"><label for="{{ form.category.id_for_label }}">{% translate "Department" %}</label>{{ form.category }}</div>
-    <div class="field"><label for="{{ form.ward.id_for_label }}">{% translate "Ward" %}</label>{{ form.ward }}</div>
-    <div class="field"><label for="{{ form.sort.id_for_label }}">{% translate "Sort by" %}</label>{{ form.sort }}</div>
+    <div class="field"><label for="{{ form.department.id_for_label }}">{{ form.department.label }}</label>{{ form.department }}</div>
+    <div class="field"><label for="{{ form.ward.id_for_label }}">{{ form.ward.label }}</label>{{ form.ward }}</div>
+    <div class="field"><label for="{{ form.status.id_for_label }}">{{ form.status.label }}</label>{{ form.status }}</div>
+    <div class="field"><label for="{{ form.assignment.id_for_label }}">{{ form.assignment.label }}</label>{{ form.assignment }}</div>
+    <div class="field"><label for="{{ form.sort.id_for_label }}">{{ form.sort.label }}</label>{{ form.sort }}</div>
     <div class="filters__actions">
       <button type="submit" class="btn btn--primary">{% translate "Apply" %}</button>
-      <a class="btn btn--ghost" href="{% url 'grievances:officers' %}">{% icon 'refresh' 'sm' %}{% translate "Reset" %}</a>
+      <a class="btn btn--ghost" href="{% url 'grievances:officers' %}{% if view == 'table' %}?view=table{% endif %}">{% icon 'refresh' 'sm' %}{% translate "Reset" %}</a>
     </div>
   </form>
 </section>
 
-{% if not any_officers %}
+<datalist id="open-complaints">
+  {% for complaint in open_complaints %}<option value="{{ complaint.reference }}">{{ complaint.title|truncatechars:60 }}</option>{% endfor %}
+</datalist>
+
+{% if not any_employees %}
+  <div class="card empty"><p>{% translate "No employees yet. Add the first one with the form above." %}</p></div>
+{% elif not employees %}
   <div class="card empty">
-    <p>{% translate "No officers have been added yet." %}</p>
-    <a class="link" href="{% url 'admin:grievances_officer_add' %}">{% translate "Add the first officer" %} {% icon 'arrow-right' 'sm' %}</a>
-  </div>
-{% elif not officers %}
-  <div class="card empty">
-    <p>{% translate "No officers match your search." %}</p>
+    <p>{% translate "No employees match your search." %}</p>
     <a class="link" href="{% url 'grievances:officers' %}">{% translate "Reset filters" %}</a>
   </div>
 {% elif view == 'table' %}
   <div class="card card--flush">
     <div class="table-wrap">
       <table class="table">
-        <caption class="sr-only">{% translate "Officers in charge" %}</caption>
+        <caption class="sr-only">{% translate "Employees" %}</caption>
         <thead>
-          <tr><th scope="col">{% translate "Officer" %}</th><th scope="col">{% translate "Department" %}</th><th scope="col">{% translate "Ward" %}</th><th scope="col">{% translate "Assigned" %}</th><th scope="col">{% translate "Open" %}</th><th scope="col">{% translate "Resolution" %}</th><th scope="col"><span class="sr-only">{% translate "Contact" %}</span></th></tr>
+          <tr><th scope="col">{% translate "Employee" %}</th><th scope="col">{% translate "Department" %}</th><th scope="col">{% translate "Ward" %}</th><th scope="col">{% translate "Work" %}</th><th scope="col">{% translate "Open complaints" %}</th><th scope="col">{% translate "Reports" %}</th><th scope="col">{% translate "Actions" %}</th></tr>
         </thead>
         <tbody>
-          {% for officer in officers %}
+          {% for employee in employees %}
             <tr>
-              <td><div class="person"><span class="person__avatar" aria-hidden="true">{{ officer.name|slice:":1" }}</span><span><strong>{{ officer.name }}</strong><small>{{ officer.designation }}</small></span></div></td>
-              <td>{{ officer.category.department|tr }}</td>
-              <td class="nowrap">{{ officer.ward }}<small>{{ officer.ward.area|tr }}</small></td>
-              <td>{{ officer.assigned }}</td>
-              <td>{{ officer.open }}</td>
-              <td class="nowrap"><div class="rate"><span class="bar{% if officer.rate >= 80 %} bar--green{% elif officer.rate < 60 %} bar--orange{% endif %}"><span style="width:{{ officer.rate }}%"></span></span><b>{{ officer.rate }}%</b></div></td>
-              <td>{% include "grievances/_officer_contact.html" %}</td>
+              <td><div class="person">{% include "grievances/_employee_avatar.html" %}<span><a href="{{ employee.get_absolute_url }}"><strong>{{ employee.name }}</strong></a><small>{{ employee.employee_id }} · {{ employee.designation }}</small></span></div></td>
+              <td>{{ employee.department|tr }}</td>
+              <td class="nowrap">{{ employee.ward }}<small>{{ employee.ward.area|tr }}</small></td>
+              <td>{% include "grievances/_employee_badge.html" %}</td>
+              <td>{{ employee.open_complaints }}</td>
+              <td>{{ employee.report_count }}</td>
+              <td class="table__actions">
+                <a class="btn btn--ghost btn--sm" href="{% url 'grievances:officer_id_card' employee.employee_id %}">{% translate "View ID card" %}</a>
+                {% include "grievances/_employee_actions.html" %}
+              </td>
             </tr>
           {% endfor %}
         </tbody>
@@ -75,29 +100,28 @@
   </div>
 {% else %}
   <div class="grid grid--auto">
-    {% for officer in officers %}
-      <article class="card officer">
+    {% for employee in employees %}
+      <article class="card officer" aria-labelledby="emp-{{ employee.employee_id }}">
         <div class="person">
-          <span class="person__avatar person__avatar--lg" aria-hidden="true">{{ officer.name|slice:":1" }}</span>
-          <span><strong class="officer__name">{{ officer.name }}</strong><small>{{ officer.designation }}</small></span>
+          {% include "grievances/_employee_avatar.html" with size='lg' %}
+          <span><a href="{{ employee.get_absolute_url }}"><strong class="officer__name" id="emp-{{ employee.employee_id }}">{{ employee.name }}</strong></a><small>{{ employee.designation }}</small></span>
         </div>
+        <div>{% include "grievances/_employee_badge.html" %}</div>
         <ul class="officer__meta">
-          <li>{% icon officer.category.icon 'sm' %}{{ officer.category.department|tr }}</li>
-          <li>{% icon 'pin' 'sm' %}{{ officer.ward }} · {{ officer.ward.area|tr }}</li>
+          <li>{% icon 'shield' 'sm' %}<span class="mono">{{ employee.employee_id }}</span></li>
+          <li>{% icon 'building' 'sm' %}{{ employee.department|tr }}</li>
+          <li>{% icon 'pin' 'sm' %}{{ employee.ward }} · {{ employee.ward.area|tr }}</li>
         </ul>
         <div class="officer__numbers">
-          <div><strong>{{ officer.assigned }}</strong><span>{% translate "Assigned" %}</span></div>
-          <div><strong>{{ officer.resolved }}</strong><span>{% translate "Resolved" %}</span></div>
-          <div><strong>{{ officer.open }}</strong><span>{% translate "Open" %}</span></div>
-        </div>
-        <div class="officer__rate">
-          <div class="officer__rate-top"><span>{% translate "Resolution progress" %}</span><b>{{ officer.rate }}%</b></div>
-          <span class="bar{% if officer.rate >= 80 %} bar--green{% elif officer.rate < 60 %} bar--orange{% endif %}" role="progressbar" aria-label="{% translate 'Resolution progress' %}" aria-valuenow="{{ officer.rate }}" aria-valuemin="0" aria-valuemax="100"><span style="width:{{ officer.rate }}%"></span></span>
+          <div><strong>{{ employee.open_tasks }}</strong><span>{% translate "Open tasks" %}</span></div>
+          <div><strong>{{ employee.open_complaints }}</strong><span>{% translate "Open complaints" %}</span></div>
+          <div><strong>{{ employee.report_count }}</strong><span>{% translate "Reports" %}</span></div>
         </div>
         <div class="actions actions--tight">
-          {% include "grievances/_officer_contact.html" %}
-          <a class="btn btn--ghost btn--sm" href="{% url 'grievances:complaint_list' %}?ward={{ officer.ward.pk }}&amp;category={{ officer.category.pk }}">{% translate "View complaints" %}</a>
+          <a class="btn btn--ghost btn--sm" href="{% url 'grievances:officer_id_card' employee.employee_id %}">{% icon 'user' 'sm' %}{% translate "View ID card" %}</a>
+          {% include "grievances/_employee_contact.html" %}
         </div>
+        {% include "grievances/_employee_actions.html" %}
       </article>
     {% endfor %}
   </div>

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load ui i18n %}
+
+{% block title %}{% blocktranslate with employee_id=employee.employee_id %}ID card {{ employee_id }} · City Corporation{% endblocktranslate %}{% endblock %}
+
+{% block content %}
+<div class="head no-print">
+  <a class="link" href="{{ employee.get_absolute_url }}">{% icon 'arrow-left' 'sm' %}{% translate "Back to employee" %}</a>
+  <button type="button" class="btn btn--primary btn--sm" data-print>{% icon 'download' 'sm' %}{% translate "Print ID card" %}</button>
+</div>
+
+<article class="idcard" aria-label="{% translate 'Employee ID card' %}">
+  <header class="idcard__band">
+    <span class="idcard__mark">{% icon 'building' %}</span>
+    <span><strong>{% translate "City" context "brand, first word" %} {% translate "Corporation" context "brand, second word" %}</strong><small>{% translate "Your city, our responsibility." %}</small></span>
+  </header>
+  <div class="idcard__body">
+    {% if employee.has_photo %}
+      <img class="idcard__photo" src="{% url 'grievances:officer_photo' employee.employee_id %}" alt="{% blocktranslate with name=employee.name %}Photo of {{ name }}{% endblocktranslate %}">
+    {% else %}
+      <span class="idcard__photo idcard__photo--initial" aria-hidden="true">{{ employee.initial }}</span>
+    {% endif %}
+    <div class="idcard__text">
+      <strong class="idcard__name">{{ employee.name }}</strong>
+      <span class="idcard__role">{{ employee.designation }}</span>
+      <dl class="idcard__facts">
+        <dt>{% translate "Employee ID" %}</dt><dd class="mono">{{ employee.employee_id }}</dd>
+        <dt>{% translate "Department" %}</dt><dd>{{ employee.department|tr }}</dd>
+        <dt>{% translate "Ward" %}</dt><dd>{{ employee.ward }}</dd>
+        <dt>{% translate "Date joined" %}</dt><dd>{{ employee.date_joined|date:"d M Y" }}</dd>
+      </dl>
+    </div>
+  </div>
+  <footer class="idcard__foot">{% translate "Employee ID card" %}{% if employee.status != 'active' %} · {{ employee.get_status_display }}{% endif %}</footer>
+</article>
+{% endblock %}

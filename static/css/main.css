@@ -749,3 +749,67 @@ code { font-size: .85em; padding: 1px 4px; border-radius: 4px; background: var(-
 /* Hindi: letter-spacing pulls Devanagari letters apart, so drop it (the OTP box keeps its spacing). */
 html[lang="hi"] body *:not(input) { letter-spacing: normal; }
 html[lang="hi"] .brand__tag { font-size: .62rem; }
+
+/* Employees page (officers.html, officer_detail.html, officer_id_card.html) ---- */
+.mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .95em; letter-spacing: .02em; }
+.split--even { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.person__photo { object-fit: cover; }
+.person__avatar--xl { width: 64px; height: 64px; font-size: 1.2rem; }
+.count { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--red-soft); color: var(--red); font-size: .62rem; font-weight: 700; }
+
+.addpanel { padding: 0; }
+.addpanel__summary { display: flex; align-items: center; gap: 12px; padding: 16px 20px; cursor: pointer; list-style: none; }
+.addpanel__summary::-webkit-details-marker { display: none; }
+.addpanel__summary strong { display: block; font-size: .86rem; }
+.addpanel__summary small { display: block; font-size: .7rem; color: var(--muted); }
+.addpanel__summary > .icon:last-child { margin-left: auto; transition: transform .15s; }
+.addpanel[open] .addpanel__summary > .icon:last-child { transform: rotate(180deg); }
+.addpanel__form { padding: 4px 20px 20px; border-top: 1px solid var(--line); }
+.addpanel__form .form-grid { margin-top: 16px; }
+
+.taskforms { display: flex; flex-wrap: wrap; gap: 8px; }
+.taskform > summary { list-style: none; cursor: pointer; }
+.taskform > summary::-webkit-details-marker { display: none; }
+.taskform[open] { flex-basis: 100%; }
+.taskform__body { display: grid; gap: 10px; margin-top: 10px; padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: #FAFBFD; }
+.taskform__body .btn { justify-self: start; }
+.taskform__row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.table__actions { min-width: 220px; }
+.table__actions > .btn { margin-bottom: 8px; }
+
+.tasks { display: grid; gap: 10px; margin: 12px 0 0; padding: 0; list-style: none; }
+.task { display: grid; gap: 6px; padding: 12px; border: 1px solid var(--line); border-left: 3px solid var(--blue); border-radius: 8px; }
+.task--overdue { border-left-color: var(--red); background: #FFF8F7; }
+.task__top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; font-size: .8rem; }
+.task__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: .7rem; color: var(--muted); }
+.task__text { font-size: .74rem; }
+.task__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.idcard { width: 100%; max-width: 360px; margin: 0 auto; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 14px; background: #fff; box-shadow: var(--shadow); color: var(--navy); }
+.idcard__band { display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: linear-gradient(120deg, #24426C, #2E5487 60%, #3E6599); color: #fff; }
+.idcard__band strong { display: block; font-size: .95rem; }
+.idcard__band small { display: block; font-size: .62rem; opacity: .85; }
+.idcard__mark { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 8px; background: rgba(255, 255, 255, .15); }
+.idcard__body { display: grid; justify-items: center; gap: 12px; padding: 20px 18px 16px; text-align: center; }
+.idcard__photo { width: 110px; height: 130px; object-fit: cover; border: 3px solid var(--select); border-radius: 10px; }
+.idcard__photo--initial { display: grid; place-items: center; background: var(--select); color: var(--blue); font-size: 2.4rem; font-weight: 800; }
+.idcard__name { display: block; font-size: 1.05rem; }
+.idcard__role { display: block; font-size: .74rem; color: var(--muted); }
+.idcard__facts { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 12px 0 0; font-size: .72rem; text-align: left; }
+.idcard__facts dt { color: var(--muted); }
+.idcard__facts dd { margin: 0; font-weight: 600; }
+.idcard__foot { padding: 8px 18px; background: var(--orange); color: #1B2F4F; font-size: .66rem; font-weight: 700; letter-spacing: .06em; text-align: center; text-transform: uppercase; }
+
+@media (max-width: 760px) {
+  .split--even { grid-template-columns: 1fr; }
+  .taskform__row { grid-template-columns: 1fr; }
+}
+
+@media print {
+  /* On the ID card page, only the card prints. */
+  body:has(.idcard) * { visibility: hidden; }
+  .idcard, .idcard * { visibility: visible; }
+  .idcard { position: absolute; top: 0; left: 0; box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .no-print { display: none !important; }
+}
+
