@@ -157,21 +157,6 @@ code { font-size: .85em; padding: 1px 4px; border-radius: 4px; background: var(-
   font-size: .56rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
   background: var(--orange-soft); color: var(--orange-text);
 }
-.nav__link--support { margin-top: 14px; }
-.nav__link--support > .icon:last-child { margin-left: auto; color: var(--muted); }
-
-.helpcard {
-  display: flex; flex-direction: column; gap: 6px;
-  padding: 18px 16px; border: 1px solid transparent; border-radius: var(--radius);
-  background: #EFF3F9; color: var(--navy);
-}
-.helpcard:hover { text-decoration: none; border-color: #D3DDEC; }
-.helpcard.is-active { border-color: var(--blue); background: var(--select); }
-.helpcard > .icon { margin-bottom: 8px; }
-.helpcard__title { font-size: .8rem; }
-.helpcard__text { font-size: .72rem; color: var(--muted); }
-.helpcard__link { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; font-size: .86rem; font-weight: 700; }
-.helpcard__small { font-size: .64rem; color: var(--muted); }
 
 .sidebar__foot {
   display: flex; align-items: center; gap: 10px;

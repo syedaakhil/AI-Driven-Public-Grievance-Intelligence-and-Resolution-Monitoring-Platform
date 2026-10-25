@@ -37,18 +37,6 @@
 
     <div class="sidebar__spacer"></div>
 
-    <a class="helpcard{% if menu_active == 'help_desk' %} is-active{% endif %}" href="{% url 'grievances:help_desk' %}"{% if menu_active == 'help_desk' %} aria-current="page"{% endif %}>
-      {% icon 'phone' %}
-      <strong class="helpcard__title">{% translate "Your neighbourhood matters." %}</strong>
-      <span class="helpcard__text">{% translate "Water, roads or drainage? Connect with your corporation." %}</span>
-      <span class="helpcard__link"><span>{% translate "Citizen help desk" %}</span>{% icon 'arrow-right' 'sm' %}</span>
-      <small class="helpcard__small">{% translate "For everyday civic services &amp; assistance." %}</small>
-    </a>
-
-    <a class="nav__link nav__link--support{% if menu_active == 'help_support' %} is-active{% endif %}" href="{% url 'grievances:help_support' %}"{% if menu_active == 'help_support' %} aria-current="page"{% endif %}>
-      {% icon 'help' %}<span>{% translate "Help &amp; support" %}</span>{% icon 'chevron-right' 'sm' %}
-    </a>
-
     <p class="sidebar__foot"><span class="flag" aria-hidden="true"></span>{% translate "Better cities. Better everyday lives." %}</p>
   </div>
 </aside>
