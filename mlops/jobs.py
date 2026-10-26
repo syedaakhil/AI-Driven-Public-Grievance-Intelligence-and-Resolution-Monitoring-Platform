@@ -132,12 +132,15 @@ def _collect(job):
     if provider is None:
         raise ProviderError(_('This data source is no longer set up on the server.'))
     job.records_total = provider.count()
-    job.records_processed = job.records_new = 0
+    job.records_processed = job.records_new = job.candidates_new = 0
     job.error = ''
-    _save_progress(job, 'records_total', 'records_processed', 'records_new', 'error')
+    _save_progress(job, 'records_total', 'records_processed', 'records_new', 'candidates_new', 'error')
     for batch in provider.batches():
         _store_batch(job, batch)
         _save_progress(job, 'records_processed', 'records_new')
+    # Sources that need a review first (the news agent) report how many new stories they found.
+    job.candidates_new = getattr(provider, 'found_new', 0)
+    _save_progress(job, 'candidates_new')
     with transaction.atomic():
         dataset = Dataset.objects.select_for_update().get(pk=job.dataset_id)
         # The source no longer has these: drop them, so the dataset mirrors the source.

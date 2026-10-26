@@ -65,7 +65,7 @@
           <span class="person__avatar person__avatar--lg" aria-hidden="true">{% icon provider.icon %}</span>
           <strong class="officer__name" id="ds-{{ provider.slug }}">{{ provider.name }}</strong>
         </div>
-        <button type="button" class="btn btn--primary btn--sm collect-btn" data-collect data-state="idle"
+        <button type="button" class="btn btn--primary btn--sm collect-btn" data-collect data-state="{% if card.setup_problem %}disabled{% else %}idle{% endif %}"{% if card.setup_problem %} disabled data-disabled{% endif %}
                 aria-describedby="ds-{{ provider.slug }}-status">
           <span class="collect-btn__icon collect-btn__icon--idle" aria-hidden="true">{% icon 'download' 'sm' %}</span>
           <span class="collect-btn__icon collect-btn__icon--success" aria-hidden="true">{% icon 'check' 'sm' %}</span>
@@ -94,13 +94,48 @@
       <div class="dataset__progress" data-progress{% if not job or not job.is_active %} hidden{% endif %}>
         <div class="bar" role="progressbar" aria-labelledby="ds-{{ provider.slug }}" aria-valuemin="0" aria-valuemax="100"{% if job.progress is not None %} aria-valuenow="{{ job.progress }}"{% endif %}><span data-progress-fill style="width: {{ job.progress|default:0 }}%"></span></div>
       </div>
-      <p class="dataset__status{% if job.status == 'failed' %} is-error{% endif %}" id="ds-{{ provider.slug }}-status" role="status" aria-live="polite" data-status>{% if card.job_data %}{{ card.job_data.message }}{% endif %}</p>
+      <p class="dataset__status{% if job.status == 'failed' %} is-error{% endif %}" id="ds-{{ provider.slug }}-status" role="status" aria-live="polite" data-status>{% if card.setup_problem %}{{ card.setup_problem }}{% elif card.job_data %}{{ card.job_data.message }}{% endif %}</p>
       <p class="dataset__next" data-next>{{ card.next_action }}</p>
     </article>
     {% endwith %}
   {% endfor %}
 </div>
 <span hidden data-collect-url="{% url 'mlops:api_collect' %}"></span>
+
+{% if news_card %}
+<section class="card section newsreview" id="news-review" aria-labelledby="news-review-title">
+  <div class="card__head">
+    <h2 class="card__title" id="news-review-title">{% translate "News to review" %} {% if review_total %}<span class="count">{{ review_total }}</span>{% endif %}</h2>
+  </div>
+  <p class="newsreview__lead">{% translate "The news agent pre-filled these from the channel's newest videos because they mention a municipal problem. Check each one: approve it with the right category, or reject it. Only approved stories are used for training." %}</p>
+  {% if review %}
+    <div class="newsreview__list">
+      {% for candidate, form in review %}
+        <article class="newsitem" aria-labelledby="news-{{ candidate.pk }}">
+          <div class="newsitem__top">
+            <h3 class="newsitem__title" id="news-{{ candidate.pk }}"><a href="{{ candidate.url }}" target="_blank" rel="noopener noreferrer">{{ candidate.title }}</a></h3>
+            {% if candidate.published_at %}<span class="newsitem__date">{{ candidate.published_at|date:"d M Y, H:i" }}</span>{% endif %}
+          </div>
+          {% if candidate.summary %}<p class="newsitem__summary">{{ candidate.summary|truncatechars:280 }}</p>{% endif %}
+          <p class="newsitem__meta">{% icon 'sparkle' 'sm' %}{% blocktranslate with category=candidate.suggested_category.name|tr words=candidate.matched_keywords %}Agent's guess: {{ category }} (matched: {{ words }}){% endblocktranslate %}</p>
+          <form method="post" action="{% url 'mlops:news_review' candidate.pk %}" class="newsitem__form">
+            {% csrf_token %}
+            <div class="field"><label for="{{ form.category.id_for_label }}">{{ form.category.label }}</label>{{ form.category }}</div>
+            <div class="field"><label for="{{ form.district.id_for_label }}">{{ form.district.label }} <span class="opt">{% translate "(optional)" %}</span></label>{{ form.district }}</div>
+            <div class="newsitem__actions">
+              <button type="submit" name="{{ form.decision.html_name }}" value="approve" class="btn btn--primary btn--sm">{% icon 'check' 'sm' %}{% translate "Approve" %}</button>
+              <button type="submit" name="{{ form.decision.html_name }}" value="reject" class="btn btn--ghost btn--sm">{% icon 'x' 'sm' %}{% translate "Reject" %}</button>
+            </div>
+          </form>
+        </article>
+      {% endfor %}
+    </div>
+    {% if review_total > review|length %}<p class="newsreview__lead">{% blocktranslate with shown=review|length total=review_total %}Showing the newest {{ shown }} of {{ total }} stories. Review these to see the rest.{% endblocktranslate %}</p>{% endif %}
+  {% else %}
+    <div class="empty"><p>{% translate "Nothing to review. Press Collect data on the news card to look for new stories." %}</p></div>
+  {% endif %}
+</section>
+{% endif %}
 {% endblock %}
 
 {% block scripts %}

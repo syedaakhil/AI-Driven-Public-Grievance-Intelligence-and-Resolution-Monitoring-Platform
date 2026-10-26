@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: City Corporation\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-26 15:44+0530\n"
+"POT-Creation-Date: 2026-10-26 16:08+0530\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: City Corporation team\n"
 "Language-Team: Hindi\n"
@@ -213,6 +213,9 @@ msgstr "पिछला रन विफल"
 
 msgid "Collected"
 msgstr "एकत्रित"
+
+msgid "Show the new stories →"
+msgstr "नई खबरें दिखाएँ →"
 
 msgid "Starting collection…"
 msgstr "संग्रह शुरू हो रहा है…"

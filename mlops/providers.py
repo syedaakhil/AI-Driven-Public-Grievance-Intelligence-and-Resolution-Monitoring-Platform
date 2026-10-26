@@ -64,6 +64,10 @@ class Provider:
         """How many records batches() will yield, or None if the source can't tell in advance."""
         return None
 
+    def setup_problem(self):
+        """Why this source can't be collected yet (e.g. a missing API key), or None."""
+        return None
+
     def batches(self):
         raise NotImplementedError
 
@@ -131,6 +135,39 @@ class IngestedRecordsProvider(Provider):
             last_pk = rows[-1].pk
             yield [CollectedRecord(f'{record.dataset}:{record.pk}', clean_text(record.title, record.content),
                                    _label_from(record.data)) for record in rows]
+
+
+@register
+class YouTubeNewsProvider(Provider):
+    """
+    The news agent (news.py): municipal-problem videos from YOUTUBE_CHANNEL_HANDLE. Each run saves new
+    stories for review; the dataset holds only the ones a reviewer approved.
+    """
+    slug = 'news'
+    description = _('Municipal-problem news videos, added to the dataset once a reviewer approves each one.')
+    source_label = _('YouTube Data API')
+    label_name = _('Service category')
+    icon = 'megaphone'
+
+    def __init__(self):
+        self.found_new = 0
+
+    @property
+    def name(self):
+        return settings.YOUTUBE_SOURCE_NAME or 'News (YouTube)'
+
+    def setup_problem(self):
+        if not settings.YOUTUBE_API_KEY:
+            return _('Add YOUTUBE_API_KEY to .env to collect news (see ML_SETUP.md).')
+        return None
+
+    def batches(self):
+        from . import news
+
+        self.found_new = news.collect_candidates()
+        records = news.approved_records()
+        for start in range(0, len(records), BATCH_SIZE):
+            yield records[start:start + BATCH_SIZE]
 
 
 def _label_from(data):

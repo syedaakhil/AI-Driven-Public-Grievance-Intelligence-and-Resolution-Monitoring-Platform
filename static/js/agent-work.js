@@ -56,6 +56,7 @@
     this.bar = element.querySelector('[role="progressbar"]');
     this.fill = element.querySelector('[data-progress-fill]');
     this.job = null;
+    this.disabled = element.querySelector('[data-collect][data-disabled]') !== null;
     this.failures = 0;
     this.timer = null;
     var raw = element.getAttribute('data-job');
@@ -68,6 +69,12 @@
   }
 
   Card.prototype.render = function (job, opts) {
+    if (this.disabled) {
+      // Not set up on the server (e.g. no API key): keep the button off and the server's note.
+      this.button.setAttribute('data-state', 'disabled');
+      this.button.disabled = true;
+      return;
+    }
     var view = buttonState(job, opts);
     this.button.setAttribute('data-state', view.state);
     this.button.disabled = view.disabled;
@@ -79,6 +86,14 @@
     else if (job) this.setStatus(job.message, job.status === 'failed');
     if (opts.next !== undefined) this.next.textContent = opts.next;
     else if (job) this.next.textContent = job.next_action;
+    if (job && job.review_url && job.status === 'succeeded' && opts.next === undefined) {
+      // The review list is drawn by the server; reload to show the stories just found.
+      var link = this.doc.createElement('a');
+      link.className = 'link';
+      link.href = job.review_url;
+      link.textContent = ' ' + gettext('Show the new stories →');
+      this.next.appendChild(link);
+    }
 
     if (!job) return;
     var badge = badgeFor(job);

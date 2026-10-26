@@ -301,6 +301,12 @@ ML_TRAIN_EPOCHS = env_int('ML_TRAIN_EPOCHS', 30)
 ML_HTTP_SOURCE_URL = os.environ.get('ML_HTTP_SOURCE_URL', '').strip()
 ML_HTTP_SOURCE_TOKEN = os.environ.get('ML_HTTP_SOURCE_TOKEN', '').strip()
 ML_HTTP_SOURCE_NAME = os.environ.get('ML_HTTP_SOURCE_NAME', 'External source').strip()
+# News agent: municipal-problem videos from a YouTube channel (YouTube Data API v3), reviewed by
+# staff on the Agent Work page before they join the "news" dataset. Paste the key into .env yourself.
+YOUTUBE_API_KEY = os.environ.get('YOUTUBE_API_KEY', '').strip()
+YOUTUBE_CHANNEL_HANDLE = os.environ.get('YOUTUBE_CHANNEL_HANDLE', '@polimernews').strip()
+YOUTUBE_SOURCE_NAME = os.environ.get('YOUTUBE_SOURCE_NAME', 'Polimer News (YouTube)').strip()
+YOUTUBE_MAX_VIDEOS = env_int('YOUTUBE_MAX_VIDEOS', 200)   # newest uploads read per run (50 per API call)
 
 # Warnings and errors (failed SMS, server errors) go to the console, which gunicorn/systemd keep.
 LOGGING = {

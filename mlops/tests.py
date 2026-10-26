@@ -26,7 +26,8 @@ from grievances.models import Category, Complaint
 
 from . import jobs, providers
 from .ml import data, tensorflow_available, train
-from .models import CollectionJob, Dataset, DatasetRecord, TrainingRun
+from . import news
+from .models import CollectionJob, Dataset, DatasetRecord, NewsCandidate, TrainingRun
 from .providers import CollectedRecord, ProviderError
 
 Status = CollectionJob.Status
@@ -103,7 +104,7 @@ class ProviderTests(TestCase):
 
     def test_unknown_provider(self):
         self.assertIsNone(providers.get_provider('nope'))
-        self.assertEqual([provider.slug for provider in providers.providers()], ['complaints', 'ingested'])
+        self.assertEqual([provider.slug for provider in providers.providers()], ['complaints', 'ingested', 'news'])
         with self.assertRaises(NotImplementedError):
             providers.Provider().batches()
         self.assertIsNone(providers.Provider().count())
@@ -482,12 +483,15 @@ class PageTests(TestCase):
         self.assertContains(response, '<h1 class="head__title">Agent Work</h1>', html=True)
         self.assertContains(response, 'aria-current="page"')
         self.assertEqual(response.context['menu_active'], 'agent_work')
-        self.assertEqual([card['provider'].slug for card in response.context['cards']], ['complaints', 'ingested'])
+        self.assertEqual([card['provider'].slug for card in response.context['cards']], ['complaints', 'ingested', 'news'])
         self.assertContains(response, 'data-collect data-state="idle"', count=2)
+        self.assertContains(response, 'data-collect data-state="disabled" disabled data-disabled')
+        self.assertContains(response, 'Add YOUTUBE_API_KEY to .env')
         self.assertContains(response, 'aria-describedby="ds-complaints-status"')
         self.assertContains(response, 'id="ds-complaints-status" role="status" aria-live="polite"')
-        self.assertContains(response, 'Not collected yet', count=2)
-        self.assertContains(response, '<span data-last-collected>Never collected</span>', count=2)
+        self.assertContains(response, 'Not collected yet', count=3)
+        self.assertContains(response, '<span data-last-collected>Never collected</span>', count=3)
+        self.assertContains(response, 'Nothing to review.')
         self.assertContains(response, 'No model has been trained yet.')
         self.assertContains(response, 'js/agent-work.js')
         self.assertContains(response, f'data-collect-url="{reverse("mlops:api_collect")}"')
@@ -513,7 +517,7 @@ class PageTests(TestCase):
         self.assertContains(response, '87.5%')
         self.assertContains(response, '50.0%')
         self.assertContains(response, 'title="Too few"')
-        self.assertEqual(response.context['totals'], {'datasets': 2, 'records': 1, 'running': 0, 'models': 1})
+        self.assertEqual(response.context['totals'], {'datasets': 3, 'records': 1, 'running': 0, 'models': 1})
 
     @override_settings(ML_JOB_RUNNER='command')
     def test_running_and_failed_cards(self):
@@ -530,7 +534,7 @@ class PageTests(TestCase):
 
     def test_admin_cannot_add_jobs_or_training_runs(self):
         sign_in_admin(self.client)
-        for model in ('collectionjob', 'trainingrun'):
+        for model in ('collectionjob', 'trainingrun', 'newscandidate'):
             with self.subTest(model=model):
                 self.assertEqual(self.client.get(f'/admin/mlops/{model}/add/').status_code, 403)
         self.assertEqual(self.client.get('/admin/mlops/dataset/').status_code, 200)
@@ -658,3 +662,208 @@ class TensorFlowTrainingTests(TestCase):
             call_command('train_model', 'complaints', epochs=3, stdout=out)
         self.assertIn('held-out records', out.getvalue())
         self.assertIn(self.folder, out.getvalue())
+
+
+# Video titles written for these tests (Tamil and English), not taken from the channel.
+VIDEOS = [
+    ('v-water', 'சென்னையில் குடிநீர் தட்டுப்பாடு - மக்கள் அவதி', 'Residents of Chennai wait for tankers. Call 9876543210'),
+    ('v-sewage', 'Sewage overflowing on the main street in Madurai', 'Drainage blocked for a week.'),
+    ('v-accident', 'சாலை விபத்து: பள்ளம் காரணமா?', 'Accident near the bus stand.'),
+    ('v-sport', 'Cricket final highlights', 'Subscribe for more.'),
+    ('v-garbage', 'குப்பை கொட்டும் இடமாக மாறிய ஏரி', 'கோவை அருகே துர்நாற்றம்'),
+]
+
+
+def youtube_answer(videos=VIDEOS, pages=1):
+    """A fake urlopen: channels -> uploads playlist; playlistItems -> the videos, split over `pages`."""
+    calls = []
+
+    def urlopen(request, timeout):
+        url = request.full_url
+        calls.append(url)
+        if '/channels?' in url:
+            return fake_response({'items': [{'contentDetails': {'relatedPlaylists': {'uploads': 'UU-test'}}}]})
+        page = int(url.split('pageToken=p')[1].split('&')[0]) if 'pageToken=' in url else 1
+        per_page = -(-len(videos) // pages)
+        chunk = videos[(page - 1) * per_page:page * per_page]
+        body = {'items': [{'snippet': {'title': title, 'description': description,
+                                       'publishedAt': '2026-10-26T10:00:00Z', 'resourceId': {'videoId': video_id}}}
+                          for video_id, title, description in chunk]}
+        body['items'].append({'snippet': {'title': 'Private video', 'resourceId': {'videoId': 'hidden'}}})
+        if page < pages:
+            body['nextPageToken'] = f'p{page + 1}'
+        return fake_response(body)
+
+    return urlopen, calls
+
+
+@override_settings(YOUTUBE_API_KEY='test-key', YOUTUBE_CHANNEL_HANDLE='@testchannel', ML_JOB_RUNNER='inline')
+class NewsAgentTests(TestCase):
+    def setUp(self):
+        cache.clear()
+
+    def test_match_and_district(self):
+        self.assertEqual(news.match('சென்னையில் குடிநீருக்கு அலையும் மக்கள்'), ('water', ['குடிநீ']))
+        self.assertEqual(news.match('Huge POTHOLES on the road')[0], 'roads')
+        self.assertEqual(news.match('road accident near pothole'), (None, []))
+        self.assertEqual(news.match('broad daylight'), (None, []))
+        self.assertEqual(news.guess_district('கோவை அருகே'), 'Coimbatore')
+        self.assertEqual(news.guess_district('nowhere'), '')
+
+    def test_collect_prefills_only_municipal_stories(self):
+        urlopen, calls = youtube_answer()
+        with mock.patch('urllib.request.urlopen', urlopen):
+            job = jobs.start_collection('news')
+        job.refresh_from_db()
+        self.assertEqual((job.status, job.candidates_new, job.records_processed), (Status.SUCCEEDED, 3, 0))
+        stories = {story.external_id: story for story in NewsCandidate.objects.all()}
+        self.assertEqual(set(stories), {'v-water', 'v-sewage', 'v-garbage'})
+        water = stories['v-water']
+        self.assertEqual((water.category.slug, water.suggested_category.slug, water.district, water.status),
+                         ('water', 'water', 'Chennai', 'pending'))
+        self.assertIn('[phone]', water.summary)
+        self.assertEqual(water.url, 'https://www.youtube.com/watch?v=v-water')
+        self.assertEqual(stories['v-garbage'].district, 'Coimbatore')
+        self.assertIn('forHandle=%40testchannel', calls[0])
+        self.assertIn('key=test-key', calls[1])
+        # A second run finds nothing new, and the cached playlist saves the channels call.
+        with mock.patch('urllib.request.urlopen', urlopen):
+            again = jobs.start_collection('news')
+        again.refresh_from_db()
+        self.assertEqual(again.candidates_new, 0)
+        self.assertEqual(sum('/channels?' in url for url in calls), 1)
+
+    def test_pages_and_limit(self):
+        urlopen, calls = youtube_answer(pages=2)
+        with mock.patch('urllib.request.urlopen', urlopen):
+            videos = news.latest_videos('@testchannel', 4)
+        self.assertEqual([video['id'] for video in videos], ['v-water', 'v-sewage', 'v-accident', 'v-sport'])
+        self.assertTrue(any('pageToken=p2' in url for url in calls))
+        self.assertIsNone(news._parse_time('not a date'))
+        self.assertIsNone(news._parse_time(None))
+
+    def youtube_error(self, code, reason=''):
+        body = json.dumps({'error': {'errors': [{'reason': reason}]}}).encode() if reason else b'oops'
+        return urllib.error.HTTPError('https://www.googleapis.com/x?key=test-key', code, 'x', {}, io.BytesIO(body))
+
+    def test_http_errors_never_show_the_key(self):
+        cases = [
+            (self.youtube_error(403, 'quotaExceeded'), 'quota is used up', False),
+            (self.youtube_error(400, 'keyInvalid'), 'refused the API key', False),
+            (self.youtube_error(503), 'HTTP 503', True),
+        ]
+        for error, message, temporary in cases:
+            with self.subTest(message=message):
+                with mock.patch('urllib.request.urlopen', side_effect=error), \
+                        self.assertLogs('mlops.news', 'WARNING') as logs, self.assertRaises(ProviderError) as caught:
+                    news.latest_videos('@testchannel', 5)
+                self.assertIn(message, str(caught.exception))
+                self.assertNotIn('test-key', str(caught.exception) + ' '.join(logs.output))
+                self.assertEqual(caught.exception.temporary, temporary)
+
+    def test_network_errors(self):
+        for outcome, message in ((urllib.error.URLError('down'), 'could not be reached'),
+                                 (fake_response(b'not json'), 'could not be read')):
+            with self.subTest(message=message):
+                kwargs = {'side_effect': outcome} if isinstance(outcome, Exception) else {'return_value': outcome}
+                with mock.patch('urllib.request.urlopen', **kwargs), self.assertRaises(ProviderError) as caught:
+                    news.latest_videos('@testchannel', 5)
+                self.assertIn(message, str(caught.exception))
+                self.assertTrue(caught.exception.temporary)
+
+    def test_unknown_channel(self):
+        with mock.patch('urllib.request.urlopen', return_value=fake_response({'items': []})):
+            with self.assertRaisesMessage(ProviderError, 'No YouTube channel was found for @testchannel'):
+                news.latest_videos('@testchannel', 5)
+
+    @override_settings(YOUTUBE_API_KEY='')
+    def test_no_key(self):
+        with self.assertRaisesMessage(ProviderError, 'Add YOUTUBE_API_KEY'):
+            news.collect_candidates()
+        sign_in_admin(self.client)
+        response = self.client.post(reverse('mlops:api_collect'), '{"dataset": "news"}', content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('YOUTUBE_API_KEY', response.json()['error'])
+
+
+@override_settings(YOUTUBE_API_KEY='test-key', ML_JOB_RUNNER='inline')
+class NewsReviewTests(TestCase):
+    def setUp(self):
+        cache.clear()
+        sign_in_admin(self.client)
+        urlopen, _calls = youtube_answer()
+        with mock.patch('urllib.request.urlopen', urlopen):
+            self.job = jobs.start_collection('news')
+        self.water = NewsCandidate.objects.get(external_id='v-water')
+        self.page = reverse('mlops:agent_work')
+
+    def review(self, story, **data):
+        prefix = f'news-{story.pk}'
+        return self.client.post(reverse('mlops:news_review', args=[story.pk]),
+                                {f'{prefix}-{key}': value for key, value in data.items()})
+
+    def messages_of(self, response):
+        return [str(message) for message in response.wsgi_request._messages]
+
+    def test_page_shows_prefilled_forms(self):
+        response = self.client.get(self.page)
+        self.assertEqual(response.context['review_total'], 3)
+        self.assertContains(response, 'id="news-review"')
+        self.assertContains(response, 'href="https://www.youtube.com/watch?v=v-water" target="_blank" rel="noopener noreferrer"')
+        self.assertContains(response, f'name="news-{self.water.pk}-district"')
+        self.assertContains(response, 'value="Chennai"')
+        self.assertContains(response, 'matched: குடிநீ')
+        self.assertContains(response, 'check the stories under “News to review”')
+        job = self.client.get(reverse('mlops:api_job', args=[self.job.pk])).json()['job']
+        self.assertEqual(job['candidates_new'], 3)
+        self.assertIn('Found 3 new stories to review.', job['message'])
+        self.assertEqual(job['review_url'], f'{self.page}?review=1#news-review')
+
+    def test_approve_adds_a_labelled_record(self):
+        roads = Category.objects.get(slug='roads')
+        response = self.review(self.water, decision='approve', category=roads.pk, district='  Chennai   North ')
+        self.assertRedirects(response, f'{self.page}#news-review', fetch_redirect_response=False)
+        self.assertIn('was added to the news dataset', self.messages_of(response)[0])
+        self.water.refresh_from_db()
+        self.assertEqual((self.water.status, self.water.category, self.water.district), ('approved', roads, 'Chennai North'))
+        self.assertEqual(self.water.reviewed_by.username, 'admin')
+        record = DatasetRecord.objects.get(dataset__slug='news')
+        self.assertEqual((record.source_id, record.label), ('youtube:v-water', 'roads'))
+        self.assertIn('குடிநீர்', record.text)
+        self.assertEqual(Dataset.objects.get(slug='news').record_count, 1)
+        # Collecting again keeps approved stories in the dataset.
+        urlopen, _calls = youtube_answer()
+        with mock.patch('urllib.request.urlopen', urlopen):
+            job = jobs.start_collection('news')
+        job.refresh_from_db()
+        self.assertEqual((job.records_processed, job.records_new), (1, 0))
+        self.assertEqual(news.approved_records()[0].label, 'roads')
+
+    def test_reject_and_already_reviewed(self):
+        response = self.review(self.water, decision='reject')
+        self.assertIn('will not be used', self.messages_of(response)[0])
+        self.water.refresh_from_db()
+        self.assertEqual(self.water.status, 'rejected')
+        self.assertFalse(DatasetRecord.objects.filter(dataset__slug='news').exists())
+        response = self.review(self.water, decision='approve', category=Category.objects.first().pk)
+        self.assertIn('already reviewed', self.messages_of(response)[-1])
+        self.assertEqual(self.client.get(self.page).context['review_total'], 2)
+
+    def test_approve_needs_a_category(self):
+        response = self.review(self.water, decision='approve', category='')
+        self.assertIn('Choose the service category before approving.', self.messages_of(response))
+        self.review(self.water, decision='maybe')
+        self.water.refresh_from_db()
+        self.assertEqual(self.water.status, 'pending')
+
+    def test_staff_only_and_post_only(self):
+        url = reverse('mlops:news_review', args=[self.water.pk])
+        self.assertEqual(self.client.get(url).status_code, 405)
+        self.assertEqual(self.client.post(reverse('mlops:news_review', args=[999])).status_code, 404)
+        self.client.logout()
+        self.assertEqual(self.client.post(url, {}).status_code, 302)
+        self.water.refresh_from_db()
+        self.assertEqual(self.water.status, 'pending')
+
+    def test_string(self):
+        self.assertEqual(str(self.water), 'youtube:v-water · pending')

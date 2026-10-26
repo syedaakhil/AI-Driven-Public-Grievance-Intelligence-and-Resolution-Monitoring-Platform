@@ -44,6 +44,7 @@ class CollectionJob(models.Model):
     records_total = models.PositiveIntegerField(null=True, blank=True, help_text='Empty when the source cannot count.')
     records_processed = models.PositiveIntegerField(default=0)
     records_new = models.PositiveIntegerField(default=0)
+    candidates_new = models.PositiveIntegerField(default=0, help_text='New news stories waiting for review.')
     attempts = models.PositiveSmallIntegerField(default=0)
     error = models.TextField(blank=True)
 
@@ -110,3 +111,46 @@ class TrainingRun(models.Model):
 
     def __str__(self):
         return f'Training {self.pk} · {self.dataset.slug} · {self.status}'
+
+
+class NewsCandidate(models.Model):
+    """
+    A news story the agent found (e.g. a Polimer News video about a municipal problem), pre-filled
+    for staff review. Only approved stories become records of the "news" dataset.
+    """
+
+    class Status(models.TextChoices):
+        PENDING = 'pending', 'Waiting for review'
+        APPROVED = 'approved', 'Approved'
+        REJECTED = 'rejected', 'Rejected'
+
+    source = models.CharField(max_length=20, default='youtube')
+    external_id = models.CharField(max_length=64, help_text='The video ID at the source.')
+    title = models.CharField(max_length=300)
+    summary = models.TextField(blank=True)
+    url = models.URLField(max_length=300)
+    published_at = models.DateTimeField(null=True, blank=True)
+    suggested_category = models.ForeignKey('grievances.Category', on_delete=models.SET_NULL, null=True, blank=True,
+                                           related_name='+', help_text="The agent's guess.")
+    category = models.ForeignKey('grievances.Category', on_delete=models.PROTECT, null=True, blank=True,
+                                 related_name='+', help_text='Chosen by the reviewer.')
+    district = models.CharField(max_length=60, blank=True)
+    matched_keywords = models.CharField(max_length=300, blank=True)
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING, db_index=True)
+    reviewed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+                                    related_name='+')
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ['-published_at', '-id']
+        constraints = [
+            models.UniqueConstraint(fields=['source', 'external_id'], name='unique_news_story_per_source'),
+        ]
+
+    def __str__(self):
+        return f'{self.source}:{self.external_id} · {self.status}'
+
+    @property
+    def record_text(self):
+        return ' '.join(part for part in (self.title, self.summary) if part)

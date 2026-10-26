@@ -4,7 +4,8 @@ import logging
 from django.conf import settings
 from django.db import DatabaseError
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import date_format
@@ -14,14 +15,16 @@ from django.views.decorators.http import require_GET, require_POST
 from accounts.decorators import staff_required
 from assistant.ratelimit import allow
 
-from . import jobs
+from . import jobs, news
+from .forms import NewsReviewForm
 from .ml import tensorflow_available
-from .models import CollectionJob, Dataset, TrainingRun
-from .providers import providers
+from .models import CollectionJob, Dataset, NewsCandidate, TrainingRun
+from .providers import get_provider, providers
 
 logger = logging.getLogger(__name__)
 
 COLLECT_PER_MINUTE = 10
+REVIEW_LIST_SIZE = 30
 
 
 def _error(message, status, **extra):
@@ -44,8 +47,12 @@ def job_message(job):
                 'done': job.records_processed, 'total': job.records_total}
         return _('Collecting… %(done)s records so far') % {'done': job.records_processed}
     if job.status == CollectionJob.Status.SUCCEEDED:
-        return ngettext('Collected %(count)s record (%(new)s new).', 'Collected %(count)s records (%(new)s new).',
-                        job.records_processed) % {'count': job.records_processed, 'new': job.records_new}
+        message = ngettext('Collected %(count)s record (%(new)s new).', 'Collected %(count)s records (%(new)s new).',
+                           job.records_processed) % {'count': job.records_processed, 'new': job.records_new}
+        if job.candidates_new:
+            message += ' ' + ngettext('Found %(count)s new story to review.', 'Found %(count)s new stories to review.',
+                                      job.candidates_new) % {'count': job.candidates_new}
+        return message
     # Errors are saved in English; translate the ones that have a Hindi version.
     return _(job.error) if job.error else _('Collection failed.')
 
@@ -57,6 +64,8 @@ def next_action(dataset, job):
         return _('You can leave this page; collection carries on in the background.')
     if job.status == CollectionJob.Status.FAILED:
         return _('Fix the problem above if it names one, then press Try again.')
+    if dataset.slug == news.NEWS_DATASET and NewsCandidate.objects.filter(status=NewsCandidate.Status.PENDING).exists():
+        return _('Next: check the stories under “News to review” and approve the ones about municipal problems.')
     labelled = dataset.records.exclude(label='').count()
     if labelled >= settings.ML_MIN_TRAIN_RECORDS and dataset.label_count >= 2:
         return _('Next: train the model with “manage.py train_model %(slug)s”.') % {'slug': dataset.slug}
@@ -99,6 +108,8 @@ def job_to_dict(job):
         'started_at': job.started_at.isoformat() if job.started_at else None,
         'finished_at': job.finished_at.isoformat() if job.finished_at else None,
         'status_url': reverse('mlops:api_job', args=[job.pk]),
+        'candidates_new': job.candidates_new,
+        'review_url': f'{reverse("mlops:agent_work")}?review=1#news-review' if job.candidates_new else '',
     }
 
 
@@ -118,7 +129,12 @@ def agent_work(request):
             'job_json': json.dumps(job_to_dict(job)) if job else '',
             'next_action': next_action(dataset, job),
             'last_collected': last_collected(dataset) if dataset else _('Never collected'),
+            'setup_problem': provider.setup_problem(),
         })
+    pending = NewsCandidate.objects.filter(status=NewsCandidate.Status.PENDING).select_related('suggested_category')
+    review = [(candidate, NewsReviewForm(prefix=f'news-{candidate.pk}', initial={
+        'category': candidate.category_id, 'district': candidate.district}))
+        for candidate in pending[:REVIEW_LIST_SIZE]]
     latest_runs = list(TrainingRun.objects.select_related('dataset')[:5])
     for run in latest_runs:
         run.accuracy_pct = _percent(run.metrics.get('accuracy'))
@@ -132,6 +148,9 @@ def agent_work(request):
             'models': TrainingRun.objects.filter(status=TrainingRun.Status.SUCCEEDED).count(),
         },
         'training_runs': latest_runs,
+        'review': review,
+        'review_total': pending.count(),
+        'news_card': any(card['provider'].slug == news.NEWS_DATASET for card in cards),
         'tensorflow_ready': tensorflow_available(),
         'min_train_records': settings.ML_MIN_TRAIN_RECORDS,
         'artifacts_dir': settings.ML_ARTIFACTS_DIR,
@@ -157,6 +176,10 @@ def api_collect(request):
     slug = body.get('dataset') if isinstance(body, dict) else None
     if not isinstance(slug, str) or not slug.strip():
         return _error(_('Choose a dataset to collect.'), 400)
+    provider = get_provider(slug.strip())
+    problem = provider.setup_problem() if provider else None
+    if problem:
+        return _error(str(problem), 400)
     try:
         job = jobs.start_collection(slug.strip(), request.user)
     except jobs.UnknownDataset:
@@ -181,3 +204,27 @@ def api_job(request, pk):
     if job.is_active and jobs.expire_stale_jobs(job.dataset):
         job.refresh_from_db()
     return JsonResponse({'job': job_to_dict(job)})
+
+
+@staff_required
+@require_POST
+def news_review(request, pk):
+    """Approve (into the "news" dataset) or reject one story the news agent pre-filled."""
+    candidate = get_object_or_404(NewsCandidate, pk=pk)
+    back = redirect(f'{reverse("mlops:agent_work")}#news-review')
+    if candidate.status != NewsCandidate.Status.PENDING:
+        messages.info(request, _('This story was already reviewed.'))
+        return back
+    form = NewsReviewForm(request.POST, prefix=f'news-{candidate.pk}')
+    if not form.is_valid():
+        errors = [error for field_errors in form.errors.values() for error in field_errors]
+        messages.error(request, ' '.join(errors))
+        return back
+    if form.cleaned_data['decision'] == NewsReviewForm.APPROVE:
+        news.approve(candidate, form.cleaned_data['category'], form.cleaned_data['district'], request.user)
+        messages.success(request, _('Approved: “%(title)s” was added to the news dataset.') % {'title': candidate.title[:80]})
+    else:
+        news.reject(candidate, request.user)
+        messages.success(request, _('Rejected: “%(title)s” will not be used.') % {'title': candidate.title[:80]})
+    logger.info('News story %s %s by %s', candidate.external_id, candidate.status, request.user.username)
+    return back

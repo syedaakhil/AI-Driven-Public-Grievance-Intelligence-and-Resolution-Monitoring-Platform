@@ -8,9 +8,42 @@ collection. Training is a separate step that only runs when you start it on the 
 |---|---|---|---|
 | `complaints` | Complaints in this portal that have a service category | title + description | category slug (`water`, `roads`, …) |
 | `ingested` | Records sent to `POST /api/ingest/` (see INGEST_API.md) | title + content | the record's `category` or `label` field, if any |
+| `news` | Polimer News YouTube videos, **after a reviewer approves each one** (see below) | video title + description | the category the reviewer chose |
 | `external` | Only when `ML_HTTP_SOURCE_URL` is set | `text` (or `title`) | `label` |
 
 Email addresses and phone numbers are replaced with `[email]` / `[phone]` before anything is saved.
+
+## News agent (Polimer News on YouTube)
+
+1. **Collect data** on the "Polimer News (YouTube)" card reads the channel's newest uploads
+   (`YOUTUBE_MAX_VIDEOS`, default 200) through the YouTube Data API v3.
+2. It keeps only stories that mention a municipal problem. `mlops/news.py` has Tamil and English
+   keywords for the portal's four categories: water, roads, sewage and sanitation. A road *accident* is skipped.
+3. Each kept story is pre-filled under **News to review**: title (a link to the video), summary, the
+   agent's category guess, the words it matched, and the district if the text names one.
+4. You check each one and press **Approve** (with the right category) or **Reject**. Approved stories go
+   straight into the `news` dataset; rejected ones are never used. A story is never offered twice.
+5. Once there are at least `ML_MIN_TRAIN_RECORDS` approved stories in 2 or more categories:
+
+   ```bash
+   .venv\Scripts\python.exe manage.py train_model news
+   ```
+
+The keyword filter is only a first pass and will miss some stories and catch some it shouldn't.
+That is why nothing reaches training without a person approving it.
+
+**Getting the API key** (free, about 5 minutes):
+1. Open https://console.cloud.google.com/ and sign in with a Google account.
+2. Top bar → project picker → **New project** → name it (e.g. "City Corporation") → **Create**.
+3. Search bar → "YouTube Data API v3" → **Enable**.
+4. Left menu → **APIs & Services → Credentials** → **Create credentials → API key**. Copy it.
+5. Optional but wise: **Edit API key → API restrictions → Restrict key → YouTube Data API v3**.
+6. Paste it into `.env` as `YOUTUBE_API_KEY=...` and restart the server. On Vercel, add it under
+   Project → Settings → Environment Variables, then redeploy.
+
+One run costs about 5 units of the free 10,000-unit daily quota. YouTube's developer policies limit how
+long API data may be kept, so check them before you keep stories for months. Stories are used only
+inside this staff-only page.
 
 ## 1. Install
 

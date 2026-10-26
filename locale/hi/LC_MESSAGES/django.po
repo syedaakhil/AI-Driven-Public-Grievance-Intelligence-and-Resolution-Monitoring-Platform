@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: City Corporation\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-26 15:44+0530\n"
+"POT-Creation-Date: 2026-10-26 16:08+0530\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: City Corporation team\n"
 "Language-Team: Hindi\n"
@@ -802,6 +802,21 @@ msgstr "शिकायत ID इस तरह दिखती है: CC-2026-0
 msgid "Thank you. Your enquiry %(reference)s has been recorded."
 msgstr "धन्यवाद। आपकी पूछताछ %(reference)s दर्ज कर ली गई है।"
 
+msgid "Approve"
+msgstr "स्वीकार करें"
+
+msgid "Reject"
+msgstr "अस्वीकार करें"
+
+msgid "Choose a category"
+msgstr "श्रेणी चुनें"
+
+msgid "District"
+msgstr "ज़िला"
+
+msgid "Choose the service category before approving."
+msgstr "स्वीकार करने से पहले सेवा श्रेणी चुनें।"
+
 msgid "The database was not reachable. Press Collect data to try again."
 msgstr "डेटाबेस उपलब्ध नहीं था। फिर से प्रयास करने के लिए \"डेटा एकत्र करें\" दबाएँ।"
 
@@ -817,6 +832,29 @@ msgstr "कार्य पूरा होने से पहले रोक 
 
 msgid "The job stopped responding (the server may have restarted). Press Collect data to try again."
 msgstr "कार्य ने जवाब देना बंद कर दिया (शायद सर्वर फिर से शुरू हुआ)। फिर से प्रयास करने के लिए \"डेटा एकत्र करें\" दबाएँ।"
+
+msgid "The YouTube API daily quota is used up. Try again tomorrow."
+msgstr "YouTube API का दैनिक कोटा समाप्त हो गया है। कल फिर से प्रयास करें।"
+
+msgid "YouTube refused the API key. Check YOUTUBE_API_KEY in .env."
+msgstr "YouTube ने API कुंजी अस्वीकार कर दी। .env में YOUTUBE_API_KEY जाँचें।"
+
+#, python-format
+msgid "YouTube answered with HTTP %(code)s."
+msgstr "YouTube ने HTTP %(code)s के साथ जवाब दिया।"
+
+msgid "YouTube could not be reached."
+msgstr "YouTube तक नहीं पहुँच सके।"
+
+msgid "YouTube sent an answer that could not be read."
+msgstr "YouTube का जवाब पढ़ा नहीं जा सका।"
+
+#, python-format
+msgid "No YouTube channel was found for %(handle)s. Check YOUTUBE_CHANNEL_HANDLE."
+msgstr "%(handle)s के लिए कोई YouTube चैनल नहीं मिला। YOUTUBE_CHANNEL_HANDLE जाँचें।"
+
+msgid "Add YOUTUBE_API_KEY to .env to collect news (see ML_SETUP.md)."
+msgstr "समाचार एकत्र करने के लिए .env में YOUTUBE_API_KEY जोड़ें (ML_SETUP.md देखें)।"
 
 msgid "Label"
 msgstr "लेबल"
@@ -838,6 +876,12 @@ msgstr "डेटा-प्राप्ति API को भेजे गए र
 
 msgid "Data-ingestion API"
 msgstr "डेटा-प्राप्ति API"
+
+msgid "Municipal-problem news videos, added to the dataset once a reviewer approves each one."
+msgstr "नगर समस्याओं के समाचार वीडियो, समीक्षक द्वारा हर एक को स्वीकार करने पर डेटासेट में जुड़ते हैं।"
+
+msgid "YouTube Data API"
+msgstr "YouTube डेटा API"
 
 msgid "Records fetched from the outside source set in ML_HTTP_SOURCE_URL."
 msgstr "ML_HTTP_SOURCE_URL में सेट बाहरी स्रोत से लिए गए रिकॉर्ड।"
@@ -888,6 +932,12 @@ msgid_plural "Collected %(count)s records (%(new)s new)."
 msgstr[0] "%(count)s रिकॉर्ड एकत्र हुआ (%(new)s नया)।"
 msgstr[1] "%(count)s रिकॉर्ड एकत्र हुए (%(new)s नए)।"
 
+#, python-format
+msgid "Found %(count)s new story to review."
+msgid_plural "Found %(count)s new stories to review."
+msgstr[0] "समीक्षा के लिए %(count)s नई खबर मिली।"
+msgstr[1] "समीक्षा के लिए %(count)s नई खबरें मिलीं।"
+
 msgid "Collection failed."
 msgstr "संग्रह विफल रहा।"
 
@@ -900,6 +950,9 @@ msgstr "आप यह पेज छोड़ सकते हैं; संग�
 msgid "Fix the problem above if it names one, then press Try again."
 msgstr "ऊपर कोई समस्या बताई गई हो तो उसे ठीक करें, फिर \"फिर से प्रयास करें\" दबाएँ।"
 
+msgid "Next: check the stories under “News to review” and approve the ones about municipal problems."
+msgstr "अगला कदम: “समीक्षा के लिए समाचार” में खबरें जाँचें और नगर समस्याओं वाली खबरें स्वीकार करें।"
+
 #, python-format
 msgid "Next: train the model with “manage.py train_model %(slug)s”."
 msgstr "अगला कदम: “manage.py train_model %(slug)s” से मॉडल प्रशिक्षित करें।"
@@ -907,6 +960,13 @@ msgstr "अगला कदम: “manage.py train_model %(slug)s” से म�
 #, python-format
 msgid "Training needs at least %(count)s labelled records in 2 or more labels; collect again when more arrive."
 msgstr "प्रशिक्षण के लिए 2 या अधिक लेबल में कम से कम %(count)s लेबल वाले रिकॉर्ड चाहिए; और आने पर फिर से एकत्र करें।"
+
+msgid "Never collected"
+msgstr "कभी एकत्र नहीं हुआ"
+
+#, python-format
+msgid "Last collected %(when)s"
+msgstr "अंतिम संग्रह %(when)s"
 
 msgid "Queued"
 msgstr "कतार में"
@@ -938,6 +998,17 @@ msgstr "यह डेटासेट पहले से एकत्र हो 
 
 msgid "This job does not exist."
 msgstr "यह कार्य मौजूद नहीं है।"
+
+msgid "This story was already reviewed."
+msgstr "इस खबर की समीक्षा पहले ही हो चुकी है।"
+
+#, python-format
+msgid "Approved: “%(title)s” was added to the news dataset."
+msgstr "स्वीकृत: “%(title)s” समाचार डेटासेट में जोड़ी गई।"
+
+#, python-format
+msgid "Rejected: “%(title)s” will not be used."
+msgstr "अस्वीकृत: “%(title)s” का उपयोग नहीं होगा।"
 
 msgid "Register a complaint · City Corporation"
 msgstr "शिकायत दर्ज करें · नगर निगम"
@@ -2220,15 +2291,25 @@ msgstr "पिछला रन विफल"
 msgid "Not collected yet"
 msgstr "अभी एकत्र नहीं हुआ"
 
-#, python-format
-msgid "Last collected %(when)s"
-msgstr "अंतिम संग्रह %(when)s"
-
-msgid "Never collected"
-msgstr "कभी एकत्र नहीं हुआ"
-
 msgid "New last run"
 msgstr "पिछले रन में नए"
+
+msgid "News to review"
+msgstr "समीक्षा के लिए समाचार"
+
+msgid "The news agent pre-filled these from the channel's newest videos because they mention a municipal problem. Check each one: approve it with the right category, or reject it. Only approved stories are used for training."
+msgstr "समाचार एजेंट ने इन्हें चैनल के नए वीडियो से भरा है क्योंकि इनमें नगर समस्या का ज़िक्र है। हर एक जाँचें: सही श्रेणी के साथ स्वीकार करें, या अस्वीकार करें। प्रशिक्षण में केवल स्वीकृत खबरें इस्तेमाल होती हैं।"
+
+#, python-format
+msgid "Agent's guess: %(category)s (matched: %(words)s)"
+msgstr "एजेंट का अनुमान: %(category)s (मिले शब्द: %(words)s)"
+
+#, python-format
+msgid "Showing the newest %(shown)s of %(total)s stories. Review these to see the rest."
+msgstr "%(total)s में से नवीनतम %(shown)s खबरें दिख रही हैं। बाकी देखने के लिए इनकी समीक्षा करें।"
+
+msgid "Nothing to review. Press Collect data on the news card to look for new stories."
+msgstr "समीक्षा के लिए कुछ नहीं। नई खबरें खोजने के लिए समाचार कार्ड पर \"डेटा एकत्र करें\" दबाएँ।"
 
 msgid "Pages"
 msgstr "पृष्ठ"
