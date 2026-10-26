@@ -1,0 +1,9 @@
+# Training on the Agent Work datasets ("manage.py train_model"). Install only on the computer that
+# trains: TensorFlow is about 500 MB, far over Vercel's 250 MB limit, so requirements.txt doesn't include
+# it and the website runs without it. TensorFlow 2.21 supports Python 3.10–3.13 (64-bit).
+#   .venv\Scripts\python.exe -m pip install -r requirements-ml.txt
+-r requirements.txt
+
+tensorflow==2.21.0
+keras==3.15.1
+numpy==2.5.4

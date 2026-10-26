@@ -8,6 +8,7 @@ source =
     citycorp
     core
     grievances
+    mlops
 omit =
     */tests.py
     citycorp/asgi.py

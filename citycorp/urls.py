@@ -11,6 +11,7 @@ urlpatterns = [
     path('', include('accounts.urls')),
     path('', include('grievances.urls')),
     path('', include('assistant.urls')),
+    path('', include('mlops.urls')),
     # Language switch (POST language=en|hi) and the JavaScript translation catalogue
     path('i18n/', include('django.conf.urls.i18n')),
     path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load ui i18n humanize %}
+
+{% block title %}{% translate "Agent Work · City Corporation" %}{% endblock %}
+
+{% block content %}
+<div class="head">
+  <h1 class="head__title">{% translate "Agent Work" %}</h1>
+  <p class="head__lead">{% translate "Collect datasets from the portal's own records, and train a model that suggests the service category of new complaints." %}</p>
+</div>
+
+<details class="card section addpanel">
+  <summary class="addpanel__summary"><span class="tile tile--orange">{% icon 'sparkle' %}</span><span><strong>{% translate "Train the model" %}</strong><small>{% translate "Collecting never trains. Training runs only when started on the server." %}</small></span>{% icon 'chevron-down' 'sm' %}</summary>
+  <div class="addpanel__form trainpanel">
+    {% if tensorflow_ready %}
+      <div class="alert alert--success">{% icon 'check' %}<span>{% translate "TensorFlow is installed on this server." %}</span></div>
+    {% else %}
+      <div class="alert alert--info">{% icon 'info' %}<span>{% translate "TensorFlow is not installed on this server. Collecting works without it; install requirements-ml.txt on the computer that trains." %}</span></div>
+    {% endif %}
+    <ol class="trainpanel__steps">
+      <li>{% translate "Press Collect data on the Complaint texts card." %}</li>
+      <li>{% blocktranslate with count=min_train_records %}Wait until it has at least {{ count }} labelled records in 2 or more categories.{% endblocktranslate %}</li>
+      <li>{% translate "On the server, run:" %} <code class="mono">.venv\Scripts\python.exe manage.py train_model complaints</code></li>
+    </ol>
+    <p class="trainpanel__where">{% translate "Models and metrics are saved in:" %} <code class="mono">{{ artifacts_dir }}</code></p>
+    {% if training_runs %}
+      <div class="table-wrap">
+        <table class="table">
+          <caption class="sr-only">{% translate "Latest training runs" %}</caption>
+          <thead><tr><th scope="col">{% translate "Run" %}</th><th scope="col">{% translate "Dataset" %}</th><th scope="col">{% translate "Status" %}</th><th scope="col">{% translate "Accuracy" %}</th><th scope="col">{% translate "Most-common-label guess" %}</th><th scope="col">{% translate "Records" %}</th><th scope="col">{% translate "Started" %}</th></tr></thead>
+          <tbody>
+            {% for run in training_runs %}
+              <tr>
+                <td class="mono">#{{ run.pk }}</td>
+                <td>{{ run.dataset.name }}</td>
+                <td>{% if run.status == 'succeeded' %}<span class="badge badge--resolved">{% translate "Trained" %}</span>{% elif run.status == 'failed' %}<span class="badge badge--high" title="{{ run.error }}">{% translate "Failed" %}</span>{% else %}<span class="badge badge--medium">{% translate "Training" %}</span>{% endif %}</td>
+                <td>{% if run.accuracy_pct is not None %}{{ run.accuracy_pct }}%{% else %}—{% endif %}</td>
+                <td>{% if run.baseline_pct is not None %}{{ run.baseline_pct }}%{% else %}—{% endif %}</td>
+                <td>{{ run.record_count }}</td>
+                <td class="nowrap">{{ run.started_at|date:"d M Y, H:i" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="trainpanel__where">{% translate "No model has been trained yet." %}</p>
+    {% endif %}
+  </div>
+</details>
+
+<section class="grid grid--4 section" aria-label="{% translate 'Summary' %}">
+  <div class="card mini"><span class="tile">{% icon 'table' %}</span><div><strong>{{ totals.datasets }}</strong><span>{% translate "Datasets" %}</span></div></div>
+  <div class="card mini"><span class="tile tile--orange">{% icon 'list' %}</span><div><strong data-total-records>{{ totals.records|intcomma }}</strong><span>{% translate "Records collected" %}</span></div></div>
+  <div class="card mini"><span class="tile tile--green">{% icon 'refresh' %}</span><div><strong data-total-running>{{ totals.running }}</strong><span>{% translate "Collecting now" %}</span></div></div>
+  <div class="card mini"><span class="tile">{% icon 'sparkle' %}</span><div><strong>{{ totals.models }}</strong><span>{% translate "Trained models" %}</span></div></div>
+</section>
+
+<div class="grid grid--auto grid--datasets">
+  {% for card in cards %}
+    {% with provider=card.provider dataset=card.dataset job=card.job %}
+    <article class="card officer dataset" data-dataset-card data-dataset="{{ provider.slug }}" data-job="{{ card.job_json }}" aria-labelledby="ds-{{ provider.slug }}">
+      <div class="dataset__top">
+        <div class="person">
+          <span class="person__avatar person__avatar--lg" aria-hidden="true">{% icon provider.icon %}</span>
+          <strong class="officer__name" id="ds-{{ provider.slug }}">{{ provider.name }}</strong>
+        </div>
+        <button type="button" class="btn btn--primary btn--sm collect-btn" data-collect data-state="idle"
+                aria-describedby="ds-{{ provider.slug }}-status">
+          <span class="collect-btn__icon collect-btn__icon--idle" aria-hidden="true">{% icon 'download' 'sm' %}</span>
+          <span class="collect-btn__icon collect-btn__icon--success" aria-hidden="true">{% icon 'check' 'sm' %}</span>
+          <span class="collect-btn__icon collect-btn__icon--error" aria-hidden="true">{% icon 'refresh' 'sm' %}</span>
+          <span class="collect-btn__spinner" aria-hidden="true"></span>
+          <span data-collect-label>{% translate "Collect data" %}</span>
+        </button>
+      </div>
+      <p class="dataset__desc">{{ provider.description }}</p>
+      <div data-badge>
+        {% if job and job.is_active %}<span class="badge badge--medium">{% translate "Collecting" %}</span>
+        {% elif job and job.status == 'failed' %}<span class="badge badge--high">{% translate "Last run failed" %}</span>
+        {% elif dataset and dataset.last_collected_at %}<span class="badge badge--resolved">{% translate "Collected" %}</span>
+        {% else %}<span class="badge badge--plain">{% translate "Not collected yet" %}</span>{% endif %}
+      </div>
+      <ul class="officer__meta">
+        <li>{% icon 'shield' 'sm' %}<span class="mono">{{ provider.slug }}</span></li>
+        <li>{% icon 'building' 'sm' %}{{ provider.source_label }}</li>
+        <li>{% icon 'clock' 'sm' %}<span data-last-collected>{{ card.last_collected }}</span></li>
+      </ul>
+      <div class="officer__numbers">
+        <div><strong data-count="records">{{ dataset.record_count|default:0 }}</strong><span>{% translate "Records" %}</span></div>
+        <div><strong data-count="labels">{{ dataset.label_count|default:0 }}</strong><span>{{ provider.label_name }}</span></div>
+        <div><strong data-count="new">{% if job and job.status == 'succeeded' %}{{ job.records_new }}{% else %}—{% endif %}</strong><span>{% translate "New last run" %}</span></div>
+      </div>
+      <div class="dataset__progress" data-progress{% if not job or not job.is_active %} hidden{% endif %}>
+        <div class="bar" role="progressbar" aria-labelledby="ds-{{ provider.slug }}" aria-valuemin="0" aria-valuemax="100"{% if job.progress is not None %} aria-valuenow="{{ job.progress }}"{% endif %}><span data-progress-fill style="width: {{ job.progress|default:0 }}%"></span></div>
+      </div>
+      <p class="dataset__status{% if job.status == 'failed' %} is-error{% endif %}" id="ds-{{ provider.slug }}-status" role="status" aria-live="polite" data-status>{% if card.job_data %}{{ card.job_data.message }}{% endif %}</p>
+      <p class="dataset__next" data-next>{{ card.next_action }}</p>
+    </article>
+    {% endwith %}
+  {% endfor %}
+</div>
+<span hidden data-collect-url="{% url 'mlops:api_collect' %}"></span>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static_v 'js/agent-work.js' %}"></script>
+{% endblock %}

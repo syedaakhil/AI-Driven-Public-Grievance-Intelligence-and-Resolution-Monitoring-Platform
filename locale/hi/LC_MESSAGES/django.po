@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: City Corporation\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-25 16:48+0530\n"
+"POT-Creation-Date: 2026-10-26 15:44+0530\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: City Corporation team\n"
 "Language-Team: Hindi\n"
@@ -191,13 +191,15 @@ msgstr "कर्मचारी"
 msgid "Dataset"
 msgstr "डेटासेट"
 
+msgid "Agent Work"
+msgstr "एजेंट कार्य"
+
 msgid "Overview"
 msgstr "अवलोकन"
 
 msgid "Filed complaints"
 msgstr "दर्ज शिकायतें"
 
-#| msgid "Complaint details"
 msgid "Employee details"
 msgstr "कर्मचारी का विवरण"
 
@@ -311,7 +313,6 @@ msgstr "वार्ड"
 msgid "Status"
 msgstr "स्थिति"
 
-#| msgid "Officer in charge"
 msgid "Employee in charge"
 msgstr "प्रभारी कर्मचारी"
 
@@ -375,7 +376,6 @@ msgstr "ID, नागरिक का नाम, तालुक या क्�
 msgid "Review"
 msgstr "समीक्षा"
 
-#| msgid "Assigned or in progress"
 msgid "Assigned or available"
 msgstr "सौंपा गया या उपलब्ध"
 
@@ -388,14 +388,12 @@ msgstr "उपलब्ध"
 msgid "Name (A–Z)"
 msgstr "नाम (A–Z)"
 
-#| msgid "Most open complaints"
 msgid "Most open tasks"
 msgstr "सबसे अधिक खुले कार्य"
 
 msgid "Most open complaints"
 msgstr "सबसे अधिक खुली शिकायतें"
 
-#| msgid "Search help topics"
 msgid "Search employees"
 msgstr "कर्मचारी खोजें"
 
@@ -411,11 +409,9 @@ msgstr "विभाग"
 msgid "Active and on leave"
 msgstr "सक्रिय और छुट्टी पर"
 
-#| msgid "Assigned"
 msgid "Assignment"
 msgstr "कार्य स्थिति"
 
-#| msgid "Full Name"
 msgid "Full name"
 msgstr "पूरा नाम"
 
@@ -440,19 +436,15 @@ msgstr "जैसे सहायक अभियंता"
 msgid "10-digit mobile number"
 msgstr "10 अंकों का मोबाइल नंबर"
 
-#| msgid "Choose a photo"
 msgid "Choose a department"
 msgstr "विभाग चुनें"
 
-#| msgid "Check a ward"
 msgid "Choose a ward"
 msgstr "वार्ड चुनें"
 
-#| msgid "Your name must have at least 2 characters."
 msgid "The name must have at least 2 characters."
 msgstr "नाम में कम से कम 2 अक्षर होने चाहिए।"
 
-#| msgid "Use letters, spaces, full stops, apostrophes or hyphens in your name."
 msgid "Use letters, spaces, full stops, apostrophes or hyphens in the name."
 msgstr "नाम में केवल अक्षर, रिक्त स्थान, पूर्ण विराम, एपॉस्ट्रॉफ़ी या हाइफ़न का उपयोग करें।"
 
@@ -462,22 +454,18 @@ msgstr "पद दर्ज करें, जैसे सहायक अभि
 msgid "Reason"
 msgstr "कारण"
 
-#| msgid "Your details"
 msgid "Details"
 msgstr "विवरण"
 
 msgid "What happened, and when?"
 msgstr "क्या हुआ, और कब?"
 
-#| msgid "Choose a file"
 msgid "Choose a reason"
 msgstr "कारण चुनें"
 
-#| msgid "Please describe the problem in a little more detail (at least 20 characters)."
 msgid "Please describe what happened (at least 10 characters)."
 msgstr "कृपया बताएँ कि क्या हुआ (कम से कम 10 अक्षर)।"
 
-#| msgid "Complaint ID"
 msgid "Complaint ID (optional)"
 msgstr "शिकायत ID (वैकल्पिक)"
 
@@ -490,7 +478,6 @@ msgstr "कार्य"
 msgid "Instructions"
 msgstr "निर्देश"
 
-#| msgid "Save update"
 msgid "Due date"
 msgstr "नियत तिथि"
 
@@ -501,7 +488,7 @@ msgstr "जैसे गांधी स्ट्रीट की नाली �
 msgid "No complaint with ID %(reference)s was found."
 msgstr "ID %(reference)s वाली कोई शिकायत नहीं मिली।"
 
-#| msgid "Complaint %(reference)s was deleted."
+#, python-format
 msgid "Complaint %(reference)s is already resolved."
 msgstr "शिकायत %(reference)s पहले ही हल हो चुकी है।"
 
@@ -540,7 +527,6 @@ msgstr "संदेश कम से कम 15 अक्षरों का ह
 msgid "Ward %(number)s – %(name)s"
 msgstr "वार्ड %(number)s – %(name)s"
 
-#| msgid "Activity"
 msgid "Active"
 msgstr "सक्रिय"
 
@@ -622,7 +608,6 @@ msgstr "काम की खराब गुणवत्ता"
 msgid "Open"
 msgstr "खुली"
 
-#| msgid "Close"
 msgid "Closed"
 msgstr "बंद"
 
@@ -790,7 +775,7 @@ msgstr "%(name)s (%(employee_id)s) को निष्क्रिय किय�
 msgid "Your report about %(name)s (%(employee_id)s) was recorded."
 msgstr "%(name)s (%(employee_id)s) के बारे में आपकी रिपोर्ट दर्ज कर ली गई।"
 
-#| msgid "❌ The email was not sent: %(reason)s"
+#, python-format
 msgid "The report was not saved: %(errors)s"
 msgstr "रिपोर्ट सहेजी नहीं गई: %(errors)s"
 
@@ -798,7 +783,7 @@ msgstr "रिपोर्ट सहेजी नहीं गई: %(errors)s"
 msgid "%(name)s is inactive, so work cannot be assigned."
 msgstr "%(name)s निष्क्रिय हैं, इसलिए कार्य नहीं सौंपा जा सकता।"
 
-#| msgid "❌ The email was not sent: %(reason)s"
+#, python-format
 msgid "The work was not assigned: %(errors)s"
 msgstr "कार्य नहीं सौंपा गया: %(errors)s"
 
@@ -816,6 +801,143 @@ msgstr "शिकायत ID इस तरह दिखती है: CC-2026-0
 #, python-format
 msgid "Thank you. Your enquiry %(reference)s has been recorded."
 msgstr "धन्यवाद। आपकी पूछताछ %(reference)s दर्ज कर ली गई है।"
+
+msgid "The database was not reachable. Press Collect data to try again."
+msgstr "डेटाबेस उपलब्ध नहीं था। फिर से प्रयास करने के लिए \"डेटा एकत्र करें\" दबाएँ।"
+
+#, python-format
+msgid "Collection stopped because of an unexpected error (%(type)s). The details are in the server log."
+msgstr "एक अनपेक्षित त्रुटि (%(type)s) के कारण संग्रह रुक गया। विवरण सर्वर लॉग में है।"
+
+msgid "This data source is no longer set up on the server."
+msgstr "यह डेटा स्रोत अब सर्वर पर सेट नहीं है।"
+
+msgid "The job was stopped before it finished. Press Collect data to try again."
+msgstr "कार्य पूरा होने से पहले रोक दिया गया। फिर से प्रयास करने के लिए \"डेटा एकत्र करें\" दबाएँ।"
+
+msgid "The job stopped responding (the server may have restarted). Press Collect data to try again."
+msgstr "कार्य ने जवाब देना बंद कर दिया (शायद सर्वर फिर से शुरू हुआ)। फिर से प्रयास करने के लिए \"डेटा एकत्र करें\" दबाएँ।"
+
+msgid "Label"
+msgstr "लेबल"
+
+msgid "Complaint texts"
+msgstr "शिकायत पाठ"
+
+msgid "Title and description of every complaint that has a service category."
+msgstr "सेवा श्रेणी वाली हर शिकायत का शीर्षक और विवरण।"
+
+msgid "Complaints in this portal"
+msgstr "इस पोर्टल की शिकायतें"
+
+msgid "Ingested records"
+msgstr "प्राप्त रिकॉर्ड"
+
+msgid "Records sent to the data-ingestion API, with their category when they have one."
+msgstr "डेटा-प्राप्ति API को भेजे गए रिकॉर्ड, श्रेणी हो तो उसके साथ।"
+
+msgid "Data-ingestion API"
+msgstr "डेटा-प्राप्ति API"
+
+msgid "Records fetched from the outside source set in ML_HTTP_SOURCE_URL."
+msgstr "ML_HTTP_SOURCE_URL में सेट बाहरी स्रोत से लिए गए रिकॉर्ड।"
+
+msgid "Outside source (HTTPS)"
+msgstr "बाहरी स्रोत (HTTPS)"
+
+msgid "ML_HTTP_SOURCE_URL must start with https://."
+msgstr "ML_HTTP_SOURCE_URL https:// से शुरू होना चाहिए।"
+
+#, python-format
+msgid "The outside source answered with HTTP %(code)s."
+msgstr "बाहरी स्रोत ने HTTP %(code)s के साथ जवाब दिया।"
+
+msgid "The outside source could not be reached."
+msgstr "बाहरी स्रोत तक नहीं पहुँच सके।"
+
+msgid "The outside source sent more than 5 MB."
+msgstr "बाहरी स्रोत ने 5 MB से अधिक भेजा।"
+
+msgid "The outside source did not send valid JSON."
+msgstr "बाहरी स्रोत ने मान्य JSON नहीं भेजा।"
+
+msgid "The outside source must send a JSON list of records."
+msgstr "बाहरी स्रोत को रिकॉर्ड की JSON सूची भेजनी होगी।"
+
+#, python-format
+msgid "The outside source sent more than %(count)s records."
+msgstr "बाहरी स्रोत ने %(count)s से अधिक रिकॉर्ड भेजे।"
+
+msgid "Please sign in as a corporation admin."
+msgstr "कृपया निगम प्रशासक के रूप में साइन इन करें।"
+
+msgid "Waiting to start…"
+msgstr "शुरू होने की प्रतीक्षा…"
+
+#, python-format
+msgid "Collecting… %(done)s of %(total)s records"
+msgstr "एकत्र हो रहा है… %(total)s में से %(done)s रिकॉर्ड"
+
+#, python-format
+msgid "Collecting… %(done)s records so far"
+msgstr "एकत्र हो रहा है… अब तक %(done)s रिकॉर्ड"
+
+#, python-format
+msgid "Collected %(count)s record (%(new)s new)."
+msgid_plural "Collected %(count)s records (%(new)s new)."
+msgstr[0] "%(count)s रिकॉर्ड एकत्र हुआ (%(new)s नया)।"
+msgstr[1] "%(count)s रिकॉर्ड एकत्र हुए (%(new)s नए)।"
+
+msgid "Collection failed."
+msgstr "संग्रह विफल रहा।"
+
+msgid "Press Collect data to copy the latest records into this dataset."
+msgstr "नवीनतम रिकॉर्ड इस डेटासेट में लाने के लिए \"डेटा एकत्र करें\" दबाएँ।"
+
+msgid "You can leave this page; collection carries on in the background."
+msgstr "आप यह पेज छोड़ सकते हैं; संग्रह पृष्ठभूमि में चलता रहेगा।"
+
+msgid "Fix the problem above if it names one, then press Try again."
+msgstr "ऊपर कोई समस्या बताई गई हो तो उसे ठीक करें, फिर \"फिर से प्रयास करें\" दबाएँ।"
+
+#, python-format
+msgid "Next: train the model with “manage.py train_model %(slug)s”."
+msgstr "अगला कदम: “manage.py train_model %(slug)s” से मॉडल प्रशिक्षित करें।"
+
+#, python-format
+msgid "Training needs at least %(count)s labelled records in 2 or more labels; collect again when more arrive."
+msgstr "प्रशिक्षण के लिए 2 या अधिक लेबल में कम से कम %(count)s लेबल वाले रिकॉर्ड चाहिए; और आने पर फिर से एकत्र करें।"
+
+msgid "Queued"
+msgstr "कतार में"
+
+msgid "Collecting"
+msgstr "एकत्र हो रहा है"
+
+msgid "Collected"
+msgstr "एकत्रित"
+
+msgid "Failed"
+msgstr "विफल"
+
+msgid "Too many requests. Please wait a minute and try again."
+msgstr "बहुत अधिक अनुरोध। कृपया एक मिनट रुककर फिर से प्रयास करें।"
+
+msgid "The request could not be read."
+msgstr "अनुरोध पढ़ा नहीं जा सका।"
+
+msgid "Choose a dataset to collect."
+msgstr "एकत्र करने के लिए एक डेटासेट चुनें।"
+
+#, python-format
+msgid "There is no dataset called “%(slug)s”."
+msgstr "“%(slug)s” नाम का कोई डेटासेट नहीं है।"
+
+msgid "This dataset is already being collected."
+msgstr "यह डेटासेट पहले से एकत्र हो रहा है।"
+
+msgid "This job does not exist."
+msgstr "यह कार्य मौजूद नहीं है।"
 
 msgid "Register a complaint · City Corporation"
 msgstr "शिकायत दर्ज करें · नगर निगम"
@@ -1115,34 +1237,28 @@ msgstr "इस नंबर से साइन इन:"
 msgid "Sign out"
 msgstr "साइन आउट"
 
-#| msgid "Assigned"
 msgid "Assign work"
 msgstr "कार्य सौंपें"
 
 msgid "Leave empty when you entered a complaint ID."
 msgstr "शिकायत ID दर्ज करने पर इसे खाली छोड़ दें।"
 
-#| msgid "Assigned"
 msgid "Assign"
 msgstr "सौंपें"
 
-#| msgid "Register a complaint"
 msgid "Report a complaint"
 msgstr "शिकायत दर्ज करें"
 
-#| msgid "Submitted on"
 msgid "Submit report"
 msgstr "रिपोर्ट जमा करें"
 
-#| msgid "%(counter)s open complaint"
-#| msgid_plural "%(counter)s open complaints"
+#, python-format
 msgid "Assigned · %(counter)s open task"
 msgid_plural "Assigned · %(counter)s open tasks"
 msgstr[0] "सौंपा गया · %(counter)s खुला कार्य"
 msgstr[1] "सौंपा गया · %(counter)s खुले कार्य"
 
-#| msgid "%(count)s record"
-#| msgid_plural "%(count)s records"
+#, python-format
 msgid "%(counter)s overdue"
 msgid_plural "%(counter)s overdue"
 msgstr[0] "%(counter)s समय-सीमा पार"
@@ -1207,7 +1323,6 @@ msgstr "अभी तक कोई गतिविधि दर्ज नही�
 msgid "Update complaint"
 msgstr "शिकायत अपडेट करें"
 
-#| msgid "Filed by a citizen. Choose the category and ward to route it to the officer in charge."
 msgid "Filed by a citizen. Choose the category and ward to route it to an employee of that department."
 msgstr "नागरिक द्वारा दर्ज। इसे उस विभाग के कर्मचारी तक भेजने के लिए श्रेणी और वार्ड चुनें।"
 
@@ -1592,7 +1707,6 @@ msgstr "इसकी स्थिति अपडेट करें"
 msgid "Open it from the <a href=\"%(dataset_url)s\">Dataset</a>, assign an officer and record progress."
 msgstr "इसे <a href=\"%(dataset_url)s\">डेटासेट</a> से खोलें, अधिकारी सौंपें और प्रगति दर्ज करें।"
 
-#| msgid "Follow the officers"
 msgid "Follow the employees"
 msgstr "कर्मचारियों पर नज़र रखें"
 
@@ -1807,15 +1921,13 @@ msgstr "संबंधित समस्या दर्ज करें"
 msgid "All city news &amp; notices"
 msgstr "सभी नगर समाचार और सूचनाएँ"
 
-#| msgid "My complaints · City Corporation"
+#, python-format
 msgid "%(name)s · Employees · City Corporation"
 msgstr "%(name)s · कर्मचारी · नगर निगम"
 
-#| msgid "Back to my complaints"
 msgid "Back to employees"
 msgstr "कर्मचारियों पर वापस जाएँ"
 
-#| msgid "View as"
 msgid "View ID card"
 msgstr "पहचान पत्र देखें"
 
@@ -1825,7 +1937,6 @@ msgstr "संपादित करें"
 msgid "Employee ID"
 msgstr "कर्मचारी ID"
 
-#| msgid "Date range"
 msgid "Date joined"
 msgstr "कार्यभार ग्रहण की तिथि"
 
@@ -1838,15 +1949,13 @@ msgid_plural "Open tasks (%(counter)s)"
 msgstr[0] "खुला कार्य (%(counter)s)"
 msgstr[1] "खुले कार्य (%(counter)s)"
 
-#| msgid "Filed %(date)s"
+#, python-format
 msgid "Due %(date)s"
 msgstr "नियत तिथि %(date)s"
 
-#| msgid "Overview"
 msgid "Overdue"
 msgstr "समय-सीमा पार"
 
-#| msgid "Works in progress"
 msgid "Mark in progress"
 msgstr "प्रगति पर चिह्नित करें"
 
@@ -1862,23 +1971,20 @@ msgid_plural "Completed tasks (%(counter)s)"
 msgstr[0] "पूरा हुआ कार्य (%(counter)s)"
 msgstr[1] "पूरे हुए कार्य (%(counter)s)"
 
-#| msgid "Filed %(date)s"
+#, python-format
 msgid "Done on %(date)s"
 msgstr "%(date)s को पूरा हुआ"
 
-#| msgid "No complaints yet."
 msgid "No completed tasks yet."
 msgstr "अभी तक कोई कार्य पूरा नहीं हुआ।"
 
-#| msgid "Filed complaints"
 msgid "Linked complaints"
 msgstr "जुड़ी हुई शिकायतें"
 
-#| msgid "No complaints in this period yet"
 msgid "No complaints are linked to this employee."
 msgstr "इस कर्मचारी से कोई शिकायत जुड़ी नहीं है।"
 
-#| msgid "filed %(date)s"
+#, python-format
 msgid "Report filed (%(counter)s)"
 msgid_plural "Reports filed (%(counter)s)"
 msgstr[0] "दर्ज रिपोर्ट (%(counter)s)"
@@ -1888,7 +1994,6 @@ msgstr[1] "दर्ज रिपोर्टें (%(counter)s)"
 msgid "%(date)s · by %(who)s"
 msgstr "%(date)s · %(who)s द्वारा"
 
-#| msgid "No complaints have been filed by citizens yet."
 msgid "No reports have been filed against this employee."
 msgstr "इस कर्मचारी के विरुद्ध कोई रिपोर्ट दर्ज नहीं हुई है।"
 
@@ -1901,7 +2006,7 @@ msgstr "कर्मचारी सूची से छिप जाएगा �
 msgid "Deactivate"
 msgstr "निष्क्रिय करें"
 
-#| msgid "Citizen help desk · City Corporation"
+#, python-format
 msgid "Edit %(name)s · City Corporation"
 msgstr "%(name)s संपादित करें · नगर निगम"
 
@@ -1915,14 +2020,13 @@ msgstr "%(name)s (%(employee_id)s) संपादित करें"
 msgid "The employee ID never changes."
 msgstr "कर्मचारी ID कभी नहीं बदलती।"
 
-#| msgid "Date range"
 msgid "Save changes"
 msgstr "बदलाव सहेजें"
 
 msgid "Cancel"
 msgstr "रद्द करें"
 
-#| msgid "My complaints · City Corporation"
+#, python-format
 msgid "ID card %(employee_id)s · City Corporation"
 msgstr "पहचान पत्र %(employee_id)s · नगर निगम"
 
@@ -1933,7 +2037,6 @@ msgstr "पहचान पत्र प्रिंट करें"
 msgid "Photo of %(name)s"
 msgstr "%(name)s की फ़ोटो"
 
-#| msgid "My complaints · City Corporation"
 msgid "Employees · City Corporation"
 msgstr "कर्मचारी · नगर निगम"
 
@@ -1955,14 +2058,12 @@ msgstr "कर्मचारी जोड़ें"
 msgid "An employee ID such as CC-EMP-123456 is created automatically."
 msgstr "CC-EMP-123456 जैसी कर्मचारी ID अपने-आप बनती है।"
 
-#| msgid "JPG, JPEG, PNG or WEBP · up to 5 MB"
 msgid "JPG, PNG or WEBP, up to 5 MB. Shown on the ID card."
 msgstr "JPG, PNG या WEBP, 5 MB तक। पहचान पत्र पर दिखाई जाती है।"
 
 msgid "Save employee"
 msgstr "कर्मचारी सहेजें"
 
-#| msgid "Works in progress"
 msgid "Working employees"
 msgstr "कार्यरत कर्मचारी"
 
@@ -1972,7 +2073,6 @@ msgstr "समय-सीमा पार कार्य"
 msgid "No employees yet. Add the first one with the form above."
 msgstr "अभी कोई कर्मचारी नहीं। ऊपर दिए फ़ॉर्म से पहला कर्मचारी जोड़ें।"
 
-#| msgid "No officers match your search."
 msgid "No employees match your search."
 msgstr "आपकी खोज से कोई कर्मचारी मेल नहीं खाता।"
 
@@ -1982,15 +2082,12 @@ msgstr "कर्मचारी"
 msgid "Work"
 msgstr "कार्य"
 
-#| msgid "Reported"
 msgid "Reports"
 msgstr "रिपोर्टें"
 
-#| msgid "Action"
 msgid "Actions"
 msgstr "कार्रवाई"
 
-#| msgid "Open dataset"
 msgid "Open tasks"
 msgstr "खुले कार्य"
 
@@ -2043,6 +2140,95 @@ msgstr "आपकी शिकायतें"
 
 msgid "You haven't registered any complaints with this mobile number yet."
 msgstr "आपने अभी तक इस मोबाइल नंबर से कोई शिकायत दर्ज नहीं की है।"
+
+msgid "Agent Work · City Corporation"
+msgstr "एजेंट कार्य · नगर निगम"
+
+msgid "Collect datasets from the portal's own records, and train a model that suggests the service category of new complaints."
+msgstr "पोर्टल के अपने रिकॉर्ड से डेटासेट एकत्र करें, और ऐसा मॉडल प्रशिक्षित करें जो नई शिकायतों की सेवा श्रेणी सुझाए।"
+
+msgid "Train the model"
+msgstr "मॉडल प्रशिक्षित करें"
+
+msgid "Collecting never trains. Training runs only when started on the server."
+msgstr "एकत्र करने से प्रशिक्षण नहीं होता। प्रशिक्षण केवल सर्वर पर शुरू करने पर चलता है।"
+
+msgid "TensorFlow is installed on this server."
+msgstr "इस सर्वर पर TensorFlow इंस्टॉल है।"
+
+msgid "TensorFlow is not installed on this server. Collecting works without it; install requirements-ml.txt on the computer that trains."
+msgstr "इस सर्वर पर TensorFlow इंस्टॉल नहीं है। संग्रह इसके बिना काम करता है; प्रशिक्षण वाले कंप्यूटर पर requirements-ml.txt इंस्टॉल करें।"
+
+msgid "Press Collect data on the Complaint texts card."
+msgstr "\"शिकायत पाठ\" कार्ड पर \"डेटा एकत्र करें\" दबाएँ।"
+
+#, python-format
+msgid "Wait until it has at least %(count)s labelled records in 2 or more categories."
+msgstr "तब तक प्रतीक्षा करें जब तक 2 या अधिक श्रेणियों में कम से कम %(count)s लेबल वाले रिकॉर्ड न हों।"
+
+msgid "On the server, run:"
+msgstr "सर्वर पर चलाएँ:"
+
+msgid "Models and metrics are saved in:"
+msgstr "मॉडल और मेट्रिक्स यहाँ सहेजे जाते हैं:"
+
+msgid "Latest training runs"
+msgstr "नवीनतम प्रशिक्षण रन"
+
+msgid "Run"
+msgstr "रन"
+
+msgid "Accuracy"
+msgstr "सटीकता"
+
+msgid "Most-common-label guess"
+msgstr "सबसे आम लेबल का अनुमान"
+
+msgid "Records"
+msgstr "रिकॉर्ड"
+
+msgid "Started"
+msgstr "शुरू हुआ"
+
+msgid "Trained"
+msgstr "प्रशिक्षित"
+
+msgid "Training"
+msgstr "प्रशिक्षण जारी"
+
+msgid "No model has been trained yet."
+msgstr "अभी तक कोई मॉडल प्रशिक्षित नहीं हुआ है।"
+
+msgid "Datasets"
+msgstr "डेटासेट"
+
+msgid "Records collected"
+msgstr "एकत्रित रिकॉर्ड"
+
+msgid "Collecting now"
+msgstr "अभी एकत्र हो रहे"
+
+msgid "Trained models"
+msgstr "प्रशिक्षित मॉडल"
+
+msgid "Collect data"
+msgstr "डेटा एकत्र करें"
+
+msgid "Last run failed"
+msgstr "पिछला रन विफल"
+
+msgid "Not collected yet"
+msgstr "अभी एकत्र नहीं हुआ"
+
+#, python-format
+msgid "Last collected %(when)s"
+msgstr "अंतिम संग्रह %(when)s"
+
+msgid "Never collected"
+msgstr "कभी एकत्र नहीं हुआ"
+
+msgid "New last run"
+msgstr "पिछले रन में नए"
 
 msgid "Pages"
 msgstr "पृष्ठ"

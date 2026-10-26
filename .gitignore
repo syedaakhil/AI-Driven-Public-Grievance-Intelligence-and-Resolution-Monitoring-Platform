@@ -241,3 +241,6 @@ logs/
 !locale/**/*.mo
 !static/**
 !nagar-seva/**
+
+# Trained Agent Work models and metrics (manage.py train_model)
+ml_artifacts/

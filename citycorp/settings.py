@@ -37,6 +37,16 @@ def env_list(name, default=''):
     return [item.strip() for item in os.environ.get(name, default).split(',') if item.strip()]
 
 
+def env_int(name, default):
+    value = os.environ.get(name, '').strip()
+    if not value:
+        return default
+    try:
+        return int(value)
+    except ValueError:
+        raise ImproperlyConfigured(f'{name} must be a whole number, not {value!r}.') from None
+
+
 PYMYSQL_PREFIX = 'mysql+pymysql://'
 
 
@@ -137,6 +147,7 @@ INSTALLED_APPS = [
     'accounts',
     'grievances',
     'assistant',
+    'mlops',
 ]
 
 MIDDLEWARE = [
@@ -269,6 +280,27 @@ ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'govermentowncorporation@gmail.com')
 INGEST_API_KEY = os.environ.get('INGEST_API_KEY', '').strip()
 # Request bodies up to 5 MB (the ingestion API's limit; Django's default is 2.5 MB).
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
+
+# --- Agent Work: dataset collection and TensorFlow training (see mlops/, ML_SETUP.md) ---
+# Where "Collect data" jobs run: "thread" (a background thread in the web process), "inline" (inside
+# the request; Vercel freezes background threads once the response is sent) or "command" (left queued
+# for "manage.py run_collection_jobs", e.g. from a systemd timer or Task Scheduler).
+ML_JOB_RUNNER = os.environ.get('ML_JOB_RUNNER', 'inline' if os.environ.get('VERCEL') else 'thread').strip().lower()
+if ML_JOB_RUNNER not in ('thread', 'inline', 'command'):
+    raise ImproperlyConfigured('ML_JOB_RUNNER must be "thread", "inline" or "command".')
+# A running job that hasn't reported progress for this long (or a job queued this long) is marked failed.
+ML_JOB_STALE_SECONDS = env_int('ML_JOB_STALE_SECONDS', 300)
+ML_JOB_QUEUE_TIMEOUT = env_int('ML_JOB_QUEUE_TIMEOUT', 900)
+# Tries per job when the database or the data source fails for a moment.
+ML_JOB_MAX_ATTEMPTS = env_int('ML_JOB_MAX_ATTEMPTS', 3)
+# Trained models and their metrics: <ML_ARTIFACTS_DIR>/<dataset>/<run time>/ (gitignored).
+ML_ARTIFACTS_DIR = Path(os.environ.get('ML_ARTIFACTS_DIR', '').strip() or BASE_DIR / 'ml_artifacts')
+ML_MIN_TRAIN_RECORDS = env_int('ML_MIN_TRAIN_RECORDS', 20)
+ML_TRAIN_EPOCHS = env_int('ML_TRAIN_EPOCHS', 30)
+# Optional outside data source (JSON over HTTPS), shown as one more dataset card. See ML_SETUP.md.
+ML_HTTP_SOURCE_URL = os.environ.get('ML_HTTP_SOURCE_URL', '').strip()
+ML_HTTP_SOURCE_TOKEN = os.environ.get('ML_HTTP_SOURCE_TOKEN', '').strip()
+ML_HTTP_SOURCE_NAME = os.environ.get('ML_HTTP_SOURCE_NAME', 'External source').strip()
 
 # Warnings and errors (failed SMS, server errors) go to the console, which gunicorn/systemd keep.
 LOGGING = {

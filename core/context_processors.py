@@ -10,6 +10,7 @@ MAIN_MENU = [
     ('file', 'grievances:complaint_create', _('Filed complaint'), 'file', ''),
     ('officers', 'grievances:officers', _('Employees'), 'building', ''),
     ('dataset', 'grievances:complaint_list', _('Dataset'), 'table', ''),
+    ('agent_work', 'mlops:agent_work', _('Agent Work'), 'settings', ''),
 ]
 
 # url name -> (highlighted menu key, breadcrumb label)
@@ -22,6 +23,7 @@ PAGES = {
     'officer_id_card': ('officers', _('Employee ID card')),
     'complaint_list': ('dataset', _('Complaints dataset')),
     'complaint_detail': ('dataset', _('Complaint details')),
+    'agent_work': ('agent_work', _('Agent Work')),
     'help_desk': ('help_desk', _('Citizen help desk')),
     'help_support': ('help_support', _('Help & support')),
 }

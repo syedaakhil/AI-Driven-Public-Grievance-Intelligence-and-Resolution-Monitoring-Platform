@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: City Corporation\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-24 15:24+0530\n"
+"POT-Creation-Date: 2026-10-26 15:44+0530\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: City Corporation team\n"
 "Language-Team: Hindi\n"
@@ -187,6 +187,51 @@ msgstr "कॉपी विफल"
 msgid "Copy is not available in this browser. Please write the reference number down."
 msgstr "इस ब्राउज़र में कॉपी उपलब्ध नहीं है। कृपया संदर्भ संख्या लिख लें।"
 
+msgid "Collect data"
+msgstr "डेटा एकत्र करें"
+
+msgid "Starting…"
+msgstr "शुरू हो रहा है…"
+
+msgid "Try again"
+msgstr "फिर से प्रयास करें"
+
+msgid "Collecting…"
+msgstr "एकत्र हो रहा है…"
+
+msgid "Collect again"
+msgstr "फिर से एकत्र करें"
+
+msgid "Not collected yet"
+msgstr "अभी एकत्र नहीं हुआ"
+
+msgid "Collecting"
+msgstr "एकत्र हो रहा है"
+
+msgid "Last run failed"
+msgstr "पिछला रन विफल"
+
+msgid "Collected"
+msgstr "एकत्रित"
+
+msgid "Starting collection…"
+msgstr "संग्रह शुरू हो रहा है…"
+
+msgid "Please sign in again."
+msgstr "कृपया फिर से साइन इन करें।"
+
+msgid "Your session has ended. Reload the page and sign in."
+msgstr "आपका सत्र समाप्त हो गया है। पेज फिर से लोड करें और साइन इन करें।"
+
+msgid "Collection could not be started. Please try again."
+msgstr "संग्रह शुरू नहीं हो सका। कृपया फिर से प्रयास करें।"
+
+msgid "Could not reach the server. Check your connection and try again."
+msgstr "सर्वर तक नहीं पहुँच सके। अपना कनेक्शन जाँचें और फिर से प्रयास करें।"
+
+msgid "Lost contact with the server. The job may still be running; reload the page to check."
+msgstr "सर्वर से संपर्क टूट गया। कार्य शायद अभी भी चल रहा है; जाँचने के लिए पेज फिर से लोड करें।"
+
 msgid "(no title)"
 msgstr "(कोई शीर्षक नहीं)"
 
@@ -210,9 +255,6 @@ msgstr "कुछ गड़बड़ हो गई। कृपया फिर 
 
 msgid "Please keep the message under 500 characters."
 msgstr "कृपया संदेश 500 अक्षरों से कम रखें।"
-
-msgid "Could not reach the server. Check your connection and try again."
-msgstr "सर्वर तक नहीं पहुँच सके। अपना कनेक्शन जाँचें और फिर से प्रयास करें।"
 
 msgid "Chart could not load (Chart.js needs an internet connection). The figures above still work."
 msgstr "चार्ट लोड नहीं हो सका (Chart.js के लिए इंटरनेट कनेक्शन चाहिए)। ऊपर दिए आँकड़े फिर भी काम करते हैं।"

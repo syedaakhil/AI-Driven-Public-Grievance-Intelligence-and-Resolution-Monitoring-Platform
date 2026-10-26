@@ -109,6 +109,11 @@ Open pages through `runserver` on port 8000. VS Code Live Server (port 5500) can
     - It accepts JSON, CSV or file uploads, up to 5 MB and 5000 records.
     - Duplicates are removed by a fingerprint (`dataset` plus ID or cleaned data).
   - Tests mock `urllib.request.urlopen`; nothing is really emailed.
+- **`mlops/`**: the **Agent Work** page (`/agent-work/`, staff only, last menu item): dataset collection and TensorFlow training. Setup is in `ML_SETUP.md`.
+  - `providers.py`: a registry of data sources, one dataset card each. `complaints` (title + description → category slug) and `ingested` (`KnowledgeRecord`) read this portal's own data; `external` appears only when `ML_HTTP_SOURCE_URL` is set. `clean_text()` hides emails and phone numbers. Never add a provider that invents records.
+  - `jobs.py`: `start_collection()` locks the `Dataset` row (one queued/running job per dataset, `JobConflict` → 409), then `dispatch()` per `ML_JOB_RUNNER`: `thread` (on commit), `inline` (default on Vercel, whose threads freeze) or `command` (`manage.py run_collection_jobs`). `run_job()` claims a job atomically, upserts `DatasetRecord`s by (dataset, source_id), retries temporary errors, and deletes records the source no longer has only on success. Stale jobs are failed by `expire_stale_jobs()`. Saved errors are English msgids, translated by the status API.
+  - API: `POST /api/agent-work/collect/` `{"dataset"}` → 202/409 `{"job"}`, 400/401/429/503 `{"error"}`; `GET /api/agent-work/jobs/<id>/` for polling. `static/js/agent-work.js` drives the button (`buttonState()` is tested with Node by `ButtonStateJsTests`).
+  - `ml/`: `data.py` (load, stratified split, checks; no TensorFlow) and `train.py` (`train()`, `predict()`; TF-IDF → Dense → softmax, saved under `ML_ARTIFACTS_DIR/<dataset>/<time>-<run>/`). **Collect data never trains**; training is only `manage.py train_model`. TensorFlow is in `requirements-ml.txt`, not `requirements.txt` (too big for Vercel); `TensorFlowTrainingTests` skip without it.
 - **`core/`**: shared UI.
   - `context_processors.layout`: the sidebar, notifications, and a count of citizen complaints waiting for review.
   - `templatetags/ui.py`: `icon`, `static_v` (static URL plus `?v=<mtime>` cache-busting; use it for every CSS/JS link), `absolute` and `query`.
